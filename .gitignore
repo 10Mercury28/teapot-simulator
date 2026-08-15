@@ -73,12 +73,12 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 # Video assets 
-/teapot-simulator/teapot simulator/Assets/cut module/
-/teapot-simulator/teapot simulator/Assets/pat module/
-/teapot-simulator/teapot simulator/Assets/patDemoV/
-/teapot-simulator/teapot simulator/Assets/tool selection/
+/teapot simulator/Assets/cut module/
+/teapot simulator/Assets/pat module/
+/teapot simulator/Assets/patDemoV/
+/teapot simulator/Assets/tool selection/
 
-/teapot-simulator/teapot simulator/Assets/cut module.meta
-/teapot-simulator/teapot simulator/Assets/pat module.meta
-/teapot-simulator/teapot simulator/Assets/patDemoV.meta
-/teapot-simulator/teapot simulator/Assets/tool selection.meta
+/teapot simulator/Assets/cut module.meta
+/teapot simulator/Assets/pat module.meta
+/teapot simulator/Assets/patDemoV.meta
+/teapot simulator/Assets/tool selection.meta
