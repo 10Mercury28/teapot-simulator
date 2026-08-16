@@ -1,817 +1,1166 @@
-/* 成功无trail
- using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Video;
-using System.Collections;
-using System.Collections.Generic;
-
-[RequireComponent(typeof(Canvas))]
-public class CutModule : MonoBehaviour
-{
-    [Header("区域（必须挂 Collider2D）")]
-    public Collider2D areaA;
-    public Collider2D areaB;
-    public Collider2D areaC;
-
-    [Header("可选：区域可视根（把ABC条/图形都放到这里，便于统一改透明度）")]
-    public GameObject regionsRoot;
-
-    [Header("视频组件")]
-    public VideoPlayer videoA;      // 主视频（可 scrub / 停第一帧）
-    public VideoPlayer videoB;      // 失败视频
-    public VideoPlayer transition;  // 成功过渡视频
-    public RawImage rawA;
-    public RawImage rawB;
-    public RawImage rawTrans;
-
-    [Header("轨迹效果")]
-    public TrailRenderer trailPrefab;
-    private TrailRenderer activeTrail;
-
-    [Header("透明度控制")]
-    [Range(0f, 1f)] public float mainAlpha = 0.8f;  // A 显示/播放时
-    [Range(0f, 1f)] public float failAlpha = 0.3f;  // B 播放时
-    [Range(0f, 1f)] public float idleAlpha = 1.0f;  // 其它时刻（例如初始化）
-    public bool enableAlphaControl = true;
-
-    [Header("调试")]
-    public Camera mainCamera;
-    public bool debugLog = true;
-
-    [Header("状态（只读观察）")]
-    public bool complete = false;
-
-    // 运行态
-    private bool preparedA = false, preparedB = false, preparedT = false;
-    private bool cutting = false, failed = false, inB = false;
-    private float progress = 0f;
-
-    private CutSequenceController controller;
-
-    // 缓存可调透明度目标
-    private readonly List<Graphic> graphics = new();
-    private readonly List<SpriteRenderer> sprites = new();
-    private readonly List<CanvasGroup> groups = new();
-
-    public void Initialize(CutSequenceController ctrl)
-    {
-        controller = ctrl;
-
-        CacheAlphaTargets(); // ✅ 收集 regionsRoot 下所有可调透明度对象
-
-        SetupVideo(videoA, v => preparedA = true);
-        SetupVideo(videoB, v => preparedB = true);
-        SetupVideo(transition, v => preparedT = true);
-
-        ResetState();
-
-        if (debugLog) Debug.Log($"🔍 [{name}] ▶️ Initialized by Controller");
-    }
-
-    private void CacheAlphaTargets()
-    {
-        graphics.Clear();
-        sprites.Clear();
-        groups.Clear();
-        if (!regionsRoot) return;
-
-        regionsRoot.GetComponentsInChildren(true, graphics);
-        regionsRoot.GetComponentsInChildren(true, sprites);
-        regionsRoot.GetComponentsInChildren(true, groups);
-    }
-
-    private void SetupVideo(VideoPlayer vp, System.Action<VideoPlayer> onReady)
-    {
-        if (!vp) return;
-        vp.playOnAwake = false;
-        vp.Pause();
-        vp.Prepare();
-        vp.prepareCompleted += _ => onReady?.Invoke(vp);
-    }
-
-    private void ResetState()
-    {
-        progress = 0f;
-        failed = false;
-        inB = false;
-        cutting = false;
-        complete = false;
-
-        EnableOnly(rawA);
-
-        if (videoA)
-        {
-            videoA.Pause();
-            videoA.time = 0;
-            videoA.StepForward();
-        }
-
-        // 初始交互可用、透明度按 idle
-        SetRegionsActive(true);
-        ApplyRegionsAlpha(idleAlpha);
-
-        if (debugLog) LogStatus("🔄 State Reset");
-    }
-
-    private void EnableOnly(RawImage active)
-    {
-        if (rawA) rawA.enabled = (active == rawA);
-        if (rawB) rawB.enabled = (active == rawB);
-        if (rawTrans) rawTrans.enabled = (active == rawTrans);
-
-        // 基于可见层同步透明度（只要启用了控制）
-        if (!enableAlphaControl || !regionsRoot) return;
-
-        if (active == rawA)
-            ApplyRegionsAlpha(mainAlpha);
-        else if (active == rawB)
-            ApplyRegionsAlpha(failAlpha);
-        else
-            ApplyRegionsAlpha(idleAlpha);
-    }
-
-    private void ApplyRegionsAlpha(float a)
-    {
-        // CanvasGroup 优先，能“一键控制”
-        foreach (var g in groups)
-            if (g) g.alpha = a;
-
-        // 其次逐个 Graphic/SpriteRenderer
-        foreach (var gr in graphics)
-            if (gr)
-            {
-                var c = gr.color;
-                gr.color = new Color(c.r, c.g, c.b, a);
-            }
-
-        foreach (var sr in sprites)
-            if (sr)
-            {
-                var c = sr.color;
-                sr.color = new Color(c.r, c.g, c.b, a);
-            }
-    }
-
-    private void SetRegionsActive(bool on)
-    {
-        if (regionsRoot)
-        {
-            regionsRoot.SetActive(on);
-        }
-        else
-        {
-            if (areaA) areaA.gameObject.SetActive(on);
-            if (areaB) areaB.gameObject.SetActive(on);
-            if (areaC) areaC.gameObject.SetActive(on);
-        }
-    }
-
-    private void LogStatus(string prefix)
-    {
-        if (!debugLog) return;
-        Debug.Log($"{prefix}\n" +
-                  $"    RAW => A[{rawA?.enabled}], B[{rawB?.enabled}], T[{rawTrans?.enabled}]\n" +
-                  $"    STATE => cutting[{cutting}], failed[{failed}], inB[{inB}], complete[{complete}]");
-    }
-
-    void Update()
-    {
-        if (complete) return;
-        if (!mainCamera) mainCamera = Camera.main;
-
-        Vector2 mouseWorld = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-
-        // 按下开始
-        if (Input.GetMouseButtonDown(0) && IsInside(mouseWorld, areaA))
-        {
-            cutting = true;
-            failed = false;
-            inB = false;
-            progress = 0f;
-
-            if (trailPrefab && activeTrail == null)
-            {
-                activeTrail = Instantiate(trailPrefab, mouseWorld, Quaternion.identity);
-                activeTrail.Clear();
-            }
-
-            // A 层被看到 → 应用 mainAlpha（保证视觉一致）
-            if (rawA && rawA.enabled && enableAlphaControl)
-                ApplyRegionsAlpha(mainAlpha);
-
-            if (debugLog) LogStatus("✂️ Cut started in A");
-        }
-
-        // 拖动中
-        if (cutting && !failed && Input.GetMouseButton(0))
-        {
-            if (activeTrail)
-                activeTrail.transform.position = mouseWorld;
-
-            if (IsInside(mouseWorld, areaB))
-            {
-                inB = true;
-                UpdateVideoA(mouseWorld);  // 实时 scrub 视频A
-                if (rawA && rawA.enabled && enableAlphaControl)
-                    ApplyRegionsAlpha(mainAlpha);
-            }
-            else if (inB)
-            {
-                failed = true;
-                StartCoroutine(PlayVideoB());
-            }
-        }
-
-        // 松手结束
-        if (Input.GetMouseButtonUp(0))
-        {
-            if (activeTrail)
-                activeTrail.emitting = false;
-
-            if (cutting && !failed)
-            {
-                if (inB && IsInside(mouseWorld, areaC))
-                {
-                    StartCoroutine(PlayTransition());
-                }
-                else
-                {
-                    failed = true;
-                    StartCoroutine(PlayVideoB());
-                }
-            }
-            cutting = false;
-        }
-    }
-
-    // A 按 x 坐标进度 scrub
-    private void UpdateVideoA(Vector2 mouseWorld)
-    {
-        if (!preparedA || !videoA || !areaB) return;
-
-        float width = areaB.bounds.size.x;
-        float startX = areaB.bounds.min.x;
-        float current = Mathf.Clamp(mouseWorld.x, startX, startX + width);
-
-        float newProgress = Mathf.InverseLerp(startX, startX + width, current);
-        progress = Mathf.Max(progress, newProgress);
-
-        double t = videoA.length * progress;
-        videoA.Pause();
-        videoA.time = t;
-        videoA.StepForward();
-    }
-
-    // 失败：B 从 (1-progress) 处开播，播完再回到 A 的第一帧
-    private IEnumerator PlayVideoB()
-    {
-        if (!videoB) yield break;
-
-        // 切层到 B，并把 ABC 区域设为 failAlpha
-        EnableOnly(rawB); // 内部会自动应用 failAlpha
-
-        if (!videoB.isPrepared)
-        {
-            preparedB = false;
-            videoB.Prepare();
-            yield return new WaitUntil(() => videoB.isPrepared);
-            preparedB = true;
-        }
-
-        double startTime = videoB.length * Mathf.Clamp01(1f - progress);
-        videoB.time = startTime;
-        videoB.Play();
-
-        yield return new WaitUntil(() => !videoB.isPlaying);
-
-        videoB.Stop();
-        videoB.time = 0;
-
-        // 回到 A 的第一帧（并恢复 mainAlpha）
-        EnableOnly(rawA); // 内部会自动应用 mainAlpha
-
-        if (videoA)
-        {
-            videoA.Pause();
-            videoA.time = 0;
-            videoA.StepForward();
-        }
-
-        // 允许重新交互
-        SetRegionsActive(true);
-        if (activeTrail)
-        {
-            Destroy(activeTrail.gameObject);
-            activeTrail = null;
-        }
-        failed = false;
-        inB = false;
-        cutting = false;
-        if (debugLog) LogStatus("🔁 Fail handled → back to A");
-    }
-
-    // 成功：隐藏区域 → 播放 transition → 标记 complete → 通知控制器
-    private IEnumerator PlayTransition()
-    {
-        // 1) 立即隐藏 ABC（bar）
-        SetRegionsActive(false);
-
-        // 2) 预载下一个模块并让它显示 A 的第一帧（避免空白）
-        if (controller != null)
-        {
-            int idx = System.Array.IndexOf(controller.modules, this);
-            if (idx >= 0 && idx + 1 < controller.modules.Length)
-            {
-                CutModule next = controller.modules[idx + 1];
-                if (next && !next.gameObject.activeSelf)
-                {
-                    next.gameObject.SetActive(true);
-                    next.Initialize(controller);
-                    if (next.videoA)
-                    {
-                        next.videoA.Pause();
-                        next.videoA.time = 0;
-                        next.videoA.StepForward();
-                    }
-                    if (next.rawA) next.rawA.enabled = true;
-                    if (next.debugLog) Debug.Log($"👀 预载下一模块首帧：{next.name}");
-                }
-            }
-        }
-
-        // 3) 切到过渡层并播放
-        EnableOnly(rawTrans); // 转场时无需调整 regions 透明度（已隐藏）
-
-        if (transition)
-        {
-            if (!transition.isPrepared)
-            {
-                preparedT = false;
-                transition.Prepare();
-                yield return new WaitUntil(() => transition.isPrepared);
-                preparedT = true;
-            }
-            transition.time = 0;
-            transition.Play();
-            yield return new WaitUntil(() => !transition.isPlaying);
-            transition.Stop();
-        }
-
-        // 4) 完成并通知
-        complete = true;
-        controller?.OnModuleCompleted(this);
-
-        // 清理轨迹
-        if (activeTrail)
-        {
-            Destroy(activeTrail.gameObject);
-            activeTrail = null;
-        }
-
-        if (debugLog) LogStatus("✅ Transition done → complete");
-    }
-
-    private bool IsInside(Vector2 p, Collider2D c) => c && c.OverlapPoint(p);
-}
-*/
-
-
-
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
 using System.Collections;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(Canvas))]
 public class CutModule : MonoBehaviour
 {
+    // ============================================================
+    // CUT 区域
+    // ============================================================
+
     [Header("区域（必须挂 Collider2D）")]
     public Collider2D areaA;
     public Collider2D areaB;
     public Collider2D areaC;
 
-    [Header("可选：区域可视根（把ABC条/图形都放到这里，便于统一改透明度）")]
+    [Header("区域可视根")]
+    [Tooltip("把 A/B/C 条或图形放在这里。成功后会隐藏。")]
     public GameObject regionsRoot;
 
-    [Header("视频组件")]
-    public VideoPlayer videoA;      // 主视频（可 scrub / 停第一帧）
-    public VideoPlayer videoB;      // 失败视频
-    public VideoPlayer transition;  // 成功过渡视频
+
+    // ============================================================
+    // CUT 视频
+    // ============================================================
+
+    [Header("Cut 视频组件")]
+    public VideoPlayer videoA;          // 主视频，可 scrub
+    public VideoPlayer videoB;          // Fail 视频
+    public VideoPlayer transition;      // Transition 视频
+
     public RawImage rawA;
     public RawImage rawB;
     public RawImage rawTrans;
 
+
+    // ============================================================
+    // COMPLETE
+    // ============================================================
+
+    [Header("Complete 提示")]
+    [Tooltip("成功切完之后显示的 Complete GameObject / Panel。")]
+    public GameObject completeRoot;
+
+    [Tooltip("如果 Complete 本身是视频，把它的 VideoPlayer 拖这里。不是视频可以留空。")]
+    public VideoPlayer completeVideo;
+
+    [Tooltip("如果 Complete 不是视频，显示多少秒以后进入 Transition。")]
+    public float completeDisplayDuration = 0.8f;
+
+
+    // ============================================================
+    // TRAIL
+    // ============================================================
+
     [Header("轨迹效果")]
     public TrailRenderer trailPrefab;
+
     private TrailRenderer activeTrail;
 
+
+    // ============================================================
+    // ALPHA
+    // ============================================================
+
     [Header("透明度控制")]
-    [Range(0f, 1f)] public float mainAlpha = 0.8f;
-    [Range(0f, 1f)] public float failAlpha = 0.3f;
-    [Range(0f, 1f)] public float idleAlpha = 1.0f;
+    [Range(0f, 1f)]
+    public float mainAlpha = 0.8f;
+
+    [Range(0f, 1f)]
+    public float failAlpha = 0.3f;
+
+    [Range(0f, 1f)]
+    public float idleAlpha = 1.0f;
+
     public bool enableAlphaControl = true;
 
+
     [Header("Trail 显示阈值")]
-    [Range(0f, 1f)] public float trailAlphaThreshold = 0.75f;
+    [Range(0f, 1f)]
+    public float trailAlphaThreshold = 0.75f;
+
+
+    // ============================================================
+    // DEBUG
+    // ============================================================
 
     [Header("调试")]
     public Camera mainCamera;
     public bool debugLog = true;
 
-    [Header("状态（只读观察）")]
+
+    [Header("状态（运行时观察）")]
     public bool complete = false;
 
-    // 内部状态
-    private bool preparedA = false, preparedB = false, preparedT = false;
-    private bool cutting = false, failed = false, inB = false;
+
+    // ============================================================
+    // INTERNAL STATE
+    // ============================================================
+
+    private bool preparedA = false;
+    private bool preparedB = false;
+    private bool preparedT = false;
+
+    private bool cutting = false;
+    private bool failed = false;
+    private bool inB = false;
+
+    // 防止成功流程重复触发
+    private bool successSequenceRunning = false;
+
     private float progress = 0f;
 
     private CutSequenceController controller;
 
-    // 缓存透明度
-    private float currentRegionsAlpha = 1f;
-    private bool CanDrawTrail() => (!enableAlphaControl) || (currentRegionsAlpha >= trailAlphaThreshold);
 
-    // 缓存可调透明度目标
+    // ============================================================
+    // ALPHA CACHE
+    // ============================================================
+
+    private float currentRegionsAlpha = 1f;
+
+    private bool CanDrawTrail()
+    {
+        return !enableAlphaControl ||
+               currentRegionsAlpha >= trailAlphaThreshold;
+    }
+
     private readonly List<Graphic> graphics = new();
     private readonly List<SpriteRenderer> sprites = new();
     private readonly List<CanvasGroup> groups = new();
 
+
+    // ============================================================
+    // INITIALIZE
+    // ============================================================
+
     public void Initialize(CutSequenceController ctrl)
     {
+        Debug.Log("🔥🔥🔥 NEW CUT MODULE 2026 LOADED 🔥🔥🔥"); 
+        
         controller = ctrl;
 
         CacheAlphaTargets();
 
-        SetupVideo(videoA, v => preparedA = true);
-        SetupVideo(videoB, v => preparedB = true);
-        SetupVideo(transition, v => preparedT = true);
+        SetupVideo(videoA, () => preparedA = true);
+        SetupVideo(videoB, () => preparedB = true);
+        SetupVideo(transition, () => preparedT = true);
+
+        // Complete 绝对不能一开始显示
+        if (completeRoot != null)
+        {
+            completeRoot.SetActive(false);
+        }
+
+        if (completeVideo != null)
+        {
+            completeVideo.playOnAwake = false;
+            completeVideo.Stop();
+        }
 
         ResetState();
 
-        if (debugLog) Debug.Log($"🔍 [{name}] ▶️ Initialized by Controller");
+        if (debugLog)
+        {
+            Debug.Log(
+                $"🔍 [{name}] ▶️ Initialized by Controller"
+            );
+        }
     }
+
+
+    // ============================================================
+    // VIDEO SETUP
+    // ============================================================
+
+    private void SetupVideo(VideoPlayer vp, System.Action onReady)
+    {
+        if (vp == null)
+            return;
+
+        vp.playOnAwake = false;
+
+        vp.Pause();
+
+        if (vp.isPrepared)
+        {
+            onReady?.Invoke();
+            return;
+        }
+
+        vp.Prepare();
+
+        // 不依赖 callback 累积。
+        StartCoroutine(WaitForVideoPrepared(vp, onReady));
+    }
+
+
+    private IEnumerator WaitForVideoPrepared(
+        VideoPlayer vp,
+        System.Action onReady
+    )
+    {
+        if (vp == null)
+            yield break;
+
+        yield return new WaitUntil(
+            () => vp == null || vp.isPrepared
+        );
+
+        if (vp != null)
+        {
+            onReady?.Invoke();
+        }
+    }
+
+
+    // ============================================================
+    // RESET
+    // ============================================================
+
+    private void ResetState()
+    {
+        progress = 0f;
+
+        failed = false;
+        inB = false;
+        cutting = false;
+
+        complete = false;
+
+        successSequenceRunning = false;
+
+        EnableOnly(rawA);
+
+        // Complete 隐藏
+        if (completeRoot != null)
+        {
+            completeRoot.SetActive(false);
+        }
+
+        // 视频 A 回第一帧
+        if (videoA != null)
+        {
+            videoA.Pause();
+            videoA.time = 0;
+
+            if (videoA.isPrepared)
+            {
+                videoA.StepForward();
+            }
+        }
+
+        // ABC 恢复
+        SetRegionsActive(true);
+
+        ApplyRegionsAlpha(idleAlpha);
+
+        // 清掉上一次可能残留的 Trail
+        if (activeTrail != null)
+        {
+            Destroy(activeTrail.gameObject);
+            activeTrail = null;
+        }
+
+        if (debugLog)
+        {
+            LogStatus("🔄 State Reset");
+        }
+    }
+
+
+    // ============================================================
+    // CACHE ALPHA TARGETS
+    // ============================================================
 
     private void CacheAlphaTargets()
     {
         graphics.Clear();
         sprites.Clear();
         groups.Clear();
-        if (!regionsRoot) return;
 
-        regionsRoot.GetComponentsInChildren(true, graphics);
-        regionsRoot.GetComponentsInChildren(true, sprites);
-        regionsRoot.GetComponentsInChildren(true, groups);
+        if (regionsRoot == null)
+            return;
+
+        regionsRoot.GetComponentsInChildren(
+            true,
+            graphics
+        );
+
+        regionsRoot.GetComponentsInChildren(
+            true,
+            sprites
+        );
+
+        regionsRoot.GetComponentsInChildren(
+            true,
+            groups
+        );
     }
 
-    private void SetupVideo(VideoPlayer vp, System.Action<VideoPlayer> onReady)
-    {
-        if (!vp) return;
-        vp.playOnAwake = false;
-        vp.Pause();
-        vp.Prepare();
-        vp.prepareCompleted += _ => onReady?.Invoke(vp);
-    }
 
-    private void ResetState()
-    {
-        progress = 0f;
-        failed = false;
-        inB = false;
-        cutting = false;
-        complete = false;
-
-        EnableOnly(rawA);
-
-        if (videoA)
-        {
-            videoA.Pause();
-            videoA.time = 0;
-            videoA.StepForward();
-        }
-
-        SetRegionsActive(true);
-        ApplyRegionsAlpha(idleAlpha);
-
-        if (activeTrail)
-            activeTrail.gameObject.SetActive(CanDrawTrail());
-
-        if (debugLog) LogStatus("🔄 State Reset");
-    }
+    // ============================================================
+    // RAW IMAGE SWITCH
+    // ============================================================
 
     private void EnableOnly(RawImage active)
     {
-        if (rawA) rawA.enabled = (active == rawA);
-        if (rawB) rawB.enabled = (active == rawB);
-        if (rawTrans) rawTrans.enabled = (active == rawTrans);
+        if (rawA != null)
+            rawA.enabled = active == rawA;
 
-        // 🧩 根据透明度阈值控制 trail 显示
-        if (activeTrail)
-            activeTrail.gameObject.SetActive(CanDrawTrail());
+        if (rawB != null)
+            rawB.enabled = active == rawB;
 
-        if (!enableAlphaControl || !regionsRoot) return;
+        if (rawTrans != null)
+            rawTrans.enabled = active == rawTrans;
+
+
+        if (activeTrail != null)
+        {
+            activeTrail.gameObject.SetActive(
+                CanDrawTrail()
+            );
+        }
+
+
+        if (!enableAlphaControl ||
+            regionsRoot == null)
+        {
+            return;
+        }
+
 
         if (active == rawA)
+        {
             ApplyRegionsAlpha(mainAlpha);
+        }
         else if (active == rawB)
+        {
             ApplyRegionsAlpha(failAlpha);
+        }
         else
+        {
             ApplyRegionsAlpha(idleAlpha);
+        }
     }
 
-    private void ApplyRegionsAlpha(float a)
+
+    // ============================================================
+    // ALPHA
+    // ============================================================
+
+    private void ApplyRegionsAlpha(float alpha)
     {
-        currentRegionsAlpha = a; // 记录当前透明度
+        currentRegionsAlpha = alpha;
 
-        foreach (var g in groups)
-            if (g) g.alpha = a;
-
-        foreach (var gr in graphics)
-            if (gr)
+        foreach (CanvasGroup g in groups)
+        {
+            if (g != null)
             {
-                var c = gr.color;
-                gr.color = new Color(c.r, c.g, c.b, a);
+                g.alpha = alpha;
             }
+        }
 
-        foreach (var sr in sprites)
-            if (sr)
-            {
-                var c = sr.color;
-                sr.color = new Color(c.r, c.g, c.b, a);
-            }
+
+        foreach (Graphic graphic in graphics)
+        {
+            if (graphic == null)
+                continue;
+
+            Color c = graphic.color;
+
+            graphic.color =
+                new Color(
+                    c.r,
+                    c.g,
+                    c.b,
+                    alpha
+                );
+        }
+
+
+        foreach (SpriteRenderer sprite in sprites)
+        {
+            if (sprite == null)
+                continue;
+
+            Color c = sprite.color;
+
+            sprite.color =
+                new Color(
+                    c.r,
+                    c.g,
+                    c.b,
+                    alpha
+                );
+        }
     }
+
+
+    // ============================================================
+    // REGION ACTIVE
+    // ============================================================
 
     private void SetRegionsActive(bool on)
     {
-        if (regionsRoot)
+        if (regionsRoot != null)
         {
             regionsRoot.SetActive(on);
+            return;
         }
-        else
-        {
-            if (areaA) areaA.gameObject.SetActive(on);
-            if (areaB) areaB.gameObject.SetActive(on);
-            if (areaC) areaC.gameObject.SetActive(on);
-        }
+
+        if (areaA != null)
+            areaA.gameObject.SetActive(on);
+
+        if (areaB != null)
+            areaB.gameObject.SetActive(on);
+
+        if (areaC != null)
+            areaC.gameObject.SetActive(on);
     }
+
+
+    // ============================================================
+    // DEBUG
+    // ============================================================
 
     private void LogStatus(string prefix)
     {
-        if (!debugLog) return;
-        Debug.Log($"{prefix}\n" +
-                  $"    RAW => A[{rawA?.enabled}], B[{rawB?.enabled}], T[{rawTrans?.enabled}]\n" +
-                  $"    STATE => cutting[{cutting}], failed[{failed}], inB[{inB}], complete[{complete}]");
+        if (!debugLog)
+            return;
+
+        Debug.Log(
+            prefix + "\n" +
+            $"    RAW => A[{(rawA != null && rawA.enabled)}], " +
+            $"B[{(rawB != null && rawB.enabled)}], " +
+            $"T[{(rawTrans != null && rawTrans.enabled)}]\n" +
+            $"    STATE => cutting[{cutting}], " +
+            $"failed[{failed}], " +
+            $"inB[{inB}], " +
+            $"successRunning[{successSequenceRunning}], " +
+            $"complete[{complete}]"
+        );
     }
 
-    void Update()
+
+    // ============================================================
+    // UPDATE
+    // ============================================================
+
+    private void Update()
     {
-        if (complete) return;
-        if (!mainCamera) mainCamera = Camera.main;
+        if (complete ||
+            successSequenceRunning)
+        {
+            return;
+        }
 
-        Vector2 mouseWorld = mainCamera.ScreenToWorldPoint(Input.mousePosition);
 
-        // 🖱️ 按下开始
-        if (Input.GetMouseButtonDown(0) && IsInside(mouseWorld, areaA))
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main;
+        }
+
+
+        if (mainCamera == null)
+            return;
+
+
+        Vector2 mouseWorld =
+            mainCamera.ScreenToWorldPoint(
+                Input.mousePosition
+            );
+
+
+        // --------------------------------------------------------
+        // Mouse Down：必须从 A 开始
+        // --------------------------------------------------------
+
+        if (Input.GetMouseButtonDown(0) &&
+            IsInside(mouseWorld, areaA))
         {
             if (!CanDrawTrail())
             {
-                if (debugLog) Debug.Log("✋ Trail blocked: regions alpha below threshold.");
+                if (debugLog)
+                {
+                    Debug.Log(
+                        "✋ Trail blocked: regions alpha below threshold."
+                    );
+                }
+
                 return;
             }
+
 
             cutting = true;
             failed = false;
             inB = false;
+
             progress = 0f;
 
-            if (trailPrefab && activeTrail == null)
+
+            // 创建 Trail
+            if (trailPrefab != null &&
+                activeTrail == null)
             {
-                activeTrail = Instantiate(trailPrefab, mouseWorld, Quaternion.identity);
+                activeTrail =
+                    Instantiate(
+                        trailPrefab,
+                        mouseWorld,
+                        Quaternion.identity
+                    );
+
                 activeTrail.emitting = false;
+
                 activeTrail.Clear();
+
                 activeTrail.time = 999f;
+
                 activeTrail.autodestruct = false;
-                StartCoroutine(EnableTrailAfterFrame(activeTrail));
-                activeTrail.gameObject.SetActive(CanDrawTrail());
+
+                StartCoroutine(
+                    EnableTrailAfterFrame(
+                        activeTrail
+                    )
+                );
+
+                activeTrail.gameObject.SetActive(
+                    CanDrawTrail()
+                );
             }
 
-            if (rawA && rawA.enabled && enableAlphaControl)
-                ApplyRegionsAlpha(mainAlpha);
 
-            if (debugLog) LogStatus("✂️ Cut started in A");
+            if (rawA != null &&
+                rawA.enabled &&
+                enableAlphaControl)
+            {
+                ApplyRegionsAlpha(mainAlpha);
+            }
+
+
+            if (debugLog)
+            {
+                LogStatus("✂️ Cut started in A");
+            }
         }
 
-        // 🪶 拖动中
-        if (cutting && !failed && Input.GetMouseButton(0))
+
+        // --------------------------------------------------------
+        // Dragging
+        // --------------------------------------------------------
+
+        if (cutting &&
+            !failed &&
+            Input.GetMouseButton(0))
         {
-            if (activeTrail)
+            // Trail
+            if (activeTrail != null)
             {
                 bool allow = CanDrawTrail();
+
                 if (!allow)
                 {
                     activeTrail.emitting = false;
-                    activeTrail.gameObject.SetActive(false);
+
+                    activeTrail.gameObject.SetActive(
+                        false
+                    );
                 }
                 else
                 {
-                    if (!activeTrail.gameObject.activeSelf) activeTrail.gameObject.SetActive(true);
-                    if (!activeTrail.emitting) activeTrail.emitting = true;
-                    activeTrail.transform.position = new Vector3(mouseWorld.x, mouseWorld.y, activeTrail.transform.position.z);
+                    if (!activeTrail.gameObject.activeSelf)
+                    {
+                        activeTrail.gameObject.SetActive(
+                            true
+                        );
+                    }
+
+                    if (!activeTrail.emitting)
+                    {
+                        activeTrail.emitting = true;
+                    }
+
+                    activeTrail.transform.position =
+                        new Vector3(
+                            mouseWorld.x,
+                            mouseWorld.y,
+                            activeTrail.transform.position.z
+                        );
                 }
             }
 
+
+            // 进入 B
             if (IsInside(mouseWorld, areaB))
             {
                 inB = true;
+
                 UpdateVideoA(mouseWorld);
-                if (rawA && rawA.enabled && enableAlphaControl)
+
+                if (rawA != null &&
+                    rawA.enabled &&
+                    enableAlphaControl)
+                {
                     ApplyRegionsAlpha(mainAlpha);
+                }
             }
+
+            // 曾经进入 B，现在离开 B
+            // => Fail
             else if (inB)
             {
                 failed = true;
-                StartCoroutine(PlayVideoB());
+
+                StartCoroutine(
+                    PlayVideoB()
+                );
             }
         }
 
-        // 🖱️ 松手结束
+
+        // --------------------------------------------------------
+        // Mouse Up
+        // --------------------------------------------------------
+
         if (Input.GetMouseButtonUp(0))
         {
-            if (activeTrail)
+            // Trail 淡出
+            if (activeTrail != null)
             {
-                StartCoroutine(FadeOutAndDestroyTrail(activeTrail, 0.5f));
+                TrailRenderer trailToFade =
+                    activeTrail;
+
                 activeTrail = null;
+
+                StartCoroutine(
+                    FadeOutAndDestroyTrail(
+                        trailToFade,
+                        0.5f
+                    )
+                );
             }
 
-            if (cutting && !failed)
+
+            if (cutting &&
+                !failed)
             {
-                if (inB && IsInside(mouseWorld, areaC))
+                // ------------------------------------------------
+                // SUCCESS
+                // A → B → C
+                // ------------------------------------------------
+
+                if (inB &&
+                    IsInside(mouseWorld, areaC))
                 {
-                    StartCoroutine(PlayTransition());
+                    successSequenceRunning = true;
+
+                    StartCoroutine(
+                        PlaySuccessSequence()
+                    );
                 }
+
+                // ------------------------------------------------
+                // FAIL
+                // ------------------------------------------------
+
                 else
                 {
                     failed = true;
-                    StartCoroutine(PlayVideoB());
+
+                    StartCoroutine(
+                        PlayVideoB()
+                    );
                 }
             }
+
+
             cutting = false;
         }
     }
 
-    // 延迟一帧启用 Trail（防止半圆伪影）
-    private IEnumerator EnableTrailAfterFrame(TrailRenderer tr)
+
+    // ============================================================
+    // ENABLE TRAIL AFTER ONE FRAME
+    // ============================================================
+
+    private IEnumerator EnableTrailAfterFrame(
+        TrailRenderer trail
+    )
     {
         yield return null;
-        if (tr) tr.emitting = true;
+
+        if (trail != null)
+        {
+            trail.emitting = true;
+        }
     }
 
-    // A 区域视频 Scrub
-    private void UpdateVideoA(Vector2 mouseWorld)
+
+    // ============================================================
+    // VIDEO A SCRUB
+    // ============================================================
+
+    private void UpdateVideoA(
+        Vector2 mouseWorld
+    )
     {
-        if (!preparedA || !videoA || !areaB) return;
+        if (!preparedA ||
+            videoA == null ||
+            areaB == null)
+        {
+            return;
+        }
 
-        float width = areaB.bounds.size.x;
-        float startX = areaB.bounds.min.x;
-        float current = Mathf.Clamp(mouseWorld.x, startX, startX + width);
 
-        float newProgress = Mathf.InverseLerp(startX, startX + width, current);
-        progress = Mathf.Max(progress, newProgress);
+        float width =
+            areaB.bounds.size.x;
 
-        double t = videoA.length * progress;
+        float startX =
+            areaB.bounds.min.x;
+
+
+        float currentX =
+            Mathf.Clamp(
+                mouseWorld.x,
+                startX,
+                startX + width
+            );
+
+
+        float newProgress =
+            Mathf.InverseLerp(
+                startX,
+                startX + width,
+                currentX
+            );
+
+
+        // 只能向前
+        progress =
+            Mathf.Max(
+                progress,
+                newProgress
+            );
+
+
+        double videoTime =
+            videoA.length *
+            progress;
+
+
         videoA.Pause();
-        videoA.time = t;
+
+        videoA.time =
+            videoTime;
+
         videoA.StepForward();
     }
 
-    // 失败流程
+
+    // ============================================================
+    // FAIL VIDEO
+    // ============================================================
+
     private IEnumerator PlayVideoB()
     {
-        if (!videoB) yield break;
+        if (videoB == null)
+        {
+            failed = false;
+            inB = false;
+            cutting = false;
+            yield break;
+        }
+
 
         EnableOnly(rawB);
+
 
         if (!videoB.isPrepared)
         {
             preparedB = false;
+
             videoB.Prepare();
-            yield return new WaitUntil(() => videoB.isPrepared);
+
+            yield return new WaitUntil(
+                () => videoB.isPrepared
+            );
+
             preparedB = true;
         }
 
-        double startTime = videoB.length * Mathf.Clamp01(1f - progress);
-        videoB.time = startTime;
+
+        double startTime =
+            videoB.length *
+            Mathf.Clamp01(
+                1f - progress
+            );
+
+
+        videoB.time =
+            startTime;
+
         videoB.Play();
 
-        yield return new WaitUntil(() => !videoB.isPlaying);
+
+        // 等至少一帧，否则有些 VideoPlayer
+        // 会在 Play() 后立刻报告 isPlaying=false
+        yield return null;
+
+
+        yield return new WaitUntil(
+            () => !videoB.isPlaying
+        );
+
 
         videoB.Stop();
+
         videoB.time = 0;
 
+
+        // 返回 A
         EnableOnly(rawA);
 
-        if (videoA)
+
+        if (videoA != null)
         {
             videoA.Pause();
+
             videoA.time = 0;
-            videoA.StepForward();
-        }
 
-        SetRegionsActive(true);
-        if (activeTrail)
-        {
-            Destroy(activeTrail.gameObject);
-            activeTrail = null;
-        }
-        failed = false;
-        inB = false;
-        cutting = false;
-        if (debugLog) LogStatus("🔁 Fail handled → back to A");
-    }
-
-    // 成功流程
-    private IEnumerator PlayTransition()
-    {
-        SetRegionsActive(false);
-
-        if (controller != null)
-        {
-            int idx = System.Array.IndexOf(controller.modules, this);
-            if (idx >= 0 && idx + 1 < controller.modules.Length)
+            if (videoA.isPrepared)
             {
-                CutModule next = controller.modules[idx + 1];
-                if (next && !next.gameObject.activeSelf)
-                {
-                    next.gameObject.SetActive(true);
-                    next.Initialize(controller);
-                    if (next.videoA)
-                    {
-                        next.videoA.Pause();
-                        next.videoA.time = 0;
-                        next.videoA.StepForward();
-                    }
-                    if (next.rawA) next.rawA.enabled = true;
-                    if (next.debugLog) Debug.Log($"👀 预载下一模块首帧：{next.name}");
-                }
+                videoA.StepForward();
             }
         }
 
+
+        SetRegionsActive(true);
+
+
+        if (activeTrail != null)
+        {
+            Destroy(
+                activeTrail.gameObject
+            );
+
+            activeTrail = null;
+        }
+
+
+        failed = false;
+        inB = false;
+        cutting = false;
+
+        progress = 0f;
+
+
+        if (debugLog)
+        {
+            LogStatus(
+                "🔁 Fail handled → back to A"
+            );
+        }
+    }
+
+
+    // ============================================================
+    // SUCCESS
+    //
+    // 正确顺序：
+    //
+    // Cut 成功
+    // ↓
+    // Complete
+    // ↓
+    // Transition
+    // ↓
+    // complete = true
+    // ↓
+    // Controller
+    // ↓
+    // Cut 2
+    //
+    // ============================================================
+
+    private IEnumerator PlaySuccessSequence()
+    {
+        successSequenceRunning = true;
+
+        cutting = false;
+        failed = false;
+
+
+        // --------------------------------------------------------
+        // 1. 成功以后立即关闭 ABC
+        // --------------------------------------------------------
+
+        SetRegionsActive(false);
+
+
+        // --------------------------------------------------------
+        // 2. COMPLETE
+        // --------------------------------------------------------
+
+        if (debugLog)
+        {
+            Debug.Log(
+                $"🎉 [{name}] Cut 成功 → 显示 Complete"
+            );
+        }
+
+
+        if (completeRoot != null)
+        {
+            completeRoot.SetActive(true);
+        }
+
+
+        // 如果 Complete 是视频
+        if (completeVideo != null)
+        {
+            completeVideo.playOnAwake = false;
+
+
+            if (!completeVideo.isPrepared)
+            {
+                completeVideo.Prepare();
+
+                yield return new WaitUntil(
+                    () => completeVideo.isPrepared
+                );
+            }
+
+
+            completeVideo.Stop();
+
+            completeVideo.time = 0;
+
+            completeVideo.Play();
+
+
+            yield return null;
+
+
+            yield return new WaitUntil(
+                () => !completeVideo.isPlaying
+            );
+
+
+            completeVideo.Stop();
+        }
+
+        // 如果 Complete 只是文字 / Panel
+        else
+        {
+            yield return new WaitForSeconds(
+                completeDisplayDuration
+            );
+        }
+
+
+        if (completeRoot != null)
+        {
+            completeRoot.SetActive(false);
+        }
+
+
+        if (debugLog)
+        {
+            Debug.Log(
+                $"🎬 [{name}] Complete 结束 → 开始 Transition"
+            );
+        }
+
+
+        // --------------------------------------------------------
+        // 3. TRANSITION
+        // --------------------------------------------------------
+
         EnableOnly(rawTrans);
 
-        if (transition)
+
+        if (transition != null)
         {
             if (!transition.isPrepared)
             {
                 preparedT = false;
+
                 transition.Prepare();
-                yield return new WaitUntil(() => transition.isPrepared);
+
+                yield return new WaitUntil(
+                    () => transition.isPrepared
+                );
+
                 preparedT = true;
             }
+
+
+            transition.Stop();
+
             transition.time = 0;
+
             transition.Play();
-            yield return new WaitUntil(() => !transition.isPlaying);
+
+
+            yield return null;
+
+
+            yield return new WaitUntil(
+                () => !transition.isPlaying
+            );
+
+
             transition.Stop();
         }
 
-        complete = true;
-        controller?.OnModuleCompleted(this);
 
-        if (activeTrail)
+        // --------------------------------------------------------
+        // 4. 当前 Cut 完整结束
+        // --------------------------------------------------------
+
+        complete = true;
+
+        successSequenceRunning = false;
+
+
+        // Trail 清理
+        if (activeTrail != null)
         {
-            Destroy(activeTrail.gameObject);
+            Destroy(
+                activeTrail.gameObject
+            );
+
             activeTrail = null;
         }
 
-        if (debugLog) LogStatus("✅ Transition done → complete");
+
+        if (debugLog)
+        {
+            LogStatus(
+                "✅ Complete + Transition done → complete"
+            );
+        }
+
+
+        // --------------------------------------------------------
+        // 5. 最后才通知 Controller
+        //
+        // 注意：
+        // 这里以前会先预加载 Cut2，
+        // Controller 又 Initialize Cut2 一次。
+        //
+        // 现在完全删除预加载。
+        // Cut2 只由 Controller 启动一次。
+        // --------------------------------------------------------
+
+        if (controller != null)
+        {
+            controller.OnModuleCompleted(this);
+        }
+        else
+        {
+            Debug.LogWarning(
+                $"⚠️ [{name}] CutSequenceController 为 null！"
+            );
+        }
     }
 
-    private bool IsInside(Vector2 p, Collider2D c) => c && c.OverlapPoint(p);
 
-    // 🕓 轨迹淡出
-    private IEnumerator FadeOutAndDestroyTrail(TrailRenderer trail, float duration)
+    // ============================================================
+    // COLLIDER CHECK
+    // ============================================================
+
+    private bool IsInside(
+        Vector2 point,
+        Collider2D collider
+    )
     {
-        if (!trail) yield break;
-        float startTime = Time.time;
-        float startWidth = trail.startWidth;
-        float endWidth = 0f;
-        Color startColor = trail.material.color;
-        Color endColor = new Color(startColor.r, startColor.g, startColor.b, 0f);
+        return collider != null &&
+               collider.OverlapPoint(point);
+    }
 
-        while (Time.time - startTime < duration)
+
+    // ============================================================
+    // TRAIL FADE
+    // ============================================================
+
+    private IEnumerator FadeOutAndDestroyTrail(
+        TrailRenderer trail,
+        float duration
+    )
+    {
+        if (trail == null)
+            yield break;
+
+
+        float startTime =
+            Time.time;
+
+        float startWidth =
+            trail.startWidth;
+
+
+        Material trailMaterial =
+            trail.material;
+
+        Color startColor =
+            trailMaterial.color;
+
+
+        Color endColor =
+            new Color(
+                startColor.r,
+                startColor.g,
+                startColor.b,
+                0f
+            );
+
+
+        while (
+            Time.time - startTime <
+            duration
+        )
         {
-            float t = (Time.time - startTime) / duration;
-            trail.startWidth = Mathf.Lerp(startWidth, endWidth, t);
-            trail.endWidth = trail.startWidth * 0.5f;
-            trail.material.color = Color.Lerp(startColor, endColor, t);
+            if (trail == null)
+                yield break;
+
+
+            float t =
+                (Time.time - startTime) /
+                duration;
+
+
+            trail.startWidth =
+                Mathf.Lerp(
+                    startWidth,
+                    0f,
+                    t
+                );
+
+
+            trail.endWidth =
+                trail.startWidth *
+                0.5f;
+
+
+            trailMaterial.color =
+                Color.Lerp(
+                    startColor,
+                    endColor,
+                    t
+                );
+
+
             yield return null;
         }
 
-        Destroy(trail.gameObject);
+
+        if (trail != null)
+        {
+            Destroy(
+                trail.gameObject
+            );
+        }
     }
 }
-
-
-
-
-
