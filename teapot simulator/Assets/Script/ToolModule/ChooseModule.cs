@@ -92,22 +92,40 @@ public class ChooseModule : MonoBehaviour
         Vector2 mouseWorld = mainCam.ScreenToWorldPoint(Input.mousePosition);
 
         // 点击 A 区 → 开始交互
-        if (Input.GetMouseButtonDown(0) && !dragging)
+        if (Input.GetMouseButtonDown(0))
         {
-            if (areaA && areaA.OverlapPoint(mouseWorld))
+            Debug.Log($"[ChooseModule {moduleName}] Mouse down! dragging={dragging}");
+            if (!dragging)
             {
-                if (global != null && global.currentOrder != orderIndex)
+                if (areaA != null)
                 {
-                    Debug.Log($"❌ Wrong order clicked on {moduleName}");
-                    StartCoroutine(PlayWrongOrderSelf());
-                    return;
-                }
+                    bool overlap = areaA.OverlapPoint(mouseWorld);
+                    Debug.Log($"[ChooseModule {moduleName}] areaA overlap with {mouseWorld}? {overlap}");
+                    
+                    if (overlap)
+                    {
+                        if (global != null)
+                        {
+                            Debug.Log($"[ChooseModule {moduleName}] global.currentOrder={global.currentOrder}, this.orderIndex={orderIndex}");
+                            if (global.currentOrder != orderIndex)
+                            {
+                                Debug.Log($"❌ Wrong order clicked on {moduleName}");
+                                StartCoroutine(PlayWrongOrderSelf());
+                                return;
+                            }
+                        }
 
-                controller.NotifyModuleStarted(this);
-                dragging = true;
-                currentPercent = 0f;
-                StartCoroutine(RestartAndPrepareMain());
-                Debug.Log($"[{moduleName}] ✅ 开始拖动播放");
+                        controller.NotifyModuleStarted(this);
+                        dragging = true;
+                        currentPercent = 0f;
+                        StartCoroutine(RestartAndPrepareMain());
+                        Debug.Log($"[{moduleName}] ✅ 开始拖动播放");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"[ChooseModule {moduleName}] areaA is NULL!");
+                }
             }
         }
 

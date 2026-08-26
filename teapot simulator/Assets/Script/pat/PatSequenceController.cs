@@ -359,6 +359,18 @@ public class PatSequenceController : MonoBehaviour
 
             yield break;
         }
+        
+        // ⚠️ 修复最终蓝屏闪烁：
+        // 只有在这里（确认 successVideo 真的已经开始播放，有画面了），我们再去关闭所有的模块！
+        // 这样就实现了 100% 的无缝衔接。
+        for (int i = 0; i < modules.Length; i++)
+        {
+            if (modules[i] != null)
+            {
+                // 强制立刻隐藏
+                modules[i].ForceHideAndRelease();
+            }
+        }
 
         // ===============================================
         // 等真正播放结束
