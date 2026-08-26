@@ -30,18 +30,23 @@ public class ChooseController : MonoBehaviour
         }
 
         var global = GlobalProgressManager.Instance;
+        Debug.Log($"[ChooseController] InitializeModules started. global.currentOrder = {global.currentOrder}");
 
         for (int i = 0; i < chooseModules.Count; i++)
         {
             if (chooseModules[i] != null)
             {
                 chooseModules[i].Init(this);  // ✅ 必须初始化！
-                bool active = (i == global.currentOrder);
+                
+                // ⚠️ 正确逻辑：必须用 Inspector 里填写的 orderIndex 来和全局进度对比！
+                bool active = (chooseModules[i].orderIndex == global.currentOrder);
+                Debug.Log($"[ChooseController] module '{chooseModules[i].moduleName}' (orderIndex={chooseModules[i].orderIndex}) -> SetModuleActive({active})");
+                
                 chooseModules[i].SetModuleActive(active);
             }
         }
 
-        Debug.Log($"✅ 模块初始化完成，当前索引 {global.currentOrder}");
+        Debug.Log($"✅ 模块初始化完成，当前全局进度索引 {global.currentOrder}");
     }
 
     private void PlayIntroSequence()
@@ -73,24 +78,19 @@ public class ChooseController : MonoBehaviour
         }
     }
 
-    // ✅ 当模块完成时由 ChooseModule 调用
     public void OnModuleCompleted(ChooseModule module)
     {
         global.AdvanceOrder();
 
-        // 若未完成所有模块则激活下一个
-        if (global.currentOrder < chooseModules.Count)
+        // 跨场景架构下，AdvanceOrder 会立刻切场景，这部分其实不会在视觉上停留太久
+        // 但为了严谨，我们同样修正这里的激活判断：
+        for (int i = 0; i < chooseModules.Count; i++)
         {
-            for (int i = 0; i < chooseModules.Count; i++)
+            if (chooseModules[i] != null)
             {
-                bool active = (i == global.currentOrder);
-                if (chooseModules[i] != null)
-                    chooseModules[i].SetModuleActive(active);
+                bool active = (chooseModules[i].orderIndex == global.currentOrder);
+                chooseModules[i].SetModuleActive(active);
             }
-        }
-        else
-        {
-            Debug.Log("✅ 所有模块完成。可以触发下一场景或全局事件。");
         }
     }
 

@@ -344,6 +344,18 @@ PrefabInstance:
       propertyPath: m_DirectAudioMutes.Array.data[0]
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5257121937370977319, guid: b1fd5e1dcd1f547758fc53dbb62c3639, type: 3}
+      propertyPath: m_UiScaleMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5257121937370977319, guid: b1fd5e1dcd1f547758fc53dbb62c3639, type: 3}
+      propertyPath: m_ReferenceResolution.x
+      value: 1920
+      objectReference: {fileID: 0}
+    - target: {fileID: 5257121937370977319, guid: b1fd5e1dcd1f547758fc53dbb62c3639, type: 3}
+      propertyPath: m_ReferenceResolution.y
+      value: 1080
+      objectReference: {fileID: 0}
     - target: {fileID: 5490555568367841142, guid: b1fd5e1dcd1f547758fc53dbb62c3639, type: 3}
       propertyPath: rawA
       value: 
@@ -690,6 +702,22 @@ PrefabInstance:
       propertyPath: m_DirectAudioMutes.Array.data[0]
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5257121937370977319, guid: b1fd5e1dcd1f547758fc53dbb62c3639, type: 3}
+      propertyPath: m_ScaleFactor
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 5257121937370977319, guid: b1fd5e1dcd1f547758fc53dbb62c3639, type: 3}
+      propertyPath: m_UiScaleMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5257121937370977319, guid: b1fd5e1dcd1f547758fc53dbb62c3639, type: 3}
+      propertyPath: m_ReferenceResolution.x
+      value: 1920
+      objectReference: {fileID: 0}
+    - target: {fileID: 5257121937370977319, guid: b1fd5e1dcd1f547758fc53dbb62c3639, type: 3}
+      propertyPath: m_ReferenceResolution.y
+      value: 1080
+      objectReference: {fileID: 0}
     - target: {fileID: 5490555568367841142, guid: b1fd5e1dcd1f547758fc53dbb62c3639, type: 3}
       propertyPath: rawA
       value: 
@@ -844,19 +872,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6856098189783441742, guid: b1fd5e1dcd1f547758fc53dbb62c3639, type: 3}
       propertyPath: m_LocalScale.x
-      value: 5.2637563
+      value: 6.2570267
       objectReference: {fileID: 0}
     - target: {fileID: 6856098189783441742, guid: b1fd5e1dcd1f547758fc53dbb62c3639, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.36145788
+      value: 0.38854915
       objectReference: {fileID: 0}
     - target: {fileID: 6856098189783441742, guid: b1fd5e1dcd1f547758fc53dbb62c3639, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.79
+      value: 1.2896
       objectReference: {fileID: 0}
     - target: {fileID: 6856098189783441742, guid: b1fd5e1dcd1f547758fc53dbb62c3639, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.327
+      value: 0.3428
       objectReference: {fileID: 0}
     - target: {fileID: 7703450739682959149, guid: b1fd5e1dcd1f547758fc53dbb62c3639, type: 3}
       propertyPath: m_Name
@@ -1160,8 +1188,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chooseModules:
   - {fileID: 2057303731}
+  - {fileID: 1704030570}
   - {fileID: 6192395716286588587}
-  - {fileID: 0}
   v1: {fileID: 756973916}
   v2: {fileID: 1205846369}
 --- !u!1 &724940244
@@ -2474,6 +2502,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: MenuCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 8740234845342212725, guid: 374d169caaefb4926a7def61fa41d75b, type: 3}
+      propertyPath: m_UiScaleMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8740234845342212725, guid: 374d169caaefb4926a7def61fa41d75b, type: 3}
+      propertyPath: m_ReferenceResolution.x
+      value: 1920
+      objectReference: {fileID: 0}
+    - target: {fileID: 8740234845342212725, guid: 374d169caaefb4926a7def61fa41d75b, type: 3}
+      propertyPath: m_ReferenceResolution.y
+      value: 1080
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2869,6 +2909,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2720461007733875807, guid: b1fd5e1dcd1f547758fc53dbb62c3639, type: 3}
   m_PrefabInstance: {fileID: 231760906}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1704030570 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5490555568367841142, guid: b1fd5e1dcd1f547758fc53dbb62c3639, type: 3}
+  m_PrefabInstance: {fileID: 231760906}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0aa51dcf30a4b4d76ae32934c8019db0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1732706660 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1185519615756293342, guid: b1fd5e1dcd1f547758fc53dbb62c3639, type: 3}
@@ -3604,6 +3655,18 @@ PrefabInstance:
     - target: {fileID: 5128395485420981954, guid: b1fd5e1dcd1f547758fc53dbb62c3639, type: 3}
       propertyPath: m_DirectAudioMutes.Array.data[0]
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5257121937370977319, guid: b1fd5e1dcd1f547758fc53dbb62c3639, type: 3}
+      propertyPath: m_UiScaleMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5257121937370977319, guid: b1fd5e1dcd1f547758fc53dbb62c3639, type: 3}
+      propertyPath: m_ReferenceResolution.x
+      value: 1920
+      objectReference: {fileID: 0}
+    - target: {fileID: 5257121937370977319, guid: b1fd5e1dcd1f547758fc53dbb62c3639, type: 3}
+      propertyPath: m_ReferenceResolution.y
+      value: 1080
       objectReference: {fileID: 0}
     - target: {fileID: 5490555568367841142, guid: b1fd5e1dcd1f547758fc53dbb62c3639, type: 3}
       propertyPath: rawA
