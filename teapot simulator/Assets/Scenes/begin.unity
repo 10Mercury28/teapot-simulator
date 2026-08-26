@@ -785,8 +785,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   videoPlayer: {fileID: 735743095}
   rawImage: {fileID: 184399432}
-  nextSceneName: GlobalControllers
   playButton: {fileID: 498022957}
+  skipVideo: 1
+  sceneBootstrapper: {fileID: 0}
 --- !u!1 &957729282
 GameObject:
   m_ObjectHideFlags: 0
