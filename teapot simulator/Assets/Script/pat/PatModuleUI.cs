@@ -84,11 +84,7 @@ public class PatModuleUI : MonoBehaviour
 
     bool GetInTransition()
     {
-        var f = typeof(PatModule).GetField(
-            "inTransition",
-            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance
-        );
-        return (bool)f.GetValue(module);
+        return module.currentState == PatModule.PatState.TransitionLoop || module.currentState == PatModule.PatState.SwitchingToMain;
     }
 
     int GetHits()

@@ -7,14 +7,13 @@ using System.Collections.Generic;
 [RequireComponent(typeof(Collider2D))]
 public class PatModule : MonoBehaviour
 {
-    [Header("Module State")]
-    public bool active;
-    public bool complete;
+    public enum PatState { Inactive, TransitionLoop, SwitchingToMain, MainActive, FailSequence, Done }
 
-    private bool inTransition;
-    private bool hasClickedOnce;
-    private bool inputLocked;
-    private bool timerActive;
+    [Header("Module State")]
+    public PatState currentState = PatState.Inactive;
+
+    public bool active => currentState != PatState.Inactive && currentState != PatState.Done;
+    public bool complete => currentState == PatState.Done;
 
     [Header("Gameplay")]
     public int requiredHits = 20;
@@ -54,6 +53,10 @@ public class PatModule : MonoBehaviour
 
     private List<SpriteRenderer> sprites = new List<SpriteRenderer>();
 
+    // Snapshot variables
+    private Texture2D snapshotTex;
+    private RawImage snapshotRaw;
+
     void Start()
     {
         controller = GetComponentInParent<PatSequenceController>();
@@ -76,65 +79,66 @@ public class PatModule : MonoBehaviour
     {
         LerpAlphaToTarget();
 
-        if (!active || inputLocked)
+        if (!active)
             return;
 
-        // 鼠标点击
+        // 鼠标点击判定
+        bool clickedOnModule = false;
         if (Input.GetMouseButtonDown(0))
         {
             Vector3 screenPos = Input.mousePosition;
-
             if (Camera.main != null)
             {
                 screenPos.z = Mathf.Abs(Camera.main.transform.position.z);
                 Vector3 mouse = Camera.main.ScreenToWorldPoint(screenPos);
                 Vector2 pos = new Vector2(mouse.x, mouse.y);
                 Collider2D col = GetComponent<Collider2D>();
-
                 if (col != null && col.OverlapPoint(pos))
                 {
-                    // Transition 第一次点击
-                    if (inTransition && !hasClickedOnce)
-                    {
-                        hasClickedOnce = true;
-                        StartCoroutine(SwitchToMain());
-                    }
-                    // Main 状态点击
-                    else if (!inTransition)
-                    {
-                        RegisterHit();
-                    }
+                    clickedOnModule = true;
                 }
             }
         }
 
-        // Fail Timer
-        if (timerActive && !inTransition && currentHits > 0 && !complete)
+        switch (currentState)
         {
-            timer += Time.deltaTime;
-            if (timer > timeLimit)
-            {
-                StartCoroutine(PlayFailThenTransition());
-            }
+            case PatState.TransitionLoop:
+                if (clickedOnModule)
+                {
+                    currentState = PatState.SwitchingToMain;
+                    StartCoroutine(SwitchToMain());
+                }
+                break;
+
+            case PatState.MainActive:
+                if (clickedOnModule)
+                {
+                    RegisterHit();
+                }
+
+                if (currentHits > 0)
+                {
+                    timer += Time.deltaTime;
+                    if (timer > timeLimit)
+                    {
+                        StartCoroutine(PlayFailThenTransition());
+                    }
+                }
+                break;
         }
     }
 
     public void Activate()
     {
-        if (active && !complete)
+        if (active || complete)
         {
             Debug.LogWarning($"⚠️ [{name}] Activate() 被重复调用，已忽略。");
             return;
         }
 
-        active = true;
-        complete = false;
-        inputLocked = false;
+        currentState = PatState.TransitionLoop;
         currentHits = 0;
         timer = 0f;
-        timerActive = false;
-        hasClickedOnce = false;
-        inTransition = true;
 
         Collider2D col = GetComponent<Collider2D>();
         if (col != null) col.enabled = true;
@@ -163,18 +167,11 @@ public class PatModule : MonoBehaviour
 
         transitionVideo.playbackSpeed = Mathf.Max(0.1f, transitionSpeed);
 
-        inTransition = true;
-        hasClickedOnce = false;
-
         Debug.Log($"▶️ [{name}] Transition 开始播放");
 
-        // ⚠️ 修复：不能在 while 循环里根据 isPlaying == false 疯狂调用 PlayFull()，
-        // 因为调用 Play 后 isPlaying 可能要等几帧才变 true，这会导致无限重置 time=0 卡死。
-        // 我们利用 VideoController 的 onComplete 回调来实现安全的手动循环。
-        
         System.Action playLoop = null;
         playLoop = () => {
-            if (inTransition && !hasClickedOnce)
+            if (currentState == PatState.TransitionLoop)
             {
                 transCtrl?.PlayFull(playLoop);
             }
@@ -183,7 +180,7 @@ public class PatModule : MonoBehaviour
         // 启动第一次循环
         playLoop();
 
-        while (inTransition && !hasClickedOnce)
+        while (currentState == PatState.TransitionLoop)
         {
             yield return null;
         }
@@ -195,11 +192,13 @@ public class PatModule : MonoBehaviour
 
     IEnumerator SwitchToMain()
     {
-        inputLocked = true;
-        inTransition = false;
+        // 瞬间截图当前正在播放的 Transition，定格显示在最上层
+        TakeSnapshotAndShow(transitionRaw, transitionVideo);
 
-        // ⚠️ 修复闪烁：这里不再提前调用 HideAll() 和 StopAndReset()
-        // 让 Transition 画面保留在屏幕上，直到主视频首帧准备就绪。
+        // 现在可以立刻无缝关掉之前的视频了，屏幕上已经是我们的定格画了
+        transCtrl?.StopAndReset();
+        if (transitionRaw != null) transitionRaw.enabled = false;
+        if (failRaw != null) failRaw.enabled = false;
 
         if (mainVideo != null && mainRaw != null && mainVideo.clip != null)
         {
@@ -207,7 +206,7 @@ public class PatModule : MonoBehaviour
             mainRaw.color = Color.white;
             mainRaw.enabled = true;
 
-            // 让主视频准备并播放一瞬间以建立首帧
+            // 准备并让主视频播放一瞬间以建立首帧
             bool isReady = false;
             mainCtrl?.PrepareNow(() => isReady = true);
             
@@ -216,23 +215,21 @@ public class PatModule : MonoBehaviour
             mainVideo.time = 0.0;
             mainVideo.Play();
 
-            // 等待 RT 写入第一帧
+            // 稍微等待新视频输出第一帧画面（此时底下的画面会被新视频盖上）
             yield return new WaitForSecondsRealtime(0.08f);
 
             mainCtrl?.Pause();
             Debug.Log($"🖼️ [{name}] Main 首帧已建立");
         }
 
-        // 首帧建立完成，现在可以安全地关闭过渡视频了
-        transCtrl?.StopAndReset();
-        if (transitionRaw != null) transitionRaw.enabled = false;
-        if (failRaw != null) failRaw.enabled = false;
+        // 新视频就绪，撤掉用来遮丑的定格画面！
+        HideSnapshot();
 
         currentHits = 0;
         timer = 0f;
-        timerActive = false;
         SetTargetAlpha(alphaActive);
-        inputLocked = false;
+        
+        currentState = PatState.MainActive;
     }
 
     void RegisterHit()
@@ -243,7 +240,6 @@ public class PatModule : MonoBehaviour
         if (currentHits == 1)
         {
             timer = 0f;
-            timerActive = true;
         }
 
         StartCoroutine(ClickFeedback());
@@ -266,7 +262,7 @@ public class PatModule : MonoBehaviour
     {
         SetTargetAlpha(alphaClick);
         yield return new WaitForSeconds(0.2f);
-        if (active && !inputLocked && !complete)
+        if (currentState == PatState.MainActive)
         {
             SetTargetAlpha(alphaActive);
         }
@@ -274,10 +270,7 @@ public class PatModule : MonoBehaviour
 
     void Complete()
     {
-        complete = true;
-        active = false;
-        timerActive = false;
-        inputLocked = true;
+        currentState = PatState.Done;
 
         mainCtrl?.Pause();
         
@@ -309,16 +302,14 @@ public class PatModule : MonoBehaviour
 
     IEnumerator PlayFailThenTransition()
     {
-        if (inputLocked) yield break;
-
-        inputLocked = true;
-        timerActive = false;
+        currentState = PatState.FailSequence;
         timer = 0f;
 
         mainCtrl?.Pause();
         SetTargetAlpha(alphaInactive);
         
-        // ⚠️ 修复闪烁：不要立刻隐藏 mainRaw
+        // 瞬间截图当前的主视频画面定格
+        TakeSnapshotAndShow(mainRaw, mainVideo);
 
         // FAIL VIDEO
         if (failVideo != null && failRaw != null && failVideo.clip != null)
@@ -332,13 +323,16 @@ public class PatModule : MonoBehaviour
             bool failDone = false;
             failCtrl?.PlayFull(() => failDone = true);
             
-            // 等一小会，让失败视频渲染出首帧后，再隐藏主视频
-            yield return new WaitForSecondsRealtime(0.1f);
+            // 稍等 Fail 出画面，然后撤掉主视频和定格图
+            yield return new WaitForSecondsRealtime(0.08f);
             if (mainRaw != null) mainRaw.enabled = false;
             if (transitionRaw != null) transitionRaw.enabled = false;
+            HideSnapshot();
 
             while (!failDone) yield return null;
 
+            // Fail结束，切回 Transition
+            TakeSnapshotAndShow(failRaw, failVideo);
             failRaw.enabled = false;
         }
         else
@@ -347,20 +341,17 @@ public class PatModule : MonoBehaviour
             if (transitionRaw != null) transitionRaw.enabled = false;
         }
 
-        hasClickedOnce = false;
-        inTransition = true;
-        inputLocked = false;
-
+        currentState = PatState.TransitionLoop;
         StartCoroutine(PlayTransitionLoop());
+        
+        // 给 Transition 视频一点时间建立画面
+        yield return new WaitForSecondsRealtime(0.08f);
+        HideSnapshot();
     }
 
     public void Deactivate()
     {
-        active = false;
-        inTransition = false;
-        hasClickedOnce = false;
-        inputLocked = true;
-        timerActive = false;
+        currentState = PatState.Inactive;
         timer = 0f;
 
         StopAllCoroutines();
@@ -432,5 +423,55 @@ public class PatModule : MonoBehaviour
             c.a = Mathf.Lerp(c.a, targetAlpha, Time.deltaTime * alphaLerpSpeed);
             sr.color = c;
         }
+    }
+
+    // ==============================================
+    // Snapshot 黑科技：掩盖视频加载缝隙
+    // ==============================================
+    private void TakeSnapshotAndShow(RawImage sourceRaw, VideoPlayer vp)
+    {
+        if (sourceRaw == null || vp == null || vp.targetTexture == null) return;
+        
+        if (snapshotRaw == null)
+        {
+            GameObject go = new GameObject("Pat_Snapshot_Overlay");
+            go.transform.SetParent(sourceRaw.transform.parent, false);
+            go.transform.SetAsLastSibling();
+            snapshotRaw = go.AddComponent<RawImage>();
+            
+            RectTransform srt = go.GetComponent<RectTransform>();
+            RectTransform rt = sourceRaw.GetComponent<RectTransform>();
+            srt.anchorMin = rt.anchorMin;
+            srt.anchorMax = rt.anchorMax;
+            srt.pivot = rt.pivot;
+            srt.sizeDelta = rt.sizeDelta;
+            srt.anchoredPosition = rt.anchoredPosition;
+        }
+        else
+        {
+            snapshotRaw.transform.SetAsLastSibling();
+        }
+
+        RenderTexture rtTex = vp.targetTexture;
+        if (snapshotTex == null || snapshotTex.width != rtTex.width || snapshotTex.height != rtTex.height)
+        {
+            if (snapshotTex != null) Destroy(snapshotTex);
+            snapshotTex = new Texture2D(rtTex.width, rtTex.height, TextureFormat.RGB24, false);
+        }
+
+        RenderTexture currentActiveRT = RenderTexture.active;
+        RenderTexture.active = rtTex;
+        snapshotTex.ReadPixels(new Rect(0, 0, rtTex.width, rtTex.height), 0, 0);
+        snapshotTex.Apply();
+        RenderTexture.active = currentActiveRT;
+
+        snapshotRaw.texture = snapshotTex;
+        snapshotRaw.color = Color.white;
+        snapshotRaw.enabled = true;
+    }
+
+    private void HideSnapshot()
+    {
+        if (snapshotRaw != null) snapshotRaw.enabled = false;
     }
 }
