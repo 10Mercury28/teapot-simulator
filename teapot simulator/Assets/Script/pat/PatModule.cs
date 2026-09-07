@@ -37,6 +37,9 @@ public class PatModule : MonoBehaviour
     public RawImage failRaw;
     public RawImage transitionRaw;
 
+    [Header("防穿帮垫底背景")]
+    public RawImage fallbackBackground;
+
     [Header("透明度控制（仅作用于模块本体方块）")]
     [Range(0f, 1f)] public float alphaInactive = 0.1f;
     [Range(0f, 1f)] public float alphaActive = 0.4f;
@@ -55,7 +58,6 @@ public class PatModule : MonoBehaviour
 
     // Snapshot variables
     private Texture2D snapshotTex;
-    private RawImage snapshotRaw;
 
     void Start()
     {
@@ -192,10 +194,10 @@ public class PatModule : MonoBehaviour
 
     IEnumerator SwitchToMain()
     {
-        // 瞬间截图当前正在播放的 Transition，定格显示在最上层
-        TakeSnapshotAndShow(transitionRaw, transitionVideo);
+        // 瞬间截图当前正在播放的 Transition，更新到那个始终垫底的背景图上
+        UpdateFallbackBackground(transitionVideo);
 
-        // 现在可以立刻无缝关掉之前的视频了，屏幕上已经是我们的定格画了
+        // 现在可以立刻无缝关掉之前的视频了，屏幕最底下的 -1 Canvas 已经印上了我们的定格画
         transCtrl?.StopAndReset();
         if (transitionRaw != null) transitionRaw.enabled = false;
         if (failRaw != null) failRaw.enabled = false;
@@ -221,9 +223,6 @@ public class PatModule : MonoBehaviour
             mainCtrl?.Pause();
             Debug.Log($"🖼️ [{name}] Main 首帧已建立");
         }
-
-        // 新视频就绪，撤掉用来遮丑的定格画面！
-        HideSnapshot();
 
         currentHits = 0;
         timer = 0f;
@@ -308,8 +307,8 @@ public class PatModule : MonoBehaviour
         mainCtrl?.Pause();
         SetTargetAlpha(alphaInactive);
         
-        // 瞬间截图当前的主视频画面定格
-        TakeSnapshotAndShow(mainRaw, mainVideo);
+        // 瞬间截图当前的主视频画面，印到底层背景上
+        UpdateFallbackBackground(mainVideo);
 
         // FAIL VIDEO
         if (failVideo != null && failRaw != null && failVideo.clip != null)
@@ -323,16 +322,15 @@ public class PatModule : MonoBehaviour
             bool failDone = false;
             failCtrl?.PlayFull(() => failDone = true);
             
-            // 稍等 Fail 出画面，然后撤掉主视频和定格图
+            // 稍等 Fail 出画面，然后撤掉主视频
             yield return new WaitForSecondsRealtime(0.08f);
             if (mainRaw != null) mainRaw.enabled = false;
             if (transitionRaw != null) transitionRaw.enabled = false;
-            HideSnapshot();
 
             while (!failDone) yield return null;
 
             // Fail结束，切回 Transition
-            TakeSnapshotAndShow(failRaw, failVideo);
+            UpdateFallbackBackground(failVideo);
             failRaw.enabled = false;
         }
         else
@@ -343,10 +341,6 @@ public class PatModule : MonoBehaviour
 
         currentState = PatState.TransitionLoop;
         StartCoroutine(PlayTransitionLoop());
-        
-        // 给 Transition 视频一点时间建立画面
-        yield return new WaitForSecondsRealtime(0.08f);
-        HideSnapshot();
     }
 
     public void Deactivate()
@@ -426,31 +420,11 @@ public class PatModule : MonoBehaviour
     }
 
     // ==============================================
-    // Snapshot 黑科技：掩盖视频加载缝隙
+    // Snapshot 黑科技：更新垫底的 Canvas 背景图
     // ==============================================
-    private void TakeSnapshotAndShow(RawImage sourceRaw, VideoPlayer vp)
+    private void UpdateFallbackBackground(VideoPlayer vp)
     {
-        if (sourceRaw == null || vp == null || vp.targetTexture == null) return;
-        
-        if (snapshotRaw == null)
-        {
-            GameObject go = new GameObject("Pat_Snapshot_Overlay");
-            go.transform.SetParent(sourceRaw.transform.parent, false);
-            go.transform.SetAsLastSibling();
-            snapshotRaw = go.AddComponent<RawImage>();
-            
-            RectTransform srt = go.GetComponent<RectTransform>();
-            RectTransform rt = sourceRaw.GetComponent<RectTransform>();
-            srt.anchorMin = rt.anchorMin;
-            srt.anchorMax = rt.anchorMax;
-            srt.pivot = rt.pivot;
-            srt.sizeDelta = rt.sizeDelta;
-            srt.anchoredPosition = rt.anchoredPosition;
-        }
-        else
-        {
-            snapshotRaw.transform.SetAsLastSibling();
-        }
+        if (fallbackBackground == null || vp == null || vp.targetTexture == null) return;
 
         RenderTexture rtTex = vp.targetTexture;
         if (snapshotTex == null || snapshotTex.width != rtTex.width || snapshotTex.height != rtTex.height)
@@ -465,13 +439,7 @@ public class PatModule : MonoBehaviour
         snapshotTex.Apply();
         RenderTexture.active = currentActiveRT;
 
-        snapshotRaw.texture = snapshotTex;
-        snapshotRaw.color = Color.white;
-        snapshotRaw.enabled = true;
-    }
-
-    private void HideSnapshot()
-    {
-        if (snapshotRaw != null) snapshotRaw.enabled = false;
+        fallbackBackground.texture = snapshotTex;
+        fallbackBackground.color = Color.white;
     }
 }

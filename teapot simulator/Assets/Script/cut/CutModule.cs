@@ -90,8 +90,12 @@ public class CutModule : MonoBehaviour
     public bool debugLog = true;
 
 
+    public enum ModuleState { Idle, Cutting, Failed, Success, Transition, Done }
+    
     [Header("状态（运行时观察）")]
-    public bool complete = false;
+    public ModuleState currentState = ModuleState.Idle;
+
+    public bool complete => currentState == ModuleState.Done;
 
 
     // ============================================================
@@ -102,12 +106,7 @@ public class CutModule : MonoBehaviour
     private bool preparedB = false;
     private bool preparedT = false;
 
-    private bool cutting = false;
-    private bool failed = false;
     private bool inB = false;
-
-    // 防止成功流程重复触发
-    private bool successSequenceRunning = false;
 
     private float progress = 0f;
 
@@ -222,14 +221,8 @@ public class CutModule : MonoBehaviour
     private void ResetState()
     {
         progress = 0f;
-
-        failed = false;
         inB = false;
-        cutting = false;
-
-        complete = false;
-
-        successSequenceRunning = false;
+        currentState = ModuleState.Idle;
 
         EnableOnly(rawA);
 
@@ -435,11 +428,8 @@ public class CutModule : MonoBehaviour
             $"    RAW => A[{(rawA != null && rawA.enabled)}], " +
             $"B[{(rawB != null && rawB.enabled)}], " +
             $"T[{(rawTrans != null && rawTrans.enabled)}]\n" +
-            $"    STATE => cutting[{cutting}], " +
-            $"failed[{failed}], " +
-            $"inB[{inB}], " +
-            $"successRunning[{successSequenceRunning}], " +
-            $"complete[{complete}]"
+            $"    STATE => {currentState}, " +
+            $"inB[{inB}]"
         );
     }
 
@@ -450,232 +440,119 @@ public class CutModule : MonoBehaviour
 
     private void Update()
     {
-        if (complete ||
-            successSequenceRunning)
+        if (currentState == ModuleState.Done || currentState == ModuleState.Success || currentState == ModuleState.Transition || currentState == ModuleState.Failed)
         {
             return;
         }
-
 
         if (mainCamera == null)
         {
             mainCamera = Camera.main;
         }
 
-
         if (mainCamera == null)
             return;
 
+        Vector2 mouseWorld = mainCamera.ScreenToWorldPoint(Input.mousePosition);
 
-        Vector2 mouseWorld =
-            mainCamera.ScreenToWorldPoint(
-                Input.mousePosition
-            );
-
-
-        // --------------------------------------------------------
-        // Mouse Down：必须从 A 开始
-        // --------------------------------------------------------
-
-        if (Input.GetMouseButtonDown(0) &&
-            IsInside(mouseWorld, areaA))
+        switch (currentState)
         {
-            if (!CanDrawTrail())
-            {
-                if (debugLog)
+            case ModuleState.Idle:
+                if (Input.GetMouseButtonDown(0) && IsInside(mouseWorld, areaA))
                 {
-                    Debug.Log(
-                        "✋ Trail blocked: regions alpha below threshold."
-                    );
-                }
-
-                return;
-            }
-
-
-            cutting = true;
-            failed = false;
-            inB = false;
-
-            progress = 0f;
-
-
-            // 创建 Trail
-            if (trailPrefab != null &&
-                activeTrail == null)
-            {
-                activeTrail =
-                    Instantiate(
-                        trailPrefab,
-                        mouseWorld,
-                        Quaternion.identity
-                    );
-
-                activeTrail.emitting = false;
-
-                activeTrail.Clear();
-
-                activeTrail.time = 999f;
-
-                activeTrail.autodestruct = false;
-
-                StartCoroutine(
-                    EnableTrailAfterFrame(
-                        activeTrail
-                    )
-                );
-
-                activeTrail.gameObject.SetActive(
-                    CanDrawTrail()
-                );
-            }
-
-
-            if (rawA != null &&
-                rawA.enabled &&
-                enableAlphaControl)
-            {
-                ApplyRegionsAlpha(mainAlpha);
-            }
-
-
-            if (debugLog)
-            {
-                LogStatus("✂️ Cut started in A");
-            }
-        }
-
-
-        // --------------------------------------------------------
-        // Dragging
-        // --------------------------------------------------------
-
-        if (cutting &&
-            !failed &&
-            Input.GetMouseButton(0))
-        {
-            // Trail
-            if (activeTrail != null)
-            {
-                bool allow = CanDrawTrail();
-
-                if (!allow)
-                {
-                    activeTrail.emitting = false;
-
-                    activeTrail.gameObject.SetActive(
-                        false
-                    );
-                }
-                else
-                {
-                    if (!activeTrail.gameObject.activeSelf)
+                    if (!CanDrawTrail())
                     {
-                        activeTrail.gameObject.SetActive(
-                            true
-                        );
+                        if (debugLog) Debug.Log("✋ Trail blocked: regions alpha below threshold.");
+                        return;
                     }
 
-                    if (!activeTrail.emitting)
+                    currentState = ModuleState.Cutting;
+                    inB = false;
+                    progress = 0f;
+
+                    if (trailPrefab != null && activeTrail == null)
                     {
-                        activeTrail.emitting = true;
+                        activeTrail = Instantiate(trailPrefab, mouseWorld, Quaternion.identity);
+                        activeTrail.emitting = false;
+                        activeTrail.Clear();
+                        activeTrail.time = 999f;
+                        activeTrail.autodestruct = false;
+                        StartCoroutine(EnableTrailAfterFrame(activeTrail));
+                        activeTrail.gameObject.SetActive(CanDrawTrail());
                     }
 
-                    activeTrail.transform.position =
-                        new Vector3(
-                            mouseWorld.x,
-                            mouseWorld.y,
-                            activeTrail.transform.position.z
-                        );
+                    if (rawA != null && rawA.enabled && enableAlphaControl)
+                    {
+                        ApplyRegionsAlpha(mainAlpha);
+                    }
+
+                    if (debugLog) LogStatus("✂️ Cut started in A");
                 }
-            }
+                break;
 
-
-            // 进入 B
-            if (IsInside(mouseWorld, areaB))
-            {
-                inB = true;
-
-                UpdateVideoA(mouseWorld);
-
-                if (rawA != null &&
-                    rawA.enabled &&
-                    enableAlphaControl)
+            case ModuleState.Cutting:
+                if (Input.GetMouseButton(0))
                 {
-                    ApplyRegionsAlpha(mainAlpha);
+                    // Trail
+                    if (activeTrail != null)
+                    {
+                        bool allow = CanDrawTrail();
+                        if (!allow)
+                        {
+                            activeTrail.emitting = false;
+                            activeTrail.gameObject.SetActive(false);
+                        }
+                        else
+                        {
+                            if (!activeTrail.gameObject.activeSelf) activeTrail.gameObject.SetActive(true);
+                            if (!activeTrail.emitting) activeTrail.emitting = true;
+                            activeTrail.transform.position = new Vector3(mouseWorld.x, mouseWorld.y, activeTrail.transform.position.z);
+                        }
+                    }
+
+                    // 进入 B
+                    if (IsInside(mouseWorld, areaB))
+                    {
+                        inB = true;
+                        UpdateVideoA(mouseWorld);
+
+                        if (rawA != null && rawA.enabled && enableAlphaControl)
+                        {
+                            ApplyRegionsAlpha(mainAlpha);
+                        }
+                    }
+                    else if (inB) // 曾经进入 B，现在离开 B => Fail
+                    {
+                        currentState = ModuleState.Failed;
+                        StartCoroutine(PlayVideoB());
+                    }
                 }
-            }
 
-            // 曾经进入 B，现在离开 B
-            // => Fail
-            else if (inB)
-            {
-                failed = true;
-
-                StartCoroutine(
-                    PlayVideoB()
-                );
-            }
-        }
-
-
-        // --------------------------------------------------------
-        // Mouse Up
-        // --------------------------------------------------------
-
-        if (Input.GetMouseButtonUp(0))
-        {
-            // Trail 淡出
-            if (activeTrail != null)
-            {
-                TrailRenderer trailToFade =
-                    activeTrail;
-
-                activeTrail = null;
-
-                StartCoroutine(
-                    FadeOutAndDestroyTrail(
-                        trailToFade,
-                        0.5f
-                    )
-                );
-            }
-
-
-            if (cutting &&
-                !failed)
-            {
-                // ------------------------------------------------
-                // SUCCESS
-                // A → B → C
-                // ------------------------------------------------
-
-                if (inB &&
-                    IsInside(mouseWorld, areaC))
+                if (Input.GetMouseButtonUp(0))
                 {
-                    successSequenceRunning = true;
+                    // Trail 淡出
+                    if (activeTrail != null)
+                    {
+                        TrailRenderer trailToFade = activeTrail;
+                        activeTrail = null;
+                        StartCoroutine(FadeOutAndDestroyTrail(trailToFade, 0.5f));
+                    }
 
-                    StartCoroutine(
-                        PlaySuccessSequence()
-                    );
+                    if (currentState != ModuleState.Failed)
+                    {
+                        if (inB && IsInside(mouseWorld, areaC))
+                        {
+                            currentState = ModuleState.Success;
+                            StartCoroutine(PlaySuccessSequence());
+                        }
+                        else
+                        {
+                            currentState = ModuleState.Failed;
+                            StartCoroutine(PlayVideoB());
+                        }
+                    }
                 }
-
-                // ------------------------------------------------
-                // FAIL
-                // ------------------------------------------------
-
-                else
-                {
-                    failed = true;
-
-                    StartCoroutine(
-                        PlayVideoB()
-                    );
-                }
-            }
-
-
-            cutting = false;
+                break;
         }
     }
 
@@ -766,9 +643,8 @@ public class CutModule : MonoBehaviour
     {
         if (videoB == null)
         {
-            failed = false;
             inB = false;
-            cutting = false;
+            currentState = ModuleState.Idle;
             yield break;
         }
 
@@ -848,11 +724,9 @@ public class CutModule : MonoBehaviour
         }
 
 
-        failed = false;
         inB = false;
-        cutting = false;
-
         progress = 0f;
+        currentState = ModuleState.Idle;
 
 
         if (debugLog)
@@ -885,10 +759,6 @@ public class CutModule : MonoBehaviour
 
     private IEnumerator PlaySuccessSequence()
     {
-        successSequenceRunning = true;
-
-        cutting = false;
-        failed = false;
 
 
         // --------------------------------------------------------
@@ -977,6 +847,7 @@ public class CutModule : MonoBehaviour
         // 3. TRANSITION
         // --------------------------------------------------------
 
+        currentState = ModuleState.Transition;
         EnableOnly(rawTrans);
 
 
@@ -1019,9 +890,7 @@ public class CutModule : MonoBehaviour
         // 4. 当前 Cut 完整结束
         // --------------------------------------------------------
 
-        complete = true;
-
-        successSequenceRunning = false;
+        currentState = ModuleState.Done;
 
 
         // Trail 清理
