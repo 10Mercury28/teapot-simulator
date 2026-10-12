@@ -316,6 +316,22 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3573207233951669133, guid: 7ff5a9dc50d37a948845429749d0d612, type: 3}
+      propertyPath: leftSprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 46a14d0fa92bd4e3b901dc3eb8006a31, type: 3}
+    - target: {fileID: 3573207233951669133, guid: 7ff5a9dc50d37a948845429749d0d612, type: 3}
+      propertyPath: rightSprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 92189ae53e31a446ba545f6b0e4fc32f, type: 3}
+    - target: {fileID: 3573207233951669133, guid: 7ff5a9dc50d37a948845429749d0d612, type: 3}
+      propertyPath: centerSprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 197a109acad24435cacec111dfb739c3, type: 3}
+    - target: {fileID: 3573207233951669133, guid: 7ff5a9dc50d37a948845429749d0d612, type: 3}
+      propertyPath: fallbackSprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 197a109acad24435cacec111dfb739c3, type: 3}
     - target: {fileID: 3874570337850603007, guid: 7ff5a9dc50d37a948845429749d0d612, type: 3}
       propertyPath: m_Pivot.x
       value: 0
