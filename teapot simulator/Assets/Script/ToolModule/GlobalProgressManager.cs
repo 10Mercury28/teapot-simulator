@@ -51,6 +51,19 @@ public class GlobalProgressManager : MonoBehaviour
             if (debugLog)
                 Debug.Log("🧭 自动初始化场景顺序：choose → pat → choose → cut → choose → end");
         }
+        else
+        {
+            // 自动纠错与修剪空格，防止 Inspector 误填（如 "patScene 1"）
+            for (int i = 0; i < sceneSequence.Count; i++)
+            {
+                if (string.IsNullOrEmpty(sceneSequence[i])) continue;
+                sceneSequence[i] = sceneSequence[i].Trim();
+                if (sceneSequence[i] == "patScene 1")
+                {
+                    sceneSequence[i] = "patScene";
+                }
+            }
+        }
     }
 
     void OnEnable()

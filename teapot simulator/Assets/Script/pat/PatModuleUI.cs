@@ -29,8 +29,8 @@ public class PatModuleUI : MonoBehaviour
     {
         if (!module || !ui) return;
 
-        bool inTransition = GetInTransition();
-        int hits = GetHits();
+        bool inTransition = module.inTransition;
+        int hits = module.CurrentHits;
 
         bool failShowing = module.failRaw && module.failRaw.enabled;
         bool transitionShowing = module.transitionRaw && module.transitionRaw.enabled;
@@ -79,21 +79,4 @@ public class PatModuleUI : MonoBehaviour
             lastHits = hits;
         }
     }
-
-    // ===================== 反射 =====================
-
-    bool GetInTransition()
-    {
-        return module.currentState == PatModule.PatState.TransitionLoop || module.currentState == PatModule.PatState.SwitchingToMain;
-    }
-
-    int GetHits()
-    {
-        var f = typeof(PatModule).GetField(
-            "currentHits",
-            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance
-        );
-        return (int)f.GetValue(module);
-    }
-    
 }

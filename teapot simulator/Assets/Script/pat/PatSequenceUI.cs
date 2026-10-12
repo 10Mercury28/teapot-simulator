@@ -29,8 +29,8 @@ public class PatSequenceUI : MonoBehaviour
                 continue;
             }
 
-            bool inTrans = GetTransition(m);
-            int hits = GetHits(m);
+            bool inTrans = m.inTransition;
+            int hits = m.CurrentHits;
 
             string status = m.complete ? "DONE" :
                 (m.active ? "ACTIVE" : "IDLE");
@@ -41,20 +41,5 @@ public class PatSequenceUI : MonoBehaviour
         }
 
         debugText.text = sb.ToString();
-    }
-
-    bool GetTransition(PatModule m)
-    {
-        var f = typeof(PatModule).GetField("inTransition",
-            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        return (bool)f.GetValue(m);
-    }
-
-    int GetHits(PatModule m)
-    {
-        var f = typeof(PatModule).GetField("currentHits",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-        return (int)f.GetValue(m);
     }
 }

@@ -335,7 +335,7 @@ MonoBehaviour:
   sceneTransitioning: 0
   sceneSequence:
   - chooseToolBasedOnCut
-  - patScene 1
+  - patScene
   - chooseToolBasedOnCut
   - cutScene
   - endScene

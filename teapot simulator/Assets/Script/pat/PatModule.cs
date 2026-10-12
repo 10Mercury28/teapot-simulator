@@ -14,6 +14,8 @@ public class PatModule : MonoBehaviour
 
     public bool active => currentState != PatState.Inactive && currentState != PatState.Done;
     public bool complete => currentState == PatState.Done;
+    public bool inTransition => currentState == PatState.TransitionLoop || currentState == PatState.SwitchingToMain;
+    public int CurrentHits => currentHits;
 
     [Header("Gameplay")]
     public int requiredHits = 20;
