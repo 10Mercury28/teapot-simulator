@@ -41,7 +41,26 @@ public class SceneBlinkTransition : MonoBehaviour
         }
 
         // 异步加载下一个场景（黑屏中）
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
+        AsyncOperation asyncLoad = null;
+        try
+        {
+            asyncLoad = SceneManager.LoadSceneAsync(sceneName);
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"[SceneBlinkTransition] 加载场景 '{sceneName}' 异常: {ex.Message}");
+        }
+
+        if (asyncLoad == null)
+        {
+            Debug.LogError($"❌ [SceneBlinkTransition] 无法加载场景 '{sceneName}' (未在 Build Settings 中添加或场景尚未制作)。正在恢复画面防永久黑屏卡死！");
+            if (blink != null)
+            {
+                blink.ForceOpenEyes(0.1f);
+            }
+            yield break;
+        }
+
         asyncLoad.allowSceneActivation = false;
 
         while (!asyncLoad.isDone)

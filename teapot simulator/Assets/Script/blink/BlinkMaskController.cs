@@ -180,5 +180,6 @@ public class BlinkMaskController : MonoBehaviour
         }
     }
 
+    public void ForceOpenEyes(float delay = 0.1f) => StartCoroutine(OpenEyesAfterDelay(delay));
     public void ForceBlink() => StartCoroutine(BlinkOnce());
 }

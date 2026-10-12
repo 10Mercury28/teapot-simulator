@@ -53,9 +53,15 @@ public class ChooseModule : MonoBehaviour
     private GlobalProgressManager global;
     private Camera mainCam;
 
+    private VideoController ctrlMain;
+    private VideoController ctrlFail;
+    private VideoController ctrlWrong;
+
     private bool dragging = false;
     private bool prepared = false;
+    private bool hasReachedC = false;
     private float currentPercent = 0f;
+    private Coroutine activeRoutine = null;
 
     // ----------------------------------------------------
     // 初始化
@@ -64,18 +70,27 @@ public class ChooseModule : MonoBehaviour
     {
         mainCam = Camera.main;
         global = GlobalProgressManager.Instance;
+        BindControllers();
         HideAll();
         SetAreaAlpha(normalAlpha);
-        UpdateDottedLineAlpha(); // 初始化时同步一次
+        UpdateDottedLineAlpha();
     }
 
     public void Init(ChooseController ctrl)
     {
         controller = ctrl;
         global = GlobalProgressManager.Instance;
+        BindControllers();
         HideAll();
         SetAreaAlpha(normalAlpha);
-        UpdateDottedLineAlpha(); // 初始化时同步一次
+        UpdateDottedLineAlpha();
+    }
+
+    private void BindControllers()
+    {
+        if (videoMain != null && ctrlMain == null) ctrlMain = VideoController.GetOrCreate(videoMain);
+        if (videoFail != null && ctrlFail == null) ctrlFail = VideoController.GetOrCreate(videoFail);
+        if (videoWrong != null && ctrlWrong == null) ctrlWrong = VideoController.GetOrCreate(videoWrong);
     }
 
     // ----------------------------------------------------
@@ -86,71 +101,71 @@ public class ChooseModule : MonoBehaviour
         if (controller == null || (global != null && global.sceneTransitioning)) return;
         if (!mainCam) mainCam = Camera.main;
 
-        // 🔸 每帧更新 dotted line 透明度（平滑）
+        // 平滑更新 dotted line 透明度
         UpdateDottedLineAlpha();
 
+        if (mainCam == null) return;
         Vector2 mouseWorld = mainCam.ScreenToWorldPoint(Input.mousePosition);
 
         // 点击 A 区 → 开始交互
         if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log($"[ChooseModule {moduleName}] Mouse down! dragging={dragging}");
             if (!dragging)
             {
-                if (areaA != null)
+                if (areaA != null && areaA.OverlapPoint(mouseWorld))
                 {
-                    bool overlap = areaA.OverlapPoint(mouseWorld);
-                    Debug.Log($"[ChooseModule {moduleName}] areaA overlap with {mouseWorld}? {overlap}");
-                    
-                    if (overlap)
+                    if (global != null && global.currentOrder != orderIndex)
                     {
-                        if (global != null)
-                        {
-                            Debug.Log($"[ChooseModule {moduleName}] global.currentOrder={global.currentOrder}, this.orderIndex={orderIndex}");
-                            if (global.currentOrder != orderIndex)
-                            {
-                                Debug.Log($"❌ Wrong order clicked on {moduleName}");
-                                StartCoroutine(PlayWrongOrderSelf());
-                                return;
-                            }
-                        }
-
-                        controller.NotifyModuleStarted(this);
-                        dragging = true;
-                        currentPercent = 0f;
-                        StartCoroutine(RestartAndPrepareMain());
-                        Debug.Log($"[{moduleName}] ✅ 开始拖动播放");
+                        Debug.Log($"❌ Wrong order clicked on {moduleName}");
+                        StartSequence(PlayWrongOrderSelf());
+                        return;
                     }
-                }
-                else
-                {
-                    Debug.LogWarning($"[ChooseModule {moduleName}] areaA is NULL!");
+
+                    controller.NotifyModuleStarted(this);
+                    dragging = true;
+                    hasReachedC = false;
+                    currentPercent = 0f;
+                    StartSequence(RestartAndPrepareMain());
+                    Debug.Log($"[{moduleName}] ✅ 开始拖动播放");
                 }
             }
         }
 
-        // 拖动控制视频帧
-        if (dragging && Input.GetMouseButton(0) && prepared && videoMain != null && videoMain.isPrepared)
+        // 拖动控制视频帧 (通过 VideoController 30fps 节流，完全杜绝每帧生成协程和 AVPlayer 解码塞车)
+        if (dragging && Input.GetMouseButton(0) && prepared)
         {
             UpdateVideoProgress(mouseWorld);
         }
 
-        // 松手判断成功 / 失败
+        // 松手判断成功 / 失败 (带手感容差：划满 85% 或曾触达 C 区均判成功)
         if (Input.GetMouseButtonUp(0) && dragging)
         {
             dragging = false;
 
-            if (areaC && areaC.OverlapPoint(mouseWorld))
+            bool isSuccess = hasReachedC ||
+                             (areaC != null && areaC.OverlapPoint(mouseWorld)) ||
+                             currentPercent >= 0.85f;
+
+            if (isSuccess)
             {
-                Debug.Log($"[{moduleName}] 🏁 到达C区 → 播放完结");
-                StartCoroutine(PlayToEnd(videoMain, rawMain, true));
+                Debug.Log($"[{moduleName}] 🏁 成功到达终点 (progress={currentPercent:P0}) → 播放完结");
+                StartSequence(PlayToEnd(videoMain, rawMain, true));
             }
             else
             {
-                Debug.Log($"[{moduleName}] ❌ 未到达C区 → 播放失败");
-                StartCoroutine(PlayFailVideo());
+                Debug.Log($"[{moduleName}] ❌ 未到达终点 (progress={currentPercent:P0}) → 播放失败");
+                StartSequence(PlayFailVideo());
             }
         }
+    }
+
+    private void StartSequence(IEnumerator routine)
+    {
+        if (activeRoutine != null)
+        {
+            StopCoroutine(activeRoutine);
+        }
+        activeRoutine = StartCoroutine(routine);
     }
 
     // ----------------------------------------------------
@@ -164,62 +179,97 @@ public class ChooseModule : MonoBehaviour
 
         if (videoMain == null || rawMain == null) yield break;
 
-        videoMain.Stop();
-        videoMain.time = 0;
-        videoMain.Prepare();
-        while (!videoMain.isPrepared)
-            yield return null;
+        BindControllers();
+
+        bool isPrepared = false;
+        ctrlMain.PrepareNow(() => isPrepared = true);
+        while (!isPrepared) yield return null;
 
         rawMain.enabled = true;
-        videoMain.Play();
-        videoMain.Pause();
-        prepared = true;
 
-        Debug.Log($"[{moduleName}] 🎞️ 主视频准备完毕 (length {videoMain.clip.length:F2}s)");
+        // 预渲染第 0 帧到 RenderTexture，并给底层渲染管线 0.04s 缓冲防黑屏闪烁
+        videoMain.time = 0;
+        videoMain.Play();
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForSecondsRealtime(0.04f);
+        videoMain.Pause();
+        videoMain.time = 0;
+
+        prepared = true;
+        Debug.Log($"[{moduleName}] 🎞️ 主视频准备完毕 (length {videoMain.length:F2}s)");
     }
 
     private void UpdateVideoProgress(Vector2 mousePos)
     {
-        if (!videoMain.isPrepared) return;
+        if (videoMain == null || !videoMain.isPrepared) return;
 
-        Vector2 A = startPoint.position;
-        Vector2 C = endPoint.position;
-        Vector2 AC = C - A;
-        Vector2 AM = mousePos - A;
+        if (startPoint != null && endPoint != null)
+        {
+            Vector2 A = startPoint.position;
+            Vector2 C = endPoint.position;
+            Vector2 AC = C - A;
+            Vector2 AM = mousePos - A;
 
-        float projection = Vector2.Dot(AM, AC.normalized);
-        currentPercent = Mathf.Clamp01(projection / AC.magnitude);
+            float mag = AC.magnitude;
+            if (mag > 0.001f)
+            {
+                float projection = Vector2.Dot(AM, AC.normalized);
+                currentPercent = Mathf.Clamp01(projection / mag);
+            }
+        }
 
-        double targetTime = currentPercent * videoMain.clip.length;
-        videoMain.time = targetTime;
-        videoMain.Play();
-        StartCoroutine(ForcePauseAfterFrame(videoMain));
+        // 终点触达标记
+        if (areaC != null && areaC.OverlapPoint(mousePos))
+        {
+            hasReachedC = true;
+        }
 
-        Debug.Log($"{moduleName} 拖动进度: {currentPercent * 100f:F1}% → time={videoMain.time:F2}s/{videoMain.clip.length:F2}s");
-    }
-
-    private IEnumerator ForcePauseAfterFrame(VideoPlayer vp)
-    {
-        yield return new WaitForEndOfFrame();
-        vp.Pause();
+        // 接入 VideoController 进行 30fps 节流 Scrubbing，零 GC 分配，彻底根除 Mac 滑动掉帧
+        if (ctrlMain != null)
+        {
+            ctrlMain.ScrubTo(currentPercent);
+        }
+        else
+        {
+            videoMain.time = currentPercent * videoMain.length;
+            videoMain.StepForward();
+        }
     }
 
     private IEnumerator PlayToEnd(VideoPlayer vp, RawImage raw, bool success)
     {
         if (vp == null || raw == null) yield break;
-        vp.time = currentPercent * vp.clip.length;
+
+        double len = vp.length > 0 ? vp.length : (vp.clip != null ? vp.clip.length : 1.0);
+        vp.time = currentPercent * len;
         vp.Play();
-        yield return new WaitUntil(() => !vp.isPlaying);
+
+        // 留一点缓冲时间等视频起播
+        float timeout = 1f;
+        while (!vp.isPlaying && timeout > 0)
+        {
+            timeout -= Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        while (vp.isPlaying)
+        {
+            yield return null;
+        }
+
         vp.Stop();
         raw.enabled = false;
         if (canvasRoot) canvasRoot.SetActive(false);
 
         if (success)
         {
-            controller.OnModuleCompleted(this);
-            if (!string.IsNullOrEmpty(nextSceneName))
+            if (controller != null)
             {
-                Debug.Log($"[{moduleName}] ✅ 切换场景 → {nextSceneName}");
+                controller.OnModuleCompleted(this);
+            }
+            else if (!string.IsNullOrEmpty(nextSceneName))
+            {
+                Debug.Log($"[{moduleName}] ✅ 无控制器，直接切换场景 → {nextSceneName}");
                 SceneManager.LoadScene(nextSceneName);
             }
         }
@@ -233,15 +283,28 @@ public class ChooseModule : MonoBehaviour
 
         if (videoFail == null || rawFail == null) yield break;
 
-        videoFail.Stop();
-        videoFail.time = 0;
-        videoFail.Prepare();
-        while (!videoFail.isPrepared) yield return null;
+        BindControllers();
+
+        bool isPrepared = false;
+        ctrlFail.PrepareNow(() => isPrepared = true);
+        while (!isPrepared) yield return null;
 
         rawFail.enabled = true;
+        videoFail.time = 0;
         videoFail.Play();
         Debug.Log($"[{moduleName}] ▶ 播放失败视频");
-        yield return new WaitForSeconds((float)videoFail.clip.length);
+
+        float timeout = 1f;
+        while (!videoFail.isPlaying && timeout > 0)
+        {
+            timeout -= Time.unscaledDeltaTime;
+            yield return null;
+        }
+        while (videoFail.isPlaying)
+        {
+            yield return null;
+        }
+
         videoFail.Stop();
         rawFail.enabled = false;
         if (canvasRoot) canvasRoot.SetActive(false);
@@ -259,15 +322,28 @@ public class ChooseModule : MonoBehaviour
             yield break;
         }
 
-        videoWrong.Stop();
-        videoWrong.time = 0;
-        videoWrong.Prepare();
-        while (!videoWrong.isPrepared) yield return null;
+        BindControllers();
+
+        bool isPrepared = false;
+        ctrlWrong.PrepareNow(() => isPrepared = true);
+        while (!isPrepared) yield return null;
 
         rawWrong.enabled = true;
+        videoWrong.time = 0;
         videoWrong.Play();
         Debug.Log($"[{moduleName}] ▶ 播放 Wrong 视频 ✅");
-        yield return new WaitForSeconds((float)videoWrong.clip.length);
+
+        float timeout = 1f;
+        while (!videoWrong.isPlaying && timeout > 0)
+        {
+            timeout -= Time.unscaledDeltaTime;
+            yield return null;
+        }
+        while (videoWrong.isPlaying)
+        {
+            yield return null;
+        }
+
         videoWrong.Stop();
         rawWrong.enabled = false;
         if (canvasRoot) canvasRoot.SetActive(false);
@@ -300,7 +376,7 @@ public class ChooseModule : MonoBehaviour
         sr.color = c;
     }
 
-    // 🔸 新增：更新 dotted line 透明度
+    // 更新 dotted line 透明度
     private void UpdateDottedLineAlpha()
     {
         if (dottedLine == null || global == null) return;
@@ -310,11 +386,15 @@ public class ChooseModule : MonoBehaviour
             : dottedAlphaInactive;
 
         Color c = dottedLine.color;
-        c.a = Mathf.Lerp(c.a, targetAlpha, Time.deltaTime * 6f);
-        dottedLine.color = c;
+        if (Mathf.Abs(c.a - targetAlpha) > 0.005f)
+        {
+            c.a = Mathf.Lerp(c.a, targetAlpha, Time.deltaTime * 6f);
+            dottedLine.color = c;
+        }
     }
 
     public void HideAllForExternal() => HideAll();
+
     public void SetModuleActive(bool active)
     {
         if (canvasRoot)
@@ -324,9 +404,14 @@ public class ChooseModule : MonoBehaviour
 
         if (!active)
         {
-            if (videoMain) videoMain.Pause();
-            if (videoFail) videoFail.Pause();
-            if (videoWrong) videoWrong.Pause();
+            if (ctrlMain != null) ctrlMain.StopAndReset();
+            else if (videoMain != null) videoMain.Stop();
+
+            if (ctrlFail != null) ctrlFail.StopAndReset();
+            else if (videoFail != null) videoFail.Stop();
+
+            if (ctrlWrong != null) ctrlWrong.StopAndReset();
+            else if (videoWrong != null) videoWrong.Stop();
         }
     }
 }

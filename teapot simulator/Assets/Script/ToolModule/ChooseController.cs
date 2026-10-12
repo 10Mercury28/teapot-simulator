@@ -29,8 +29,8 @@ public class ChooseController : MonoBehaviour
             return;
         }
 
-        var global = GlobalProgressManager.Instance;
-        Debug.Log($"[ChooseController] InitializeModules started. global.currentOrder = {global.currentOrder}");
+        global = GlobalProgressManager.Instance;
+        Debug.Log($"[ChooseController] InitializeModules started. global.currentOrder = {(global != null ? global.currentOrder : 0)}");
 
         for (int i = 0; i < chooseModules.Count; i++)
         {
@@ -39,20 +39,21 @@ public class ChooseController : MonoBehaviour
                 chooseModules[i].Init(this);  // ✅ 必须初始化！
                 
                 // ⚠️ 正确逻辑：必须用 Inspector 里填写的 orderIndex 来和全局进度对比！
-                bool active = (chooseModules[i].orderIndex == global.currentOrder);
+                bool active = (global != null) ? (chooseModules[i].orderIndex == global.currentOrder) : (i == 0);
                 Debug.Log($"[ChooseController] module '{chooseModules[i].moduleName}' (orderIndex={chooseModules[i].orderIndex}) -> SetModuleActive({active})");
                 
                 chooseModules[i].SetModuleActive(active);
             }
         }
 
-        Debug.Log($"✅ 模块初始化完成，当前全局进度索引 {global.currentOrder}");
+        Debug.Log($"✅ 模块初始化完成，当前全局进度索引 {(global != null ? global.currentOrder : 0)}");
     }
 
     private void PlayIntroSequence()
     {
         if (v1 != null)
         {
+            v1.loopPointReached -= OnV1Finished;
             v1.loopPointReached += OnV1Finished;
             v1.Play();
         }
@@ -67,6 +68,7 @@ public class ChooseController : MonoBehaviour
     {
         if (v1 != null)
         {
+            v1.loopPointReached -= OnV1Finished;
             v1.Stop();
             v1.gameObject.SetActive(false);
         }
@@ -78,18 +80,32 @@ public class ChooseController : MonoBehaviour
         }
     }
 
+    void OnDestroy()
+    {
+        if (v1 != null)
+        {
+            v1.loopPointReached -= OnV1Finished;
+        }
+    }
+
     public void OnModuleCompleted(ChooseModule module)
     {
-        global.AdvanceOrder();
+        if (global != null)
+        {
+            global.AdvanceOrder();
+        }
 
         // 跨场景架构下，AdvanceOrder 会立刻切场景，这部分其实不会在视觉上停留太久
         // 但为了严谨，我们同样修正这里的激活判断：
-        for (int i = 0; i < chooseModules.Count; i++)
+        if (chooseModules != null && global != null)
         {
-            if (chooseModules[i] != null)
+            for (int i = 0; i < chooseModules.Count; i++)
             {
-                bool active = (chooseModules[i].orderIndex == global.currentOrder);
-                chooseModules[i].SetModuleActive(active);
+                if (chooseModules[i] != null)
+                {
+                    bool active = (chooseModules[i].orderIndex == global.currentOrder);
+                    chooseModules[i].SetModuleActive(active);
+                }
             }
         }
     }

@@ -144,7 +144,7 @@ public class VideoController : MonoBehaviour
     /// </summary>
     public void ScrubTo(float progress)
     {
-        if (vp == null || vp.clip == null) return;
+        if (vp == null || (vp.clip == null && string.IsNullOrEmpty(vp.url))) return;
         
         if (!vp.isPrepared)
         {
@@ -157,7 +157,8 @@ public class VideoController : MonoBehaviour
         lastScrubTime = Time.unscaledTime;
 
         targetTime = -1.0; 
-        double time = vp.length * Mathf.Clamp01(progress);
+        double len = vp.length > 0 ? vp.length : (vp.clip != null ? vp.clip.length : 1.0);
+        double time = len * Mathf.Clamp01(progress);
         
         if (vp.isPlaying) vp.Pause();
         
