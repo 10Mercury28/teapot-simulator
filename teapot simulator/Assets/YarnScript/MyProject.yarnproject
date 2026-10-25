@@ -1,0 +1,15 @@
+{
+  "projectFileVersion": 4,
+  "sourceFiles": [
+    "Character_Jushi.yarn"
+  ],
+  "excludeFiles": [
+    "**/*~/*",
+    "./Samples/Yarn Spinner*/*"
+  ],
+  "localisation": {},
+  "baseLanguage": "zh-CHS",
+  "compilerOptions": {
+    "diagnosticsSeverity": {}
+  }
+}

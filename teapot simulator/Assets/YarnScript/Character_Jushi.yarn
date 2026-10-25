@@ -1,0 +1,9 @@
+﻿title: Character_Jushi
+---
+Narrator: This is an example of a Yarn Spinner script. Write your dialogue here!
+    -> Narrator: this is option A
+        Narrator: wohooo!!
+    -> Narrator: well this is obviously option C
+        Narrator: haha you fool!
+You: oh-ooh!
+===
