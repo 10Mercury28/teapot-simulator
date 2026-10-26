@@ -1,7 +1,7 @@
 {
   "projectFileVersion": 4,
   "sourceFiles": [
-    "Character_Jushi.yarn"
+    "Character_Jushi_revised.yarn"
   ],
   "excludeFiles": [
     "**/*~/*",
