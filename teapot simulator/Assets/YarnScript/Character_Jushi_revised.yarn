@@ -190,7 +190,7 @@ title: SengMao
     居士: 我既愿意接待她，花了我的功夫，这才是我在意她。
     居士: 和钱有什么关系？
 
-    <<if $LikeStory and not $TriedGongChun>>
+    <<if $LikeU and not $TriedGongChun>>
         -> 我再为您看看供春壶。
             我: 是我说得不妥当。岗前培训这么教，我想当然就说了。
             （居士温和地笑，自己翻看了一会册子）
