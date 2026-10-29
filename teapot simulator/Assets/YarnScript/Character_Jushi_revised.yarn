@@ -16,6 +16,8 @@ title: JushiVariables
 <<declare $AskedMiZong = false>>
 <<declare $AskedDengji = false>>
 <<declare $AskedOurs = false>>
+<<declare $JushiSuccess = false>>
+<<declare $JushiFailed = false>>
 ===
 
 title: Character_Jushi
@@ -348,6 +350,7 @@ title: SucEnd
     <<jump GongChun>>
 <<endif>>
 居士: 时间不早了，丫头，我回去了。
+居士: 就听你的，要这一把供春壶。
 居士: 辛苦你接待我，额外做了不少活。
 居士: 你这么小的年纪……（轻轻拍拍你的肩膀）比我儿子都小。
 居士: 他在国外念书，念博士的。
@@ -363,6 +366,7 @@ title: SucEnd
 我: 好的。
 // 游戏端触发商品结算、扫码事件。
 （请扫码。）
+<<set $JushiSuccess to true>>
 <<stop>>
 ===
 
@@ -372,6 +376,7 @@ title: FailEnd
 居士: 我下次再来，先走了。为了我来这一趟，也耽误你不少事。
 // 游戏端事件：老师后来询问居士为何另外约她在店的时候过来。
 (弹窗设计：老师事后问你怎么招待的，怎么居士另外约她在的时间来。)
+<<set $JushiFailed to true>>
 <<stop>>
 ===
  
