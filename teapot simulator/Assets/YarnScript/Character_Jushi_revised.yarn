@@ -18,6 +18,7 @@ title: JushiVariables
 <<declare $AskedOurs = false>>
 <<declare $JushiSuccess = false>>
 <<declare $JushiFailed = false>>
+<<declare $D1TalkedCicada = false>>
 ===
 
 title: Character_Jushi
@@ -141,6 +142,7 @@ title: RockNRoll
 我: 哈哈哈。
 居士: 这小姑娘说话真新奇。就要和你们小丫头说话，我们也年轻点。（温和地笑）
 我: 这是我在网上看到的。
+<<set $D1TalkedCicada to true>>
 <<return>>
 ===
 

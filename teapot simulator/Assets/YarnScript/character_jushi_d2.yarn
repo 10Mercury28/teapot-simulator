@@ -1,4 +1,5 @@
 title: JushiD2_Variables
+position: 12,12
 ---
 // 不要重复声明上一场已有的 $LikeU / $JushiSuccess。
 // 交心标记：沿用第一场 $LikeU；若含义不同，替换 D2_Start 中的判断。
@@ -19,84 +20,84 @@ title: JushiD2_Variables
 <<declare $D2SeenHeHuan = false>>
 <<declare $D2SeenFang = false>>
 <<declare $D2ScanMatched = false>>
-<<declare $D2GiftCode = "">>
 <<declare $D2GiftName = "">>
+<<declare $D2FangReserved = false>>
+<<declare $D2GiftCode = "">>
+<<declare $D2PackReturn = 0>>
+<<declare $D2GiftMenuVisited = false>>
+<<declare $D2FlowerIntroduced = false>>
+<<declare $D2ClassicIntroduced = false>>
+<<declare $D2ViewedMei = false>>
+<<declare $D2ViewedFoShou = false>>
+<<declare $D2ViewedHeHuan = false>>
+<<declare $D2ViewedFang = false>>
+<<declare $D2AcceptFang = false>>
+<<declare $D2ViewedCount = 0>>
 ===
 
 title: Character_Jushi_D2
+position: 3541,687
 ---
 // 启动入口；不要从声明节点启动。
 <<jump JushiD2_Start>>
 ===
 
 title: JushiD2_Start
+position: 3541,912
 ---
 <<if $D2Finished>>
     <<stop>>
 <<endif>>
 <<set $D2Started to true>>
-旁白: 【15:49，老师发来消息：她又来了。】
+【15:49，老师发来消息：她又来了。】
 <<if $LikeU>>
-    旁白: 【微信弹窗连着出现许多条未读语音。】
+    【微信弹窗连着出现许多条未读语音。】
     // HINT：在这里插入微信 UI 命令；不是 Yarn 内置功能。
 <<else>>
-    旁白: 【老师只发来一条简短的消息。】
+    【老师只发来一条简短的消息。】
 <<endif>>
-居士：小姑娘！小姑娘！
-居士：江湖救急江湖救急！
-居士：快，给我做一个可以当给儿子女朋友当见面礼物的壶！ 
-我：嗯？ 
-居士：啊呀不要慢腾腾的，过来。 
-居士：他们晚上17：30开餐，估计现在已经要出发去打掼蛋了。
-居士：（啧了一声） 
+居士: 小姑娘！小姑娘！
+居士: 江湖救急江湖救急！
+居士: 快，给我做一个可以当给儿子女朋友当见面礼物的壶！ 
+我: 嗯？ 
+居士: 啊呀不要慢腾腾的，过来。 
+居士: 他们晚上17：30开餐，估计现在已经要出发去打掼蛋了。
+居士: （啧了一声） 
 我: 哦哦，您先看册子，这都是现货。
 我: 我一边给您先准备包装和礼袋一边听您说下需求，再来和您一起挑选。 
-居士：啊呀这有什么需求。（啧了一声） 
-居士：小姑娘是重庆人，在国内读的电子电器本科，马上去国外读研究生。
-居士：我儿子以后的同学。
-居士：啊呀多的我也不知道。 
-我：哈哈，第一次见面，估计两边都紧张呢。您放松。 
-我：您这么有涵养，姑娘见了肯定给令郎加分。 
-居士：嗯。 
+居士: 啊呀这有什么需求。（啧了一声） 
+居士: 小姑娘是重庆人，在国内读的电子电器本科，马上去国外读研究生。
+居士: 我儿子以后的同学。
+居士: 啊呀多的我也不知道。 
+我: 哈哈，第一次见面，估计两边都紧张呢。您放松。 
+我: 您这么有涵养，姑娘见了肯定给令郎加分。 
+居士: 嗯。 
 （两边都无话了一阵） 
 <<jump JushiD2_FirstSilence>>
 ===
 
 title: JushiD2_FirstSilence
 ---
--> （我不敢停手，收拾着柜台后面待用的空盒子和礼袋） 
-    （居士啧了一声）
--> （试着打破沉默）您看……
-    （居士咬着自己唇上地死皮）
-<<jump JushiD2_PrePitch>>
-===
+-> （我不敢停手，收拾着柜台后面待用的空盒子和礼袋）
 
-title: JushiD2_EarlyPack
----
-<<if $D2Pack == 0>>
-    旁白: 你从柜台后找出老板为女性顾客定制的礼盒。
-    <<set $D2Pack to 1>>
-<<endif>>
-// HINT：插入居士啧嘴、撕嘴角的动作。
+-> （试着打破沉默）您看……
+    （居士咬着自己唇上的死皮。）
 <<jump JushiD2_PrePitch>>
 ===
 
 title: JushiD2_PrePitch
+position: 3295,1362
 ---
 // HINT：加入「传世系列／闺趣系列」对话及居士的催促。
-我：对方家里应该不太了解紫砂壶吧，我们可以看看传世系列，也可以看看闺趣系列。 
-
-居士：有什么区别？ 
-
-我： 传世系列都是经典壶形；闺趣。。都是我们老板认为很符合姑娘们审美的壶。 
-
-居士：这和我有什么关系。你理不理解我需要买一个赶快走？ 
+我: 对方家里应该不太了解紫砂壶吧，我们可以看看传世系列，也可以看看闺趣系列。 
+居士: 有什么区别？ 
+我: 传世系列都是经典壶形；闺趣。。都是我们老板认为很符合姑娘们审美的壶。 
+居士: 这和我有什么关系。你理不理解我需要买一个赶快走？ 
 <<jump JushiD2_PitchMenu>>
 ===
 
-
-
 title: JushiD2_PitchMenu
+position: 2259,1587
 ---
 <<if $D2TriedFamily and $D2TriedWelcome and $D2TriedSmall and $D2TriedVirtue>>
     <<jump JushiD2_Phones>>
@@ -115,6 +116,7 @@ title: JushiD2_PitchMenu
 
 
 title: JushiD2_TraditionalMenu
+position: 2037,687
 ---
 // 第二层：传世系列，两种话术各一次
 
@@ -137,6 +139,7 @@ title: JushiD2_TraditionalMenu
 
 
 title: JushiD2_GuiquMenu
+position: 2436,462
 ---
 // 第二层：闺趣系列，两种话术各一次
 
@@ -157,14 +160,15 @@ title: JushiD2_GuiquMenu
 
 
 title: JushiD2_PitchFamily
+position: 2148,1137
 ---
 居士: 什么意思？ 
-我：您家和女方家庭来往嘛。。。就很经典款不出错。。。 
+我: 您家和女方家庭来往嘛。。。就很经典款不出错。。。 
 我: 好一些经典款自己带一些贤达家族的典故呢。 
-我：毕竟是两家第一次正式往来，选经典器型会显得庄重一些。 
-居士： 两家？ 
-居士： 哪两家？谁跟谁家？ 
-我： 就是……您家和姑娘家…… 
+我: 毕竟是两家第一次正式往来，选经典器型会显得庄重一些。 
+居士: 两家？ 
+居士: 哪两家？谁跟谁家？ 
+我: 就是……您家和姑娘家…… 
 (居士一怔，然后温和地一笑。) 
 -> （你手上不停收拾）
     <<jump JushiD2_PackBeforePhone>>
@@ -178,54 +182,57 @@ title: JushiD2_PitchFamily
 
 
 title: JushiD2_PitchWelcome
+position: 2480,912
 ---
-我：欢迎重庆姑娘加入宜兴家庭，咱拿壶当家族名片。 
-居士：加入谁家？ 
-我： ……您家的。 
-居士：加入谁家？这是你能说定的吗？ 
-居士：我生的孩子跟谁过，就是留在美国不回来，
-居士：去北上广或者重庆，就是住老婆家里，
-居士：都是我的孩子。 
-居士：加入谁家？（居士狠狠地一啧） 
+我: 欢迎重庆姑娘加入宜兴家庭，咱拿壶当家族名片。 
+居士: 加入谁家？ 
+我:  ……您家的。 
+居士: 加入谁家？这是你能说定的吗？ 
+居士: 我生的孩子跟谁过，就是留在美国不回来，
+居士: 去北上广或者重庆，就是住老婆家里，
+居士: 都是我的孩子。 
+居士: 加入谁家？（居士狠狠地一啧） 
 【你听见“伍尔夫”的呼唤】 
 <<jump JushiD2_Awkward>>
 ===
 
 
 title: JushiD2_PitchSmall
+position: 3040,912
 ---
-我：自古以来，有身份的女人的品味都这么被训练。
-居士：什么？你当你是在介绍洛阳龙门地武曌千佛窟？ 
-居士：女人送女人的场合，只知道小巧玲珑、花花草草的？ 
-居士：为这个理由，我买什么紫砂壶。 
+我: 自古以来，有身份的女人的品味都这么被训练。
+居士: 什么？你当你是在介绍洛阳龙门地武曌千佛窟？ 
+居士: 女人送女人的场合，只知道小巧玲珑、花花草草的？ 
+居士: 为这个理由，我买什么紫砂壶。 
 （居士啧了一声） 
 <<jump JushiD2_Awkward>>
 ===
 
 
 title: JushiD2_PitchVirtue
+position: 2760,687
 ---
-居士：嗯？
+居士: 嗯？
 -> 比如，咱们可以选一个宫灯壶，然后在工艺里挑选比翼鸟的泥绘。 <<if not $D2TriedBird>>
     <<set $D2TriedBird to true>>
-    居士：哟，比翼双飞？
+    居士: 哟，比翼双飞？
     （居士啧了一声）
     <<jump JushiD2_VirtueReturn>>
 
--> 比如，咱们可以选择蟠桃壶。
-    我: 这一把上面有四种生长阶段不同的桃子，代表四世同堂。。。  <<if not $D2TriedPeach>>
+-> 比如，咱们可以选择蟠桃壶。<<if not $D2TriedPeach>>
     <<set $D2TriedPeach to true>>
-    居士：偶哟，宜室宜家！
+    我: 这一把上面有四种生长阶段不同的桃子，代表四世同堂。。。  
+    居士: 偶哟，宜室宜家！
     （居士咬着自己唇上的死皮）
     <<jump JushiD2_VirtueReturn>>
 ===
 
 
 title: JushiD2_VirtueReturn
+position: 2760,912
 ---
-    居士：我都不知道她是什么人，你倒比我先知道她是什么品格？
-    居士：我都不知道她是什么人，你倒比我先知道她是什么品格？ 
-    居士：她还没进门呢！我还没点头呢！（居士啧了一声） 
+    居士: 我都不知道她是什么人，你倒比我先知道她是什么品格？ 
+    居士: 她还没进门呢！我还没点头呢！（居士啧了一声） 
     【你听见自己对宝钗的呼唤】
 // 两个例子都说过后，女性品德主话术才算完成
 <<if $D2TriedBird and $D2TriedPeach>>
@@ -238,17 +245,18 @@ title: JushiD2_VirtueReturn
 
 
 title: JushiD2_Awkward
+position: 2760,1137
 ---
 <<set $D2AwkwardCount to $D2AwkwardCount + 1>>
-我：（啊啊啊啊啊啊啊啊！）
-<<if $D2AwkwardCount >= 1>>
-    旁白: 【你听见 MBTI 的呼唤】
-<<elseif $D2AwkwardCount >= 2>>
-    旁白: 【你听见星座的呼唤】
-<<elseif $D2AwkwardCount >= 3>>
-    旁白: 【你听见生肖的呼唤】
+我: （啊啊啊啊啊啊啊啊！）
+<<if $D2AwkwardCount == 1>>
+    【你听见 MBTI 的呼唤】
+<<elseif $D2AwkwardCount == 2>>
+    【你听见星座的呼唤】
+<<elseif $D2AwkwardCount == 3>>
+    【你听见生肖的呼唤】
 <<endif>>
-我：(好尴尬！好尴尬！)
+我: (好尴尬！好尴尬！)
 -> （你手上不停，继续收拾）
     <<jump JushiD2_PackBeforePhone>>
 ->  抱歉，我再看看
@@ -259,21 +267,22 @@ title: JushiD2_Awkward
 
 
 title: JushiD2_PackBeforePhone
+position: 2259,1362
 ---
 <<if $D2Pack == 0>>
-    旁白: 从柜台后找出老板为女性客户定制的礼盒。
+    （你从柜台后找出老板为女性客户定制的礼盒。）
     <<set $D2Pack to 1>>
 <<elseif $D2Pack == 1>>
-    旁白: 把礼物袋按照折痕展开。
+    （你把礼物袋按照折痕展开。）
     <<set $D2Pack to 2>>
 <<elseif $D2Pack == 2>>
-    旁白: 打开礼物盒子，铺好衬布。
+    （你打开礼物盒子，铺好衬布。）
     <<set $D2Pack to 3>>
 <<elseif $D2Pack == 3>>
-    旁白: 挑选合适颜色的系带，丈量长度后裁下来。
+    （你挑选合适颜色的系带，丈量长度后裁下来。）
     <<set $D2Pack to 4>>
 <<else>>
-    旁白: 礼盒与系带已经准备好了，等选好茶壶就能装盒。
+    （你已经把礼盒与系带准备好了，等选好茶壶就能装盒。
 <<endif>>
 
 <<jump JushiD2_PitchMenu>>
@@ -281,6 +290,7 @@ title: JushiD2_PackBeforePhone
 
 
 title: JushiD2_Phones
+position: 2259,1812
 ---
 （一阵电话铃声响起）
 居士: 喂！喂？
@@ -334,86 +344,414 @@ title: JushiD2_Phones
 ===
 
 title: JushiD2_GiftMenu
+position: 1757,2037
 ---
-// 四把真正成交的壶：梅桩／佛手／合欢／方片。
-// 此处不排除已看过的选项：允许看过后改变主意。扫描成功才锁定。
--> 我再介绍一下梅桩壶。
-    <<jump JushiD2_Mei>>
--> 我再介绍一下佛手提梁壶。
-    <<jump JushiD2_FoShou>>
--> 我再介绍一下曼生合欢壶。
-    <<jump JushiD2_HeHuan>>
--> 我再介绍一下方片壶。
-    <<jump JushiD2_Fang>>
+// 第一次进入：原始两句话
+<<if not $D2GiftMenuVisited>>
+    <<set $D2GiftMenuVisited to true>>
+    <<jump JushiD2_GiftMenuFirst>>
+<<endif>>
+
+// 第二次以后：显示已有待选项
+<<jump JushiD2_GiftMenuReturn>>
 ===
 
-title: JushiD2_Mei
+title: JushiD2_GiftMenuFirst
 ---
-<<if not $D2SeenMei>>
-    <<set $D2SeenMei to true>>
-    // HINT：蟠桃过渡、梅花与梅桩区别；她说「已经被伐倒还有风中伫立的力气」。
+-> 那您看一下花器壶这一页，这便是蟠桃壶。
+    <<jump JushiD2_FlowerEntry>>
+
+-> 不会的，那我们把花器纳入考量。还有您之前说愿意看看的传世系列。
+    <<jump JushiD2_ClassicEntry>>
+===
+
+
+title: JushiD2_GiftMenuReturn
+---
+我: 目前咱们待选的是……
+
+<<if $D2ViewedMei>>
+    我: 梅桩壶
 <<endif>>
--> 就选梅桩，扫码取货。
-    <<jump JushiD2_ScanMei>>
--> 再看看别的。
+<<if $D2ViewedFoShou>>
+    我: 佛手提梁壶
+<<endif>>
+<<if $D2ViewedHeHuan>>
+    我: 曼生合欢壶
+<<endif>>
+<<if $D2AcceptFang>>
+    我: 方片壶
+<<endif>>
+（居士抿着嘴点了点头）
+// 四把全部进入待选名单时，强制选择佛手
+<<if $D2ViewedMei and $D2ViewedFoShou and $D2ViewedHeHuan and $D2AcceptFang>>
+    我: 侯居士，我们老师规定，一次最多只能拿出四把壶给客人品鉴。
+    我: 如果还想看别的，我们得先收回去一把。
+    居士: 啊呀，不麻烦了。
+    居士: 就那个佛手的吧。一看就知道是我送的。
+    <<jump JushiD2_BuyFoShou>>
+<<endif>>
+我: 有入您眼的吗？
+（居士温和地笑，眼睛一个个扫过这些壶。）
+
+-> 您刚看的梅桩壶可以吗？ <<if $D2ViewedMei>>
+    <<jump JushiD2_BuyMei>>
+
+-> 我们选佛手提梁壶吧。 <<if $D2ViewedFoShou>>
+    <<jump JushiD2_BuyFoShou>>
+
+-> 还是曼生合欢壶合适。 <<if $D2ViewedHeHuan>>
+    <<jump JushiD2_BuyHeHuan>>
+
+-> 就用方片壶咯？ <<if $D2AcceptFang>>
+    <<jump JushiD2_BuyFang>>
+
+-> 还有别的，我再给您介绍。 <<if not ($D2ViewedMei and $D2ViewedFoShou and $D2ViewedHeHuan and $D2ViewedFang)>>
+    <<jump JushiD2_GiftMoreMenu>>
+===
+
+title: JushiD2_GiftMoreMenu
+---
+（居士抿了抿嘴。）
+
+-> 我们看看花器系列的。 <<if not $D2ViewedMei or not $D2ViewedFoShou>>
+    <<jump JushiD2_FlowerEntry>>
+
+-> 我们看看传世系列的。 <<if not $D2ViewedHeHuan or not $D2ViewedFang>>
+    <<jump JushiD2_ClassicEntry>>
+
+-> 那我们再看看刚刚备选的几把。
+    <<jump JushiD2_GiftMenuReturn>>
+===
+
+title: JushiD2_FlowerEntry
+---
+<<if not $D2FlowerIntroduced>>
+    <<set $D2FlowerIntroduced to true>>
+    <<jump JushiD2_FlowerIntro>>
+<<endif>>
+
+<<jump JushiD2_FlowerMenu>>
+===
+
+title: JushiD2_FlowerIntro
+position: 545,2262
+---
+我: 有的花器是在圆形器或者筋囊器基础上添加模仿动植物形体的装饰，
+我: 有的花器自身便仿照植物形态设计。
+我: 您之前买的供春是后者，今天看的蟠桃壶是前者。
+居士: 嗯，再看看。
+<<jump JushiD2_FlowerMenu>>
+===
+
+title: JushiD2_FlowerMenu
+position: 572,462
+---
+// 每把壶只允许介绍一次
+-> 其实我更建议梅桩和梅花壶。 <<if not $D2ViewedMei>>
+    <<set $D2ViewedMei to true>>
+    <<set $D2ViewedCount to $D2ViewedCount + 1>>
+    <<jump JushiD2_MeiZhuang>>
+
+-> 这页所有花形我们都有现货。 <<if not $D2ViewedFoShou>>
+    <<set $D2ViewedFoShou to true>>
+    <<set $D2ViewedCount to $D2ViewedCount + 1>>
+    <<jump JushiD2_FoShou>>
+
+-> 嗯，咱们看看传世系列。
+    <<jump JushiD2_ClassicEntry>>
+===
+
+title: JushiD2_ClassicEntry
+---
+// 只有第一次进入传世才播放介绍
+<<if not $D2ClassicIntroduced>>
+    <<set $D2ClassicIntroduced to true>>
+    <<jump JushiD2_ClassicIntro>>
+<<endif>>
+
+<<jump JushiD2_ClassicMenu>>
+===
+
+title: JushiD2_ClassicIntro
+position: 1824,2262
+---
+// 第二层：合欢 / 方片
+居士: 嗯对，还有这个。
+居士: 你刚刚说，一有个壶专门关于宴会的？还有一个象征融合的？
+居士: 别弄得太玄乎，大家看不懂。
+<<jump JushiD2_ClassicMenu>>
+===
+
+
+title: JushiD2_ClassicMenu
+position: 444,12
+---
+// 不要在这里重复写 ClassicIntro 的两句对白
+
+-> 是，是这个曼生的合欢壶。 <<if not $D2ViewedHeHuan>>
+    <<set $D2ViewedHeHuan to true>>
+    <<set $D2ViewedCount to $D2ViewedCount + 1>>
+    <<jump JushiD2_HeHuan>>
+
+-> 是，是这个方片壶。 <<if not $D2ViewedFang>>
+    <<set $D2ViewedFang to true>>
+    <<set $D2ViewedCount to $D2ViewedCount + 1>>
+    <<jump JushiD2_FangPian>>
+
+-> 嗯，那我们回到闺趣系列。
+    <<jump JushiD2_FlowerEntry>>
+===
+
+
+title: JushiD2_MeiZhuang
+position: 1757,687
+---
+我: 我感觉女孩子不一定喜欢宜室宜家的祝福和意象了，
+    我: 尤其她还想要出去闯闯。
+    我: 梅花香自苦寒来，这是没有人不喜欢的。
+    居士: （看着壶，没有立刻接话。）
+    居士: 这个桩子做得蛮有力气的。
+    居士: 就是已经被伐倒，居然还有风中伫立的力气。
+    居士: 这个梅花款的还只是在圆形壶上添上几段梅枝。
+    居士: 梅桩这个已经和壶浑然一体了。
+    居士:  ……行啊。这个不俗气。
+<<jump JushiD2_MeiZhuangConfirm>>
+===
+
+title: JushiD2_MeiZhuangConfirm
+position: 1757,1587
+---
+-> 好的，这就为您打包。
+    <<jump JushiD2_BuyMei>>
+
+-> 我们先备选，您再看看刚刚说的这些。
     <<jump JushiD2_GiftMenu>>
 ===
 
 title: JushiD2_FoShou
+position: 1536,687
 ---
-<<if not $D2SeenFoShou>>
-    <<set $D2SeenFoShou to true>>
-    // HINT：佛手果实、提梁；她讲择父母、种子、引业满业；【柯湘、宝钗呼唤】。
-    // 只首次讲宗教独白，返回时不要重演。
-<<endif>>
--> 就选佛手，扫码取货。
-    <<jump JushiD2_ScanFoShou>>
--> 再看看别的。
+居士: 哟，还有个佛手的。这小壶钮，怪可爱。
+我: 佛手是香橼，一种柑橘果实，长得像伸开的手指。
+我: 传统上取它“佛”“福”相近的吉祥意思。
+我: 这一款和蟠桃壶是一样的泥料，都是在固定器形上添加装饰。
+我: 不过，这把壶是提梁壶，还不是基础款呢。
+我: 您要是买这个，和之前的供春壶也能拉开差异。
+居士: 有福气，有缘分，意义倒是挺好。
+居士: （抿了抿嘴）其实啊，人的福气，不只是这一辈子的事情。
+我: 嗯？
+居士: 你知道，就像我们现在选壶，是因为品味到了、这个也够了——
+（她用手指做了个数钱的动作，温和地笑了一下）
+居士: 圣贤到了那个境界，也是能够自己选择来处的。
+居士: 真的，如果能够证道，那么我们下一世投身在哪里，谁是父母，也是可以决定的
+居士: 人啊，都是选择母亲的卵子投身，因为父亲的精子投身太不可靠了。
+居士: 男性的一次射精量上万呢，要在这上万的精子中和唯一的卵子结合，真的是太难了
+居士: 而且很多还没成形就被打掉的，女性一生的卵子也是有定数的，所以得人身不容易
+我: 嗯对，所有孩子都是子宫里出生的
+居士: 你不要不相信。
+居士: 这是有科学依据的。因为生命的相续就是信息的传承
+居士: 普通人的心性是五趣杂居，心地含诸种。
+居士: 所谓的证圣，实际上就是让自己的心性统一，
+居士: 但圣贤的心性就是一个大种，我们的投生都是引业和满业决定的
+居士: 圣性的种子做大了，自然就能主宰自己的人生了，可能下一辈子还是如此的
+我: 哦哦，那我倒是很感谢这一世，能够生而为人。
+【你听见柯湘和宝钗的呼唤】
+居士: 是啊。
+（她又看了一眼佛手壶，抿了抿嘴）
+<<jump JushiD2_FoShouConfirm>>
+===
+
+
+title: JushiD2_FoShouConfirm
+position: 1536,912
+---
+-> 这壶，一看就知道是您送的。
+    <<jump JushiD2_BuyFoShou>>
+
+-> 我们先备选，您再看看刚刚说的这些。
     <<jump JushiD2_GiftMenu>>
 ===
+
 
 title: JushiD2_HeHuan
+position: 384,237
 ---
-<<if not $D2SeenHeHuan>>
-    <<set $D2SeenHeHuan to true>>
-    // HINT：曼生合欢壶、大镲、宴会、同桌；【名妓、吕蒙呼唤】。
-    // 可在这里加二选一：绕远讲陈曼生 / 直接讲宴会；两路汇合后再选壶。
-<<endif>>
--> 就选合欢，扫码取货。
-    <<jump JushiD2_ScanHeHuan>>
--> 再看看别的。
+居士: 合欢？是那种夫妻和合的意思？
+我: 也可以有这个吉祥意思。
+我: 不过宜兴还流传一个故事，说它是陈曼生从大镲得来的灵感。
+居士: （打断）大镲？
+居士: 敲锣打鼓那个？
+居士: （居士温和地笑）这和今天的场合有什么关系
+-> 在陈曼生之前，紫砂壶更多是文人墨客的消费品。
+    <<jump JushiD2_HeHuanHistory>>
+
+-> 这就是他以欢宴为灵感设计的。
+    <<jump JushiD2_HeHuanStory>>
+===
+
+
+title: JushiD2_HeHuanHistory
+position: 351,462
+---
+我: 由于他自己是士人出身，又经常找匠人兄妹设计和定制紫砂壶，
+我: 甚至亲自题字，紫砂壶便成为了媒介和艺术载体。 
+【你听见名妓的呼唤】
+居士: （咬了一下嘴唇）和今天的场合有什么关系？ 
+我:  是，是。
+<<jump JushiD2_HeHuanStory>>
+===
+
+
+title: JushiD2_HeHuanStory
+position: 666,687
+---
+我: 相传曼生在溧阳做官的时候，负责把白芽贡茶送进京城。
+我: 贡茶按时送到了，皇帝满意，他便请朋友们设宴庆贺。
+我: 宴席上锣鼓喧天鞭炮齐鸣，
+我: 他一高兴，自己也蹦跶下去拿了两片大镲敲起来，一开一合的。
+我: 我们叫“席间鼓乐，亲持大镲”。
+我: 以这件事情为灵感，他设计了合欢壶。
+居士: （笑。）堂堂县令自己下去敲大镲？
+居士: 【你听见自己对吕蒙的呼唤】倒是真性情不拘泥于形式。
+我: 您看这把，壶身上下两部分合在一起，像两片镲扣住了。
+我: 而且我觉得，今天拿它做礼物，也不必只说夫妻和合。朋友、亲戚，或者本来不太熟悉的人，有机会在一张桌上吃饭，也算是一件好事。它做礼物，又有事业顺利的祝福和喜悦，又是亲友间宴乐，并没有太曲高和寡。
+居士: 是啊。各人想法不同，立场不同，能先坐到一起，才好谈和合。
+（她抿了抿嘴。）
+居士: 这个典故好。
+<<jump JushiD2_HeHuanConfirm>>
+===
+
+title: JushiD2_HeHuanConfirm
+position: 666,912
+---
+-> 嗯嗯，看起来很应景！
+    <<jump JushiD2_BuyHeHuan>>
+
+-> 我们先备选，您再看看刚刚说的这些。
     <<jump JushiD2_GiftMenu>>
 ===
 
-title: JushiD2_Fang
+
+title: JushiD2_FangPian
+position: 3773,237
 ---
-<<if not $D2SeenFang>>
-    <<set $D2SeenFang to true>>
-    // HINT：方器泥片镶接、相互磨合；可选择继续介绍现代装饰艺术。
-<<endif>>
--> 这把简洁、有现代设计感，扫码取货。
-    <<jump JushiD2_ScanFang>>
--> 再看看别的。
+我: 您看，它和刚才那些圆壶不太一样。 
+居士: 这不就是方的吗？
+我: 紫砂壶常见制作方法是拍身筒成型。
+我: 也就是把一片拍得均匀的泥料围在圆形底座上，拍拍成壶身圆鼓的形状。
+我: 方器常常要用镶接的办法，先把泥片裁好，再把几片接起来，修整边角。
+我: 您看这把，边角接好了，才能成为一个完整的壶身。
+我: 我想，今天送给两个年轻人，也可以借这个由头说，
+我: 两个人原各有各的生活的人以后要相互磨合、链接了。
+<<jump JushiD2_FangPianConfirm>>
+===
+
+title: JushiD2_FangPianConfirm
+position: 3773,1587
+---
+居士: ……（温和地一笑。）
+
+-> 这把边角处理得比较柔和，还有点简洁、现代的设计感。
+    我: 像是那种美国的装饰主义的呢！
+    居士: 她学电子电器的，说不定还真喜欢这种。
+    居士: 嗯，不错。
+    <<set $D2AcceptFang to true>>
+    <<jump JushiD2_FangPianFinal>>
+-> 我们可以再看看别的。
     <<jump JushiD2_GiftMenu>>
 ===
 
-title: JushiD2_ScanMei
+
+title: JushiD2_FangPianFinal
+position: 3851,1812
+---
+-> 那我为您打包咯～
+    <<jump JushiD2_BuyFang>>
+
+-> 我们先备选，您再看看刚刚说的这些。
+    <<jump JushiD2_GiftMenu>>
+===
+
+// 四个统一的购买入口
+// 首次推荐只有一把壶时，居士会阻止成交
+
+title: JushiD2_BuyMei
+---
+<<if $D2ViewedCount < 3>>
+    <<jump JushiD2_NeedMore>>
+<<endif>>
+居士: 好，那就这个梅桩吧。
+<<jump JushiD2_ScanMeiZhuang>>
+===
+
+
+title: JushiD2_BuyFoShou
+---
+<<if $D2ViewedCount < 3>>
+    <<jump JushiD2_NeedMore>>
+<<endif>>
+居士: 就这个吧。那就这个佛手。
+<<jump JushiD2_ScanFoShou>>
+===
+
+
+title: JushiD2_BuyHeHuan
+---
+<<if $D2ViewedCount < 3>>
+    <<jump JushiD2_NeedMore>>
+<<endif>>
+居士: 就用这个吧。合欢，挺好的。
+<<jump JushiD2_ScanHeHuan>>
+===
+
+
+title: JushiD2_BuyFang
+---
+<<if $D2ViewedCount < 3>>
+    <<jump JushiD2_NeedMore>>
+<<endif>>
+居士: 就用这个吧。挺个性。
+<<jump JushiD2_ScanFangPian>>
+===
+
+
+title: JushiD2_NeedMore
+---
+居士: 不急不急。（她温和地笑）
+
+<<if $D2ViewedCount == 1>>
+    居士: 这才看了第一把，怎么就定了？
+<<else>>
+    居士: 这才看了两把，我们再多比较比较。
+<<endif>>
+
+居士: 刚刚说的那几个，我们再挑一挑。
+
+<<jump JushiD2_GiftMenu>>
+===
+
+title: JushiD2_ScanMeiZhuang
+position: 923,1137
 ---
 <<d2_scan "09-H2zhuangjj">>
 <<if $D2ScanMatched>>
+    【未来发生了变化】
     <<set $D2GiftCode to "09-H2zhuangjj">>
     <<set $D2GiftName to "梅桩壶">>
     <<jump JushiD2_AfterGift>>
 <<else>>
     居士: 不对吧（啧），这不是我要的，重新来。
-    <<jump JushiD2_ScanMei>>
+    <<jump JushiD2_ScanMeiZhuang>>
 <<endif>>
 ===
 
 title: JushiD2_ScanFoShou
+position: 1503,1137
 ---
 <<d2_scan "09-H1FoShouJ">>
 <<if $D2ScanMatched>>
+    【未来发生了变化】
     <<set $D2GiftCode to "09-H1FoShouJ">>
     <<set $D2GiftName to "佛手提梁壶">>
     <<jump JushiD2_AfterGift>>
@@ -424,9 +762,11 @@ title: JushiD2_ScanFoShou
 ===
 
 title: JushiD2_ScanHeHuan
+position: 633,1137
 ---
 <<d2_scan "05-HeHuanHu">>
 <<if $D2ScanMatched>>
+    【未来发生了变化】
     <<set $D2GiftCode to "05-HeHuanHu">>
     <<set $D2GiftName to "合欢壶">>
     <<jump JushiD2_AfterGift>>
@@ -436,75 +776,232 @@ title: JushiD2_ScanHeHuan
 <<endif>>
 ===
 
-title: JushiD2_ScanFang
+title: JushiD2_ScanFangPian
+position: 1213,1137
 ---
 <<d2_scan "04-FangXingHj">>
 <<if $D2ScanMatched>>
+    【未来发生了变化】
     <<set $D2GiftCode to "04-FangXingHj">>
     <<set $D2GiftName to "方片壶">>
     <<jump JushiD2_AfterGift>>
 <<else>>
     居士: 不对吧（啧），这不是我要的，重新来。
-    <<jump JushiD2_ScanFang>>
+    <<jump JushiD2_ScanFangPian>>
 <<endif>>
 ===
 
 title: JushiD2_AfterGift
+position: 943,1362
 ---
-// HINT：选壶成功以后，她坦言此前没有人通知儿子的恋情、同居、见家长。
-// HINT：她对未来儿媳的反感及自相矛盾的主体性论述，结尾【吕蒙呼唤】。
+（选好壶，你俩默契地安静下来。
+你转身将她没看中的茶壶放回柜子，拿茶巾轻轻擦拭{$D2GiftName}。）
+
+居士: 我，我没筹备礼物，哈哈，给你看笑话。
+居士: 呼……
+居士: 之前没有人……通知我。
+居士: 我不知道我儿子谈恋爱了，也不知道他们这么快就同意了……
+居士: 我不认识，我都没见过她，他们就在国外同居了。
+居士: 要不是我看到……
+居士: 差点没问我就见完家长订好结婚了。
+
+-> （你手上不停，继续包装） <<if $D2Pack < 5>>
+    <<set $D2PackReturn to 1>>
+    <<jump JushiD2_PackOneStep>>
+
+-> （你看见居士的嘴已经撕破了，给她倒茶） <<if not $D2TeaGiven>>
+    我: 您喝口茶。
+    （居士抿了抿嘴。）
+    <<set $D2TeaGiven to true>>
+    <<jump JushiD2_AfterGiftCheck>>
+===
+
+title: JushiD2_AfterGiftChoice2
+---
+<<if $D2Pack == 5 and $D2TeaGiven>>
+    <<jump JushiD2_AfterGiftSecondCheck>>
+<<endif>>
+
+-> （你手上不停，继续包装） <<if $D2Pack < 5>>
+    <<set $D2PackReturn to 2>>
+    <<jump JushiD2_PackOneStep>>
+
+-> （你看见居士的嘴已经撕破了，给她倒茶） <<if not $D2TeaGiven>>
+    我: 您喝口茶。
+    （居士抿了抿嘴。）
+    <<set $D2TeaGiven to true>>
+    <<jump JushiD2_AfterGiftSecondCheck>>
+===
+
+title: JushiD2_AfterGiftSecondCheck
+---
+<<if $D2Pack < 5 or $D1TalkedCicada>>
+    <<jump JushiD2_DaughterInLaw>>
+<<else>>
+    <<jump JushiD2_Delivery>>
+<<endif>>
+===
+
+title: JushiD2_PackOneStep
+---
+<<if $D2Pack == 0>>
+    （你从柜台后找出老板为女性客户定制的礼盒。）
+    <<set $D2Pack to 1>>
+<<elseif $D2Pack == 1>>
+    （你把礼物袋按照折痕展开。）
+    <<set $D2Pack to 2>>
+<<elseif $D2Pack == 2>>
+    （你打开礼物盒子，铺好衬布。）
+    <<set $D2Pack to 3>>
+<<elseif $D2Pack == 3>>
+    （你挑选合适颜色的系带，丈量长度后裁下来。）
+    <<set $D2Pack to 4>>
+<<elseif $D2Pack == 4>>
+    （你将{$D2GiftName}和证书装入礼盒，系好礼带，再装入手提袋。）
+    <<set $D2Pack to 5>>
+<<endif>>
+
+<<if $D2PackReturn == 1>>
+    <<jump JushiD2_AfterGiftCheck>>
+<<elseif $D2PackReturn == 2>>
+    <<jump JushiD2_AfterGiftSecondCheck>>
+<<else>>
+    <<jump JushiD2_PackRemaining>>
+<<endif>>
+===
+
+title: JushiD2_AfterGiftCheck
+---
+<<if $D2Pack < 5 or $D1TalkedCicada>>
+    <<jump JushiD2_DaughterInLawIntro>>
+<<else>>
+    <<jump JushiD2_Delivery>>
+<<endif>>
+===
+
+title: JushiD2_DaughterInLawIntro
+---
+居士: 我和你说，说实话，我不喜欢这个姑娘。
+我: 为什么，您不是没见过吗？
+居士: 哼。婚前同居不说。（她又咬了一下嘴唇。）
+居士: 我儿子一年回一次国，这次不回宜兴不说。
+居士: 他不打招呼就被这姑娘带去重庆了。
+居士: 我们很被动。
+（她啧了一声。）
+
+<<jump JushiD2_AfterGiftChoice2>>
+===
+
+title: JushiD2_DaughterInLaw
+---
+// 从这里开始粘贴
+居士: 你们小姑娘不是什么都喜欢发到网上吗？
+居士: 她又听摇滚，眼睛嘴巴乌漆嘛黑的。
+居士: 前段时间，她又搞什么月经什么东西的，怎么好意思。
+居士: 还为一个粉头发轻生地女孩摇旗呐喊的。哦哟。
+居士: 你不知道，你不知道。
+居士: 我儿子是一个非常非常善良的人。
+居士: 太会照顾别人的情绪，太会委屈自己。
+居士: 都是爷爷奶奶教育的不好！
+居士: 我也是有反抗意识的性格，和他们处不了。
+（居士咬着自己唇上地死皮）
+居士: 人生一次不容易，真正随心而活，不用太顾及他人。
+我: 那她想出去读书、听摇滚，可能也是想自己做些决定吧。
+居士: 那是她的事。
+居士: 我管得了她吗？我连自己儿子都管不了。
+（她看了一眼手机。）
+居士: 我儿子不能驾驭她这样叛逆心重的。
+居士: 讲真的，她那样好的本科，拒绝保研名额就是要出国读个研看看。
+居士: 她还有奖学金。
+居士: 我儿子没有这么聪明，本来说只是申请研究生看看，顺便找找工作。
+居士: 都是被她激的。
+居士: 我儿子驾驭不了她。他善良，真要让人拿捏了，要吃大亏。
+居士: 我是不鼓励儿子现在谈恋爱，都是爷爷催的 
+【你听见吕蒙的呼唤】
 <<jump JushiD2_PackRemaining>>
 ===
 
 title: JushiD2_PackRemaining
 ---
-// 只推进实际尚未完成的步骤；前置时最多完成第4步。
-<<if $D2Pack == 0>>
-    旁白: 从柜台后找出老板为女性顾客定制的礼盒。
-    <<set $D2Pack to 1>>
-    <<jump JushiD2_PackRemaining>>
-<<elseif $D2Pack == 1>>
-    旁白: 按照折痕展开礼物袋。
-    <<set $D2Pack to 2>>
-    <<jump JushiD2_PackRemaining>>
-<<elseif $D2Pack == 2>>
-    旁白: 打开礼盒，铺好衬布。
-    <<set $D2Pack to 3>>
-    <<jump JushiD2_PackRemaining>>
-<<elseif $D2Pack == 3>>
-    旁白: 选择系带颜色，量好长度后裁下。
-    <<set $D2Pack to 4>>
-    <<jump JushiD2_PackRemaining>>
+<<if $D2Pack < 5>>
+    <<set $D2PackReturn to 3>>
+    <<jump JushiD2_PackOneStep>>
 <<else>>
-    <<jump JushiD2_PackFinal>>
+    <<jump JushiD2_Delivery>>
 <<endif>>
-===
-
-title: JushiD2_PackFinal
----
-// 第5步只有扫码选定实物以后才能完成。
-<<if $D2GiftCode == "">>
-    <<jump JushiD2_GiftMenu>>
-<<endif>>
-旁白: 你将{$D2GiftName}和证书装入礼盒，系好礼带，放进手提袋。
-<<set $D2Pack to 5>>
-<<jump JushiD2_Delivery>>
 ===
 
 title: JushiD2_Delivery
+position: 265,2037
 ---
-// HINT：夕阳、粉色羊绒套装、磨旧的扣子；18:00 是送达时间，不是取件时间。
-我: 这里给您包装好了，18:00送过去。
-居士: 不是18:00送过去，是要18:00送达。
-居士: 凯宾斯基1314包厢。
-// HINT：付款给邵苇，询问主角名字，道谢后离店，巷口右转消失。
+你静静为手上的活收尾。
+（居士慢慢看向窗外。
+太阳将要西沉，古南街上人逐渐少了，
+有的人推着自行车，有的人啾啾两声启动电瓶车。
+少有的三三两两的人启动甲虫一般的汽车。
+你的视线从逆光的窗框划回她身上。
+她瘦，头发很短，人很精神。
+她脸上的皮紧紧贴着骨头，却不凹陷。
+幽暗地橙色阳光在她颧骨、脖子、和明显地手腕骨上留下痕迹。
+刚刚兵荒马乱一阵，店里没有开灯，显得她身体以外逆光的地方又暗又冷。
+她穿的衣服应该是够暖和。
+是一件皮粉色地羊绒两件套，上面毛球都被修剪掉了，同色地塑料扣子有些旧。
+她笑得很温和。）
+我: 这里给您包装好了，18：00送过去。
+居士: 不是18：00送过去，是要送达。
+居士: 大概开餐30min送达。凯宾斯基1314包厢。
+居士: 我先走了。你这里出库，我直接把钱转给邵苇。
+居士: 小姑娘，你叫什么？
+居士: 小x，辛苦你了。
+你的目光随她走过巷子。今天也是没有别的活了。她上什么载具离开古南街呢？
+她的身影在巷口右转消失
 <<jump JushiD2_Teacher>>
 ===
 
 title: JushiD2_Teacher
+position: 265,2262
 ---
-// HINT：老师推门、方言电话、地方熟人网络；腐败特权与女性贞洁的选择性叙述。
-// HINT：老师讲2008年夜晚孩子在院口追母亲的回忆；保留为老师转述。
+老师: （开着免提打着电话，推门进来）
+（她把袋子一把尞在桌子上，朝你努努嘴，捂住听筒）
+老师: 这是这个星期给你从黄龙山带过来的。都好的吧。
+（不等你回答她又拿起手机）
+老师: 哟！阿佳（阿姐），今天哪好来看看哒。
+老师: 都好唠好唠，嗯嗯。
+老师: geze（这个）outou（丫头）能干daoze（这个丫头很能干呢）
+老师: 急家去么？那慢走哦。好好，好好。
+老师: （挂了电话，转头来对你）你哪里知道她？
+老师: 她早些年日子不要太舒服呢。
+老师: 公公是县里（不说话，比大拇指）哝，那几年招商引资，多少风光！
+老师: 嫁得嘛高咯，又过得舒服。
+老师: 小姑子还是她从前高中里最好的朋友，一家人都宠她滴个奥尼（儿子）。
+老师: 那时候她可不是现在这个样子哦。鼻孔看人，老炫耀老公家。
+老师: 他们夫妻俩工作也清闲，工资自己花，吃住都在家里，消费多少高的。
+老师: 后来不晓得给哪个举报了。真真小人，害她升职也升不成。
+老师: 她老子公司里的账也查出来了。
+老师: 哎呀，你说再熬几年，搞不好公司都是自己家的了，何必急这一时呢？
+【你听到自己对柯湘地呼唤的同时，听到了柯湘对你的呼唤】
+老师: 时也，命也！
+老师: 连她公公也给调查了。
+老师: 虽然最后没有出事，可这还怎么在一个屋檐下过。
+老师: 她老公偏偏在这个节骨眼上搬出去，后来才知道，
+我: 卷款跑路了？
+老师: 那个烟酒鬼！
+老师: 他有这个能力？外头有人了！
+老师: 那个男人从小要风得风要雨得雨，作天作地一定要离掉另娶。
+老师: 她娘家帮不上忙。惨呢！
+老师: 08年正月，
+老师: 她彻底从家里搬走，特特地等到孩子睡着了再走。
+老师: 最后一箱子细软装上车，
+老师: 车启动，灯一照，
+老师: 小佬（小孩）居然站在院子门口。
+老师: 在他奶奶怀里哭啊，叫啊。
+老师: 他奶奶哪里敢松手让他去追妈妈？老子不要刮死他？
+老师: 哭啊。两个人。
+老师: 这故事我听她讲不知道多少年。
+老师: 房子、儿子，能带走啥？
+老师: 你没看过他那个新老婆哦！
+老师: 以前侯莉的下属，还不晓得被她拿鼻孔看过多少次。
+老师: （啧），真是惨的。
 -> 您不是她的朋友吗？
     <<jump JushiD2_TeacherFriend>>
 -> 她可以拖着不离婚啊。
@@ -512,21 +1009,36 @@ title: JushiD2_Teacher
 ===
 
 title: JushiD2_TeacherFriend
+position: 512,2487
 ---
-// HINT：她怎么会不是朋友？宜兴地方小，谁家事都知道。
+老师: 是啊，不是朋友叫你接待？
+我: 。。。哦。。。没事
+老师: 啊？我哪句说她不好了？
+老师: （她低头看了一眼手机。）  
+老师: 宜兴就这么点地方，谁不知道谁家的事呢。 
+老师: 又不是秘密.
 <<jump JushiD2_Order>>
 ===
 
 title: JushiD2_TeacherDivorce
+position: 232,2487
 ---
-// HINT：老师停顿，避谈双方出轨，维护朋友的女性贞洁形象。
+老师: （顿了一下。）
+老师: 嗐。夫妻两个的事，哪里是一两句话讲得清的。
+老师: 婚姻啊！
+老师: 她这些年已经够不容易了。
+老师: 人家女人重新过日子，也不用什么旧事都拿出来说。
+我: ……
+老师: 你说，她现在修修禅，做做善事，日子清清静静的，
+老师: 又有什么不好呢？
 <<jump JushiD2_Order>>
 ===
 
 title: JushiD2_Order
+position: 265,2712
 ---
 // HINT：在此呼叫你的跑腿订单 UI；这是 Unity 端的功能。
-旁白: 【订单：古南街404室 → 宜兴陶都半岛酒店（原凯宾斯基）1314室；17:30取件，18:00送达；贵重物品。】
+【订单：古南街404室 → 宜兴陶都半岛酒店（原凯宾斯基）1314室；17:30取件，18:00送达；贵重物品。】
 -> 确认订单，结束一天。
     <<set $D2Finished to true>>
     <<stop>>
