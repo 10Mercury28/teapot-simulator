@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b70a6d73a09c41e4889619fbf448e167, type: 3}
+  m_Name: PopupData_Teacher_Pat4
+  m_EditorClassIdentifier: 
+  popupId: Teacher_Pat4
+  bannerTitle: "\u90B5\u82C7\u8001\u5E08"
+  bannerSummary: "\u5C0F\u9648\uFF0C\u4FAF\u5C45\u58EB\u9A6C\u4E0A\u8981\u6765\u5E97\u91CC\u4E86\uFF0C\u4F60\u51C6\u5907\u5F97\u600E\u4E48\u6837\u4E86\uFF1F"
+  avatarSprite: {fileID: 21300000, guid: 0833a359402bc0043ae4fbae5a331e24, type: 3}
+  bannerBackground: {fileID: 21300000, guid: 79c3fbae4958d5a4db0bec85067c2df5, type: 3}
+  hasExpandedContent: 1
+  drawerTitle: "\u90B5\u82C7\u8001\u5E08 (\u5FAE\u4FE1\u8BED\u97F3)"
+  drawerBackground: {fileID: 21300000, guid: a5001d5224cee004c906d5879137424c, type: 3}
+  drawerContentImage: {fileID: 0}
+  drawerDetailText: "\u201C\u5C0F\u9648\uFF0C\u4FAF\u5C45\u58EB\u63D0\u524D\u8FC7\u6765\u4E86\uFF0C\u9A6C\u4E0A\u5C31\u5230\u5E97\u95E8\u53E3\uFF0C\u4F9B\u6625\u58F6\u548C\u753B\u518C\u4F60\u90FD\u6446\u51FA\u6765\u4E86\u5417\uFF1F\u522B\u6020\u6162\u4E86\u4EBA\u5BB6\u3002\u201D"
+  incomingLoopSfx: {fileID: 0}
+  voiceClip: {fileID: 0}
+  isDeliveryOrder: 0
+  confirmButtonText: "\u786E\u8BA4\u53D6\u4EF6"
+  targetSceneOnConfirm: 
+  interruptWorkAndFail: 1

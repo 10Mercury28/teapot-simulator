@@ -535,3 +535,8 @@ MBTI: 作为你的一部分，你一难受，我也跟你不舒服啊，宝。
 <<set $MindDone5 to true>>
 <<jump MindMaze_End>>
 ===
+
+title: MindMaze_End
+---
+/// maybe some yarn command
+===
