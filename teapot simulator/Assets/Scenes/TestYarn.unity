@@ -2003,7 +2003,7 @@ PrefabInstance:
     - target: {fileID: 2965328233076877758, guid: 34b5fc89c14922d458d20635ffcadc6b, type: 3}
       propertyPath: debugTestSO
       value: 
-      objectReference: {fileID: 11400000, guid: 6801e9153a9ca4e45b088949c5cea104, type: 2}
+      objectReference: {fileID: 11400000, guid: ba2edc4fce626b645bfcd62e908dc760, type: 2}
     - target: {fileID: 3281840042803595446, guid: 34b5fc89c14922d458d20635ffcadc6b, type: 3}
       propertyPath: m_hasFontAssetChanged
       value: 0
@@ -2090,7 +2090,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4368502024732009333, guid: 34b5fc89c14922d458d20635ffcadc6b, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -799.9995
+      value: -779.9991
       objectReference: {fileID: 0}
     - target: {fileID: 5837940533610859689, guid: 34b5fc89c14922d458d20635ffcadc6b, type: 3}
       propertyPath: m_Name
