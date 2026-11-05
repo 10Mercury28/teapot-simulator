@@ -475,6 +475,60 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &219859682
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 219859684}
+  - component: {fileID: 219859683}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &219859683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 219859682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90a699618cec48b419993638d815494e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnBarcodeScanned:
+    m_PersistentCalls:
+      m_Calls: []
+  inputTimeout: 0.5
+  enableDebugKeySimulation: 1
+  simulateKey1: 49
+  simulateBarcode1: TOOL_01
+  simulateKey2: 50
+  simulateBarcode2: TOOL_02
+  debugLog: 1
+--- !u!4 &219859684
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 219859682}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 960, y: 540, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &314551694
 GameObject:
   m_ObjectHideFlags: 0
@@ -2036,7 +2090,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4368502024732009333, guid: 34b5fc89c14922d458d20635ffcadc6b, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -900.677
+      value: -799.9995
       objectReference: {fileID: 0}
     - target: {fileID: 5837940533610859689, guid: 34b5fc89c14922d458d20635ffcadc6b, type: 3}
       propertyPath: m_Name
@@ -2088,3 +2142,4 @@ SceneRoots:
   - {fileID: 2882933541349267988}
   - {fileID: 1092675753}
   - {fileID: 1256345447}
+  - {fileID: 219859684}

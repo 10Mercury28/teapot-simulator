@@ -95,7 +95,11 @@ public class SlideDrawerUI : MonoBehaviour
 
         if (orderConfirmButton != null)
         {
-            orderConfirmButton.onClick.AddListener(() => OnOrderConfirmed?.Invoke());
+            orderConfirmButton.onClick.AddListener(() =>
+            {
+                Debug.Log("🎯 [SlideDrawerUI] 跑腿订单确认按钮被点击！触发结束一天/订单确认事件。");
+                OnOrderConfirmed?.Invoke();
+            });
         }
 
         // 点击遮罩也可以快速收回抽屉
@@ -191,7 +195,7 @@ public class SlideDrawerUI : MonoBehaviour
             }
         }
 
-        // 5. 跑腿订单交互栏
+        // 5. 跑腿订单交互栏 / 透明确认按钮
         if (orderActionArea != null)
         {
             orderActionArea.SetActive(data.isDeliveryOrder);
@@ -199,6 +203,11 @@ public class SlideDrawerUI : MonoBehaviour
             {
                 orderConfirmButtonText.text = !string.IsNullOrEmpty(data.confirmButtonText) ? data.confirmButtonText : "确认取件";
             }
+        }
+        else if (orderConfirmButton != null)
+        {
+            // 若没有单独的父物体，直接控制透明按钮本身的显示/隐藏
+            orderConfirmButton.gameObject.SetActive(data.isDeliveryOrder);
         }
     }
 
