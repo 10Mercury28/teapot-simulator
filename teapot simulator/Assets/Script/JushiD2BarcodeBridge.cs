@@ -15,13 +15,23 @@ public class JushiD2BarcodeBridge : MonoBehaviour
 
     private void Awake()
     {
+        // 自动查找引用
+        if (dialogueRunner == null) dialogueRunner = FindObjectOfType<DialogueRunner>();
+        if (scanner == null) scanner = FindObjectOfType<BarcodeScanner>();
+
         if (dialogueRunner == null || scanner == null)
         {
-            Debug.LogError("JushiD2BarcodeBridge: Assign DialogueRunner and BarcodeScanner in Inspector.");
             return;
         }
 
-        dialogueRunner.AddCommandHandler<string>("d2_scan", AwaitBarcode);
+        try
+        {
+            dialogueRunner.AddCommandHandler<string>("d2_scan", AwaitBarcode);
+        }
+        catch (Exception)
+        {
+            // 已在 Day1YarnCommands 中全局注册，忽略重复注册
+        }
     }
 
     private IEnumerator AwaitBarcode(string expectedBarcode)
@@ -51,9 +61,11 @@ public class JushiD2BarcodeBridge : MonoBehaviour
             while (!received)
                 yield return null;
 
-            bool matches = string.Equals(scannedValue, expectedBarcode, StringComparison.Ordinal);
+            string cleanScanned = scannedValue != null ? scannedValue.Trim() : "";
+            string cleanExpected = expectedBarcode != null ? expectedBarcode.Trim() : "";
+            bool matches = string.Equals(cleanScanned, cleanExpected, StringComparison.OrdinalIgnoreCase);
             dialogueRunner.VariableStorage.SetValue("$D2ScanMatched", matches);
-            Debug.Log($"[D2 barcode] got='{scannedValue}', expected='{expectedBarcode}', matched={matches}");
+            Debug.Log($"[D2 barcode] got='{cleanScanned}', expected='{cleanExpected}', matched={matches}");
         }
         finally
         {

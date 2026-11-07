@@ -82,6 +82,10 @@ public class Day1YarnCommands : MonoBehaviour
     [Header("=== 弹窗管理器引用 (可选，默认使用 PopupManager.Instance) ===")]
     public PopupManager popupManager;
 
+    [Header("=== 扫码枪配置 (Barcode Scanner) ===")]
+    [Tooltip("扫码枪组件引用（留空会自动查找或自动添加）")]
+    public BarcodeScanner barcodeScanner;
+
     private void Awake()
     {
         if (Instance == null)
@@ -122,6 +126,11 @@ public class Day1YarnCommands : MonoBehaviour
         if (jushiFaceSwitcher == null && jushiObject != null)
         {
             jushiFaceSwitcher = jushiObject.GetComponentInChildren<FacePerspectiveSwitcher>(true);
+        }
+
+        if (barcodeScanner == null)
+        {
+            barcodeScanner = FindObjectOfType<BarcodeScanner>();
         }
     }
 
@@ -577,5 +586,116 @@ public class Day1YarnCommands : MonoBehaviour
         {
             SceneManager.LoadScene(sceneName);
         }
+    }
+
+    // ============================================================
+    // 5. 扫码枪与条码比对指令 (Barcode Commands)
+    // ============================================================
+
+    /// <summary>
+    /// 扫码枪等待指令: <<d2_scan "03-GongChun">> 或 <<scan_barcode "03-GongChun">>
+    /// 挂起 Yarn 对白，直到收到扫码枪输入（或无硬件时按键盘数字键 1 模拟）
+    /// 并将比对结果写入 Yarn 变量 $D2ScanMatched
+    /// </summary>
+    [YarnCommand("d2_scan")]
+    public static IEnumerator D2Scan(string expectedBarcode)
+    {
+        yield return ScanBarcodeInternal(expectedBarcode);
+    }
+
+    [YarnCommand("scan_barcode")]
+    public static IEnumerator ScanBarcode(string expectedBarcode)
+    {
+        yield return ScanBarcodeInternal(expectedBarcode);
+    }
+
+    private static IEnumerator ScanBarcodeInternal(string expectedBarcode)
+    {
+        Debug.Log($"📷 [YarnCommand] 开始等待扫码，期望条码: '{expectedBarcode}'");
+
+        BarcodeScanner scanner = GetBarcodeScanner();
+        DialogueRunner runner = GetDialogueRunner();
+
+        if (runner == null)
+        {
+            Debug.LogError("❌ [Day1YarnCommands] 未在场景中找到 DialogueRunner，无法写入扫码结果！");
+            yield break;
+        }
+
+        bool received = false;
+        string scannedValue = null;
+
+        void OnScan(string value)
+        {
+            if (!received)
+            {
+                scannedValue = value;
+                received = true;
+            }
+        }
+
+        runner.VariableStorage.SetValue("$D2ScanMatched", false);
+
+        if (scanner != null)
+        {
+            scanner.OnBarcodeScanned.AddListener(OnScan);
+        }
+
+        try
+        {
+            // 挂起等待扫码枪输入（扫码枪会在末尾发送回车），或通过键盘 1 / 2 快速测试
+            while (!received)
+            {
+                if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
+                {
+                    scannedValue = "03-GongChun";
+                    received = true;
+                    Debug.Log($"⌨️ [Day1YarnCommands] 键盘快捷键 1 模拟扫码: '{scannedValue}'");
+                    break;
+                }
+                if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
+                {
+                    scannedValue = "09-H2zhuangjj";
+                    received = true;
+                    Debug.Log($"⌨️ [Day1YarnCommands] 键盘快捷键 2 模拟扫码: '{scannedValue}'");
+                    break;
+                }
+
+                yield return null;
+            }
+
+            // 比较条码（Trim 去除首尾空白，不区分大小写）
+            string cleanScanned = scannedValue != null ? scannedValue.Trim() : "";
+            string cleanExpected = expectedBarcode != null ? expectedBarcode.Trim() : "";
+            bool matches = string.Equals(cleanScanned, cleanExpected, StringComparison.OrdinalIgnoreCase);
+
+            runner.VariableStorage.SetValue("$D2ScanMatched", matches);
+            Debug.Log($"🎯 [Day1YarnCommands] 扫码判定完成: 收到='{cleanScanned}', 期望='{cleanExpected}', 结果={matches}");
+        }
+        finally
+        {
+            if (scanner != null)
+            {
+                scanner.OnBarcodeScanned.RemoveListener(OnScan);
+            }
+        }
+    }
+
+    private static BarcodeScanner GetBarcodeScanner()
+    {
+        if (Instance != null && Instance.barcodeScanner != null) return Instance.barcodeScanner;
+        BarcodeScanner scanner = GameObject.FindObjectOfType<BarcodeScanner>();
+        if (scanner == null)
+        {
+            GameObject host = Instance != null ? Instance.gameObject : new GameObject("BarcodeScanner_Auto");
+            scanner = host.AddComponent<BarcodeScanner>();
+        }
+        return scanner;
+    }
+
+    private static DialogueRunner GetDialogueRunner()
+    {
+        if (Instance != null && Instance.dialogueRunner != null) return Instance.dialogueRunner;
+        return GameObject.FindObjectOfType<DialogueRunner>();
     }
 }
