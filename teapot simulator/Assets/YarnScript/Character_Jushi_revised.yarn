@@ -374,10 +374,24 @@ title: SucEnd
     (居士抿了抿嘴)
 居士: 收拾好了吗？打包吧，不用太繁琐，别浪费。
 我: 好的。
-// 游戏端触发商品结算、扫码事件。
-（请扫码。）
-<<set $JushiSuccess to true>>
-<<stop>>
+（你取出供春壶，准备为侯居士结算。）
+【请扫描正确的条码。】
+<<jump JushiD1_ScanGongChun>>
+===
+
+title: JushiD1_ScanGongChun
+---
+<<d2_scan "03-GongChun">>
+<<if $D2ScanMatched>>
+    【扫码成功。】
+    <<set $JushiSuccess to true>>
+    <<jump JushiD1_SaleComplete>>
+<<else>>
+    【扫描的商品与订单不符。】
+    居士: 这不对吧姑娘（温和地笑）。
+    （请重新扫描供春壶。）
+    <<jump JushiD1_ScanGongChun>>
+<<endif>>
 ===
 
 title: FailEnd
