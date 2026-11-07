@@ -256,20 +256,24 @@ public class Day1YarnCommands : MonoBehaviour
         {
             if (Instance != null && Instance.jushiObject != null)
             {
-                Instance.jushiObject.SetActive(visible);
+                ApplyVisibility(Instance.jushiObject, visible);
             }
             else
             {
-                GameObject go = FindObjectByNameOrTag("Jushi", "居士", "Character_Jushi");
-                if (go != null) go.SetActive(visible);
+                GameObject go = FindObjectByNameOrTag("Jushi", "居士", "Character_Jushi", "FaceCaputureCanvas");
+                if (go != null) ApplyVisibility(go, visible);
             }
 
-            // 同步转头观察控制器开关
+            // 同步转头观察控制器开关（以及内部 displayImage）
             FacePerspectiveSwitcher switcher = Instance != null ? Instance.jushiFaceSwitcher : null;
             if (switcher == null) switcher = GameObject.FindObjectOfType<FacePerspectiveSwitcher>(true);
             if (switcher != null)
             {
                 switcher.enabled = visible;
+                if (switcher.displayImage != null)
+                {
+                    switcher.displayImage.enabled = visible;
+                }
                 Debug.Log($"💬 [Day1YarnCommands] 居士转头控制器 FacePerspectiveSwitcher: {visible}");
             }
             return;
@@ -280,12 +284,12 @@ public class Day1YarnCommands : MonoBehaviour
         {
             if (Instance != null && Instance.teacherObject != null)
             {
-                Instance.teacherObject.SetActive(visible);
+                ApplyVisibility(Instance.teacherObject, visible);
             }
             else
             {
                 GameObject go = FindObjectByNameOrTag("Teacher", "老师", "ShaoWei");
-                if (go != null) go.SetActive(visible);
+                if (go != null) ApplyVisibility(go, visible);
             }
             return;
         }
@@ -297,7 +301,7 @@ public class Day1YarnCommands : MonoBehaviour
                 c.name.Trim().Equals(name, StringComparison.OrdinalIgnoreCase));
             if (custom != null && custom.target != null)
             {
-                custom.target.SetActive(visible);
+                ApplyVisibility(custom.target, visible);
                 return;
             }
         }
@@ -306,11 +310,45 @@ public class Day1YarnCommands : MonoBehaviour
         GameObject sceneObj = GameObject.Find(name);
         if (sceneObj != null)
         {
-            sceneObj.SetActive(visible);
+            ApplyVisibility(sceneObj, visible);
         }
         else
         {
             Debug.LogWarning($"⚠️ [Day1YarnCommands] 未在场景中找到名为 '{name}' 的对象以设置显隐！");
+        }
+    }
+
+    /// <summary>
+    /// 统一显隐辅助方法：同时兼容 GameObject、UI Image、SpriteRenderer 与 CanvasGroup
+    /// </summary>
+    private static void ApplyVisibility(GameObject target, bool visible)
+    {
+        if (target == null) return;
+
+        // 1. 设置 GameObject 节点显隐
+        target.SetActive(visible);
+
+        // 2. 若挂有 CanvasGroup，同步透明度与交互
+        CanvasGroup cg = target.GetComponent<CanvasGroup>();
+        if (cg != null)
+        {
+            cg.alpha = visible ? 1f : 0f;
+            cg.blocksRaycasts = visible;
+            cg.interactable = visible;
+        }
+
+        // 3. 若节点为 UI Image，同步 enabled
+        Image img = target.GetComponent<Image>();
+        if (img != null)
+        {
+            img.enabled = visible;
+        }
+
+        // 4. 若节点为场景 2D Sprite (SpriteRenderer)，同步 enabled
+        SpriteRenderer sr = target.GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.enabled = visible;
         }
     }
 
