@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b70a6d73a09c41e4889619fbf448e167, type: 3}
+  m_Name: Day1_fail
+  m_EditorClassIdentifier: 
+  popupId: Day1_fail
+  bannerTitle: "\u3010\u5FAE\u4FE1\u6D88\u606F\u3011"
+  bannerSummary: "AAA\u65E2\u767D\u5DE5\u4F5C\u5BA4 \u90B5\u8001\u5E08"
+  avatarSprite: {fileID: 21300000, guid: 0833a359402bc0043ae4fbae5a331e24, type: 3}
+  bannerBackground: {fileID: 0}
+  hasExpandedContent: 1
+  drawerTitle: "AAA\u65E2\u767D\u5DE5\u4F5C\u5BA4 \u90B5\u8001\u5E08"
+  drawerBackground: {fileID: 0}
+  drawerContentImage: {fileID: 21300000, guid: fce6b97568c3a4e76a387ca831e5d1a4, type: 3}
+  drawerDetailText: 
+  incomingLoopSfx: {fileID: 8300000, guid: a04ecf2458305b14f9dc60b540e65872, type: 3}
+  voiceClip: {fileID: 0}
+  isDeliveryOrder: 0
+  confirmButtonText: "\u786E\u8BA4\u53D6\u4EF6"
+  targetSceneOnConfirm: 
+  interruptWorkAndFail: 0

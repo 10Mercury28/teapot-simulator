@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b70a6d73a09c41e4889619fbf448e167, type: 3}
-  m_Name: PopupData_Host
+  m_Name: Day_1_HouJ
   m_EditorClassIdentifier: 
-  popupId: Day_1_Host
+  popupId: Day_1_HouJ
   bannerTitle: "\u3010\u5FAE\u4FE1\u6D88\u606F\u3011"
-  bannerSummary: "AAA\u65E2\u767D\u5DE5\u4F5C\u5BA4 \u90B5\u8001\u5E08"
-  avatarSprite: {fileID: 21300000, guid: 0833a359402bc0043ae4fbae5a331e24, type: 3}
+  bannerSummary: "\u987E\u5BA2 \u4FAF\u8389\u5C45\u58EB \u8001\u677F\u670B\u53CB"
+  avatarSprite: {fileID: 21300000, guid: 33cea32665a20fe46b87386d01088d7b, type: 3}
   bannerBackground: {fileID: 0}
   hasExpandedContent: 1
-  drawerTitle: "AAA\u65E2\u767D\u5DE5\u4F5C\u5BA4 \u90B5\u8001\u5E08"
+  drawerTitle: "\u987E\u5BA2 \u4FAF\u8389\u5C45\u58EB \u8001\u677F\u670B\u53CB"
   drawerBackground: {fileID: 0}
-  drawerContentImage: {fileID: 21300000, guid: 429d7826879b0044dbcf77af90a409ec, type: 3}
+  drawerContentImage: {fileID: 21300000, guid: 3866e98d799d14aeea466953c9266412, type: 3}
   drawerDetailText: 
   incomingLoopSfx: {fileID: 8300000, guid: a04ecf2458305b14f9dc60b540e65872, type: 3}
   voiceClip: {fileID: 0}

@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b70a6d73a09c41e4889619fbf448e167, type: 3}
-  m_Name: PopupData_Dianping
+  m_Name: Day1_Dianping_Pat2
   m_EditorClassIdentifier: 
-  popupId: Dianping_Pat2
+  popupId: Day1_Dianping_Pat2
   bannerTitle: "\u5927\u4F17\u70B9\u8BC4"
-  bannerSummary: "\u60A8\u6709\u4E00\u6761\u65B0\u7684\u70B9\u8BC4\u63A2\u5E97\u63D0\u9192\uFF1A\u7D2B\u7802\u624B\u4F5C\u5DE5\u574A\u672C\u5468\u70ED\u5EA6\u4E0A\u5347..."
-  avatarSprite: {fileID: 0}
+  bannerSummary: "\u5546\u6237\u798F\u5229\uFF01\u7EF4\u62A4\u66DD\u5149\u9001\u798F\u5229"
+  avatarSprite: {fileID: 21300000, guid: b8318390efa5ed341b227714f6760378, type: 3}
   bannerBackground: {fileID: 21300000, guid: 79c3fbae4958d5a4db0bec85067c2df5, type: 3}
-  hasExpandedContent: 0
-  drawerTitle: 
-  drawerBackground: {fileID: 0}
-  drawerContentImage: {fileID: 0}
+  hasExpandedContent: 1
+  drawerTitle: "\u5E97\u94FA\u70ED\u5EA6\u5468\u62A5"
+  drawerBackground: {fileID: 21300000, guid: 550edb002c3b142c4b9c0f0543d4bfee, type: 3}
+  drawerContentImage: {fileID: 21300000, guid: 3f9d1053738ab4dc08080825fbb3fd30, type: 3}
   drawerDetailText: 
   incomingLoopSfx: {fileID: 8300000, guid: a04ecf2458305b14f9dc60b540e65872, type: 3}
   voiceClip: {fileID: 0}

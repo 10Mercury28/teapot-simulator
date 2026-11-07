@@ -10,21 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b70a6d73a09c41e4889619fbf448e167, type: 3}
-  m_Name: PopupData_BoorBash
+  m_Name: Day1_ShaoA
   m_EditorClassIdentifier: 
-  popupId: BoorBash
-  bannerTitle: "\u3010\u7F8E\u56E2\u8DD1\u817F\u3011"
-  bannerSummary: " \u540C\u57CE\u4E00\u5BF9\u4E00\u914D\u9001\u8BA2\u5355\u5F85\u786E\u8BA4"
-  avatarSprite: {fileID: 21300000, guid: da982c5c6f71a2c41a7c51cdc7092758, type: 3}
+  popupId: Day1_ShaoA
+  bannerTitle: "\u3010\u5FAE\u4FE1\u6D88\u606F\u3011"
+  bannerSummary: "AAA\u65E2\u767D\u5DE5\u4F5C\u5BA4 \u90B5\u8001\u5E08"
+  avatarSprite: {fileID: 21300000, guid: 0833a359402bc0043ae4fbae5a331e24, type: 3}
   bannerBackground: {fileID: 0}
   hasExpandedContent: 1
-  drawerTitle: "\u3010\u7F8E\u56E2\u8DD1\u817F\u3011\u540C\u57CE\u6025\u9001\xB7\u8D35\u91CD\u7269\u54C1"
-  drawerBackground: {fileID: 21300000, guid: 5394b5d1d9dd065459ea403d65d51822, type: 3}
-  drawerContentImage: {fileID: 21300000, guid: 4bbd605a8bd34464787cad4da389d266, type: 3}
+  drawerTitle: "AAA\u65E2\u767D\u5DE5\u4F5C\u5BA4 \u90B5\u8001\u5E08"
+  drawerBackground: {fileID: 0}
+  drawerContentImage: {fileID: 21300000, guid: e4a4a051aef8f44f28a0dca2017d9b70, type: 3}
   drawerDetailText: 
   incomingLoopSfx: {fileID: 8300000, guid: a04ecf2458305b14f9dc60b540e65872, type: 3}
   voiceClip: {fileID: 0}
-  isDeliveryOrder: 1
-  confirmButtonText: 
+  isDeliveryOrder: 0
+  confirmButtonText: "\u786E\u8BA4\u53D6\u4EF6"
   targetSceneOnConfirm: 
   interruptWorkAndFail: 0
