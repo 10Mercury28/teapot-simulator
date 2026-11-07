@@ -52,6 +52,9 @@ public class PopupManager : MonoBehaviour
     public List<PopupWindowDataSO> registeredPopups = new List<PopupWindowDataSO>();
 
     [Header("=== 调试功能 ===")]
+    [Tooltip("是否在场景切换时跨场景保留该弹窗画布 (DontDestroyOnLoad)")]
+    public bool dontDestroyOnLoad = false;
+
     [Tooltip("测试使用的 SO 数据资产")]
     public PopupWindowDataSO debugTestSO;
 
@@ -63,6 +66,7 @@ public class PopupManager : MonoBehaviour
     public event Action<PopupWindowDataSO> OnBannerClicked;
     public event Action<PopupWindowDataSO> OnDrawerOpened;
     public event Action<PopupWindowDataSO> OnDrawerClosed;
+    public event Action<PopupWindowDataSO> OnPopupClosed; // 无论是横幅关闭还是抽屉关闭，弹窗流程彻底结束时触发
     public event Action<PopupWindowDataSO> OnOrderConfirmed;
     public event Action<PopupWindowDataSO> OnWorkInterrupted;
 
@@ -74,6 +78,10 @@ public class PopupManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            if (dontDestroyOnLoad)
+            {
+                DontDestroyOnLoad(gameObject);
+            }
         }
         else if (Instance != this)
         {
@@ -255,8 +263,10 @@ public class PopupManager : MonoBehaviour
         else
         {
             // 无大消息 (如大众点评) -> 直接滑出关闭
+            PopupWindowDataSO closedData = CurrentData;
             bannerUI.Hide();
             CurrentData = null;
+            OnPopupClosed?.Invoke(closedData);
         }
     }
 
@@ -264,19 +274,23 @@ public class PopupManager : MonoBehaviour
     {
         // 玩家手势划走
         StopLoopSound();
+        PopupWindowDataSO closedData = CurrentData;
         CurrentData = null;
+        OnPopupClosed?.Invoke(closedData);
     }
 
     private void HandleDrawerCloseRequested()
     {
         StopVoiceSound();
 
+        PopupWindowDataSO closedData = CurrentData;
         if (drawerUI != null)
         {
             drawerUI.Hide();
         }
 
-        OnDrawerClosed?.Invoke(CurrentData);
+        OnDrawerClosed?.Invoke(closedData);
+        OnPopupClosed?.Invoke(closedData);
         CurrentData = null;
     }
 

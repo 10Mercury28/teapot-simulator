@@ -21,6 +21,32 @@ public class PatModule : MonoBehaviour
     public int requiredHits = 20;
     public float timeLimit = 3f;
 
+    [Header("🔔 弹窗打断配置 (Popup Interruption)")]
+    [Tooltip("是否在此模块启用拍泥打断弹窗？(例如 Module 2 和 Module 4 勾选启用)")]
+    public bool enableInterruptPopup = false;
+
+    [Tooltip("拍到第几下时触发打断 (流程图中的 x 或 y 暴露参数)")]
+    public int interruptHitCount = 3;
+
+    [Tooltip("触发的弹窗数据 SO (如大众点评或老师通知)")]
+    public PopupWindowDataSO interruptPopupSO;
+
+    [Tooltip("或者通过 popupId 唤出 (与 interruptPopupSO 二选一，若 SO 为空则用 ID)")]
+    public string interruptPopupId;
+
+    [Tooltip("处理完弹窗后是否直接视作本模块完成并加载下一项？\n- False (推荐): 关闭弹窗后返回拍泥，拍完剩余次数才完成\n- True: 弹窗关闭后直接跳过本模块")]
+    public bool completeModuleOnPopupDismiss = false;
+
+    [Tooltip("被打断后重新拍泥时，是否保留已拍击的进度？\n- True (推荐): 保留打断前的次数，接着拍剩下的次数\n- False: 从第 1 下重新拍满 requiredHits")]
+    public bool retainHitsOnInterrupt = true;
+
+    [Tooltip("弹窗关闭后是否自动切回拍泥？\n- False: 保持在 Idle 待机旋转，玩家点击泥巴切回拍泥 (原生丝滑手感)\n- True: 弹窗关闭瞬间自动切回拍泥")]
+    public bool autoResumePatOnPopupDismiss = false;
+
+    private bool isInterrupted = false;
+    private bool hasTriggeredInterrupt = false;
+    private Coroutine interruptIdleRoutine;
+
     [Header("Transition Settings")]
     [Range(0.2f, 2f)]
     public float transitionSpeed = 1f;
@@ -107,6 +133,12 @@ public class PatModule : MonoBehaviour
         switch (currentState)
         {
             case PatState.TransitionLoop:
+                if (isInterrupted)
+                {
+                    // 弹窗未处理前，禁止点击切回拍泥，一直停留在 Idle 待机
+                    break;
+                }
+
                 if (clickedOnModule)
                 {
                     currentState = PatState.SwitchingToMain;
@@ -115,6 +147,12 @@ public class PatModule : MonoBehaviour
                 break;
 
             case PatState.MainActive:
+                if (isInterrupted)
+                {
+                    // 处于被弹窗打断状态：阻断拍击输入，不累加超时计时器
+                    break;
+                }
+
                 if (clickedOnModule)
                 {
                     RegisterHit();
@@ -143,6 +181,8 @@ public class PatModule : MonoBehaviour
         currentState = PatState.TransitionLoop;
         currentHits = 0;
         timer = 0f;
+        isInterrupted = false;
+        hasTriggeredInterrupt = false;
 
         Collider2D col = GetComponent<Collider2D>();
         if (col != null) col.enabled = true;
@@ -216,17 +256,30 @@ public class PatModule : MonoBehaviour
             
             while (!isReady) yield return null;
 
-            mainVideo.time = 0.0;
+            if (retainHitsOnInterrupt && hasTriggeredInterrupt && currentHits > 0)
+            {
+                float progress = Mathf.Clamp01((float)currentHits / Mathf.Max(1, requiredHits));
+                mainVideo.time = progress * mainVideo.clip.length;
+            }
+            else
+            {
+                mainVideo.time = 0.0;
+            }
+
             mainVideo.Play();
 
             // 稍微等待新视频输出第一帧画面（此时底下的画面会被新视频盖上）
             yield return new WaitForSecondsRealtime(0.08f);
 
             mainCtrl?.Pause();
-            Debug.Log($"🖼️ [{name}] Main 首帧已建立");
+            Debug.Log($"🖼️ [{name}] Main 首帧已建立 (time={mainVideo.time:F2}s, hits={currentHits})");
         }
 
-        currentHits = 0;
+        if (!retainHitsOnInterrupt || !hasTriggeredInterrupt)
+        {
+            currentHits = 0;
+        }
+
         timer = 0f;
         SetTargetAlpha(alphaActive);
         
@@ -252,6 +305,13 @@ public class PatModule : MonoBehaviour
         mainCtrl?.PlayChunk(targetTime, 0.12);
 
         Debug.Log($"👆 [{name}] Hit {currentHits}/{requiredHits} target={targetTime:F2}s");
+
+        // 检查是否达到打断阈值 (对应流程图: 开始拍第 x / y 下触发打断并弹出消息)
+        if (enableInterruptPopup && !hasTriggeredInterrupt && currentHits >= interruptHitCount)
+        {
+            TriggerInterrupt();
+            return;
+        }
 
         if (currentHits >= requiredHits)
         {
@@ -350,6 +410,19 @@ public class PatModule : MonoBehaviour
         currentState = PatState.Inactive;
         timer = 0f;
 
+        if (PopupManager.Instance != null)
+        {
+            PopupManager.Instance.OnPopupClosed -= HandlePopupClosed;
+        }
+
+        if (interruptIdleRoutine != null)
+        {
+            StopCoroutine(interruptIdleRoutine);
+            interruptIdleRoutine = null;
+        }
+
+        isInterrupted = false;
+
         StopAllCoroutines();
 
         transCtrl?.StopAndReset();
@@ -443,5 +516,80 @@ public class PatModule : MonoBehaviour
 
         fallbackBackground.texture = snapshotTex;
         fallbackBackground.color = Color.white;
+    }
+
+    // ==============================================
+    // 🔔 弹窗打断逻辑实现
+    // ==============================================
+
+    private void TriggerInterrupt()
+    {
+        hasTriggeredInterrupt = true;
+        isInterrupted = true;
+        Debug.Log($"🚨 [{name}] 拍击达到第 {interruptHitCount} 次，触发打断！播放 Fail 动画 -> 切入 Idle 待机，并呼出弹窗。");
+
+        timer = 0f; // 暂停计时器，避免打断期间超时判 Fail
+
+        // 1. 触发原生丝滑的 Fail -> Transition (Idle) 动画序列
+        StartCoroutine(PlayFailThenTransition());
+
+        // 2. 呼出 PopupManager 弹窗 (常驻 + 循环提示音骚扰)
+        if (PopupManager.Instance != null)
+        {
+            PopupManager.Instance.OnPopupClosed += HandlePopupClosed;
+
+            if (interruptPopupSO != null)
+            {
+                PopupManager.Instance.Show(interruptPopupSO);
+            }
+            else if (!string.IsNullOrEmpty(interruptPopupId))
+            {
+                PopupManager.Instance.ShowById(interruptPopupId);
+            }
+            else
+            {
+                Debug.LogWarning($"⚠️ [{name}] enableInterruptPopup 为 true，但未指定 interruptPopupSO 或 interruptPopupId！");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ [PatModule] 场景中未找到 PopupManager 实例，打断弹窗无法拉起！");
+        }
+    }
+
+    private void HandlePopupClosed(PopupWindowDataSO data)
+    {
+        if (PopupManager.Instance != null)
+        {
+            PopupManager.Instance.OnPopupClosed -= HandlePopupClosed;
+        }
+
+        if (!isInterrupted) return;
+
+        Debug.Log($"✅ [{name}] 弹窗已处理完毕！解除打断锁定。当前泥巴停留在 Idle 待机界面，点击即可切回拍泥完成剩余次数！");
+        isInterrupted = false;
+
+        if (completeModuleOnPopupDismiss)
+        {
+            // 若勾选了跳过，则直接完成本模块
+            Complete();
+        }
+        else if (autoResumePatOnPopupDismiss)
+        {
+            // 若勾选了自动切回，关闭弹窗瞬间自动调用切回拍泥
+            if (currentState == PatState.TransitionLoop)
+            {
+                currentState = PatState.SwitchingToMain;
+                StartCoroutine(SwitchToMain());
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (PopupManager.Instance != null)
+        {
+            PopupManager.Instance.OnPopupClosed -= HandlePopupClosed;
+        }
     }
 }

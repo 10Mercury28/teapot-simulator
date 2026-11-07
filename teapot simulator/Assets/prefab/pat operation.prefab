@@ -2632,6 +2632,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2086043899703388924}
     - target: {fileID: 2571078154482157703, guid: 6f2a46ee5aca445dd8bfea3252be14d6, type: 3}
+      propertyPath: interruptPopupSO
+      value: 
+      objectReference: {fileID: 11400000, guid: 6801e9153a9ca4e45b088949c5cea104, type: 2}
+    - target: {fileID: 2571078154482157703, guid: 6f2a46ee5aca445dd8bfea3252be14d6, type: 3}
+      propertyPath: enableInterruptPopup
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2571078154482157703, guid: 6f2a46ee5aca445dd8bfea3252be14d6, type: 3}
       propertyPath: transitionVideoPlayer
       value: 
       objectReference: {fileID: 0}

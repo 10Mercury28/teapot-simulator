@@ -171,19 +171,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3a57135c05b142239db5945e5ca9597, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  active: 0
-  complete: 0
+  currentState: 0
   requiredHits: 20
   timeLimit: 3
-  idleColor: {r: 1, g: 1, b: 1, a: 1}
-  activeColor: {r: 1, g: 1, b: 1, a: 0.6}
-  completeColor: {r: 0, g: 1, b: 0, a: 1}
+  enableInterruptPopup: 0
+  interruptHitCount: 3
+  interruptPopupSO: {fileID: 0}
+  interruptPopupId: 
+  completeModuleOnPopupDismiss: 1
+  interruptVideoMode: 1
+  transitionSpeed: 1
   mainVideo: {fileID: 0}
-  transitionVideo: {fileID: 0}
   failVideo: {fileID: 0}
+  transitionVideo: {fileID: 0}
   mainRaw: {fileID: 0}
-  transitionRaw: {fileID: 0}
   failRaw: {fileID: 0}
+  transitionRaw: {fileID: 0}
+  fallbackBackground: {fileID: 0}
+  alphaInactive: 0.1
+  alphaActive: 0.4
+  alphaClick: 0.2
+  alphaComplete: 0
+  alphaLerpSpeed: 8
 --- !u!61 &292497611584086674
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -51,6 +51,9 @@ public class SlideNotificationBannerUI : MonoBehaviour, IBeginDragHandler, IDrag
     public AnimationCurve slideOutCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
     [Header("=== 拖拽划走 (Swipe to Dismiss) ===")]
+    [Tooltip("是否允许向右拖拽划走关闭？\n- False: 强制禁止划走，必须点击才能处理 (符合流程图 todo: 窄窗口不可以被右滑收起)\n- True: 允许玩家向右拖拽划走")]
+    public bool allowSwipeToDismiss = false;
+
     [Tooltip("向右拖拽超过卡片宽度的多少百分比算作划走成功")]
     [Range(0.1f, 0.8f)] public float dismissThresholdPercent = 0.35f;
 
@@ -269,6 +272,7 @@ public class SlideNotificationBannerUI : MonoBehaviour, IBeginDragHandler, IDrag
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (!allowSwipeToDismiss) return;
         if (!IsVisible || IsAnimating) return;
 
         isDragging = true;
@@ -277,7 +281,7 @@ public class SlideNotificationBannerUI : MonoBehaviour, IBeginDragHandler, IDrag
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (!isDragging) return;
+        if (!allowSwipeToDismiss || !isDragging) return;
 
         float deltaX = eventData.position.x - pointerDownPos.x;
 
@@ -299,7 +303,7 @@ public class SlideNotificationBannerUI : MonoBehaviour, IBeginDragHandler, IDrag
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (!isDragging) return;
+        if (!allowSwipeToDismiss || !isDragging) return;
         isDragging = false;
 
         float draggedDistanceX = cardRect.anchoredPosition.x - visiblePos.x;
@@ -343,8 +347,8 @@ public class SlideNotificationBannerUI : MonoBehaviour, IBeginDragHandler, IDrag
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        // 若拖拽超过阈值，屏蔽点击
-        if (dragExceededDeadzone) return;
+        // 若允许拖拽且拖拽超过阈值，才屏蔽点击；若不允许拖拽，则始终响应点击
+        if (allowSwipeToDismiss && dragExceededDeadzone) return;
 
         OnClicked?.Invoke();
     }
