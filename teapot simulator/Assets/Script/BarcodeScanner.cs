@@ -21,9 +21,9 @@ public class BarcodeScanner : MonoBehaviour
     [Tooltip("开启后，按键盘数字键可直接模拟扫描特定条码")]
     public bool enableDebugKeySimulation = true;
     public KeyCode simulateKey1 = KeyCode.Alpha1;
-    public string simulateBarcode1 = "TOOL_01";
+    public string simulateBarcode1 = "03-GongChun"; // Day 1 供春壶条码
     public KeyCode simulateKey2 = KeyCode.Alpha2;
-    public string simulateBarcode2 = "TOOL_02";
+    public string simulateBarcode2 = "09-H2zhuangjj"; // Day 2 汉铎/仿古条码
 
     [Header("调试日志")]
     public bool debugLog = true;

@@ -23,6 +23,8 @@ title: JushiVariables
 
 title: Character_Jushi
 ---
+<<play_sfx "doorbell">>
+<<show_character "jushi">>
 我: 您好，欢迎光临。
 居士: 你好，我和邵苇店长有预约。
 我: 您是侯居士吧。我都准备好了。您先看壶，晚点我们去吃野菜馆。
@@ -131,12 +133,14 @@ title: OfficeMan
 <<set $LikeU to true>>
 居士: 我给你发一个我老师讲的课，你愿意听就看看。
 // 剧情事件占位：由游戏端将视频加入微信，下载/聆听逻辑在游戏系统中处理。
+<<show_popup_wait "Day_1_HouJ">>
 （微信收到一段讲课的 MP4 视频。）
 <<return>>
 ===
 
 title: RockNRoll
 ---
+<<play_sfx "蝉鸣">>
 我: 它们一年中大多时间都住在地下，盛夏一出来就大喝大唱。
 我: 沉寂，然后怒吼、喧哗、交配，然后死亡。
 我: 哈哈哈。
@@ -394,13 +398,25 @@ title: JushiD1_ScanGongChun
 <<endif>>
 ===
 
+title: JushiD1_SaleComplete
+---
+居士: 包装得真利索。我走了，你也早点收拾休息。
+我: 好的侯居士，您慢走。
+<<hide_character "jushi">>
+<<load_scene "TestYarn">>
+<<stop>>
+===
+
 title: FailEnd
 ---
 （居士温和地笑，自己翻看了一会册子。）
 居士: 我下次再来，先走了。为了我来这一趟，也耽误你不少事。
 // 游戏端事件：老师后来询问居士为何另外约她在店的时候过来。
 (弹窗设计：老师事后问你怎么招待的，怎么居士另外约她在的时间来。)
+<<hide_character "jushi">>
 <<set $JushiFailed to true>>
+<<show_popup_wait "Day1_fail">>
+<<load_scene "TestYarn">> 
 <<stop>>
 ===
  

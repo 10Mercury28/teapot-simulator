@@ -200,20 +200,58 @@ public class PopupManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 根据预注册的 popupId 弹出窗口
+    /// 根据预注册的 popupId 或资产名查找弹窗数据
+    /// </summary>
+    public PopupWindowDataSO FindPopupData(string id)
+    {
+        if (string.IsNullOrEmpty(id)) return null;
+
+        // 1. 精确匹配 popupId
+        PopupWindowDataSO found = registeredPopups.Find(p => p != null && string.Equals(p.popupId, id, StringComparison.OrdinalIgnoreCase));
+        if (found != null) return found;
+
+        // 2. 精确匹配 asset 资产名
+        found = registeredPopups.Find(p => p != null && string.Equals(p.name, id, StringComparison.OrdinalIgnoreCase));
+        if (found != null) return found;
+
+        // 3. 包含模糊匹配 (例如 "Dianping" 匹配 "Day1_Dianping_Pat2")
+        found = registeredPopups.Find(p => p != null && 
+            ((p.popupId != null && p.popupId.IndexOf(id, StringComparison.OrdinalIgnoreCase) >= 0) ||
+             (p.name != null && p.name.IndexOf(id, StringComparison.OrdinalIgnoreCase) >= 0)));
+        if (found != null) return found;
+
+        // 4. 从内存/已加载资产中查找 (防止策划未手动拖入 registeredPopups)
+        PopupWindowDataSO[] allLoaded = Resources.FindObjectsOfTypeAll<PopupWindowDataSO>();
+        foreach (var p in allLoaded)
+        {
+            if (p == null) continue;
+            if (string.Equals(p.popupId, id, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(p.name, id, StringComparison.OrdinalIgnoreCase) ||
+                (p.popupId != null && p.popupId.IndexOf(id, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                (p.name != null && p.name.IndexOf(id, StringComparison.OrdinalIgnoreCase) >= 0))
+            {
+                return p;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 根据预注册的 popupId 或资产名称弹出窗口
     /// </summary>
     public void ShowById(string id)
     {
         if (string.IsNullOrEmpty(id)) return;
 
-        PopupWindowDataSO found = registeredPopups.Find(p => p != null && p.popupId == id);
+        PopupWindowDataSO found = FindPopupData(id);
         if (found != null)
         {
             Show(found);
         }
         else
         {
-            Debug.LogWarning($"⚠️ [PopupManager] 未能在 registeredPopups 中找到 ID 为 '{id}' 的弹窗数据！");
+            Debug.LogWarning($"⚠️ [PopupManager] 未能找到 ID/名称匹配 '{id}' 的弹窗数据！");
         }
     }
 
