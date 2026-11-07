@@ -23,8 +23,11 @@ title: JushiVariables
 
 title: Character_Jushi
 ---
+<<wait 0.5>>
 <<play_sfx "doorbell">>
+<<wait 1.5>>
 <<show_character "jushi">>
+<<wait 0.5>>
 我: 您好，欢迎光临。
 居士: 你好，我和邵苇店长有预约。
 我: 您是侯居士吧。我都准备好了。您先看壶，晚点我们去吃野菜馆。
@@ -403,7 +406,7 @@ title: JushiD1_SaleComplete
 居士: 包装得真利索。我走了，你也早点收拾休息。
 我: 好的侯居士，您慢走。
 <<hide_character "jushi">>
-<<load_scene "TestYarn">>
+//<<load_scene "TestYarn">>
 <<stop>>
 ===
 
@@ -416,7 +419,7 @@ title: FailEnd
 <<hide_character "jushi">>
 <<set $JushiFailed to true>>
 <<show_popup_wait "Day1_fail">>
-<<load_scene "TestYarn">> 
+//<<load_scene "TestYarn">> 
 <<stop>>
 ===
  
