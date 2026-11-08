@@ -404,13 +404,18 @@ public class Day1YarnCommands : MonoBehaviour
     // 3. 音效与音频播放指令 (Audio / SFX Commands)
     // ============================================================
 
+    private Coroutine currentSfxFadeRoutine;
+
     /// <summary>
-    /// 播放单次音效: <<play_sfx "clip_name">>
+    /// 播放单次音效: 
+    /// <<play_sfx "clip_name">>
+    /// <<play_sfx "clip_name" 3.5>> (播放 3.5 秒后自动淡出并停止)
+    /// <<play_sfx "clip_name" 3.5 1.0>> (播放 3.5 秒，其中最后 1.0 秒平滑淡出)
     /// </summary>
     [YarnCommand("play_sfx")]
-    public static void PlaySfx(string clipName)
+    public static void PlaySfx(string clipName, float duration = 0f, float fadeOutTime = 0.5f)
     {
-        Debug.Log($"💬 [YarnCommand] play_sfx: '{clipName}'");
+        Debug.Log($"💬 [YarnCommand] play_sfx: '{clipName}' (duration={duration}s, fadeOut={fadeOutTime}s)");
         AudioClip clip = ResolveAudioClip(clipName);
         if (clip == null)
         {
@@ -419,23 +424,40 @@ public class Day1YarnCommands : MonoBehaviour
         }
 
         AudioSource source = GetSfxAudioSource();
-        if (source != null)
+        if (source == null)
         {
-            source.PlayOneShot(clip);
+            AudioSource.PlayClipAtPoint(clip, Camera.main != null ? Camera.main.transform.position : Vector3.zero);
+            return;
+        }
+
+        if (Instance != null)
+        {
+            Instance.StartPlaySfx(source, clip, duration, fadeOutTime);
         }
         else
         {
-            AudioSource.PlayClipAtPoint(clip, Camera.main != null ? Camera.main.transform.position : Vector3.zero);
+            if (duration > 0)
+            {
+                source.clip = clip;
+                source.volume = 1f;
+                source.Play();
+            }
+            else
+            {
+                source.PlayOneShot(clip);
+            }
         }
     }
 
     /// <summary>
-    /// 播放音效并等待结束: <<play_sfx_wait "clip_name">>
+    /// 播放音效并等待结束: 
+    /// <<play_sfx_wait "clip_name">>
+    /// <<play_sfx_wait "clip_name" 3.0>> (播放 3.0 秒，暂停对白 3.0 秒后继续)
     /// </summary>
     [YarnCommand("play_sfx_wait")]
-    public static IEnumerator PlaySfxWait(string clipName)
+    public static IEnumerator PlaySfxWait(string clipName, float duration = 0f, float fadeOutTime = 0.5f)
     {
-        Debug.Log($"💬 [YarnCommand] play_sfx_wait: '{clipName}'");
+        Debug.Log($"💬 [YarnCommand] play_sfx_wait: '{clipName}' (duration={duration}s)");
         AudioClip clip = ResolveAudioClip(clipName);
         if (clip == null)
         {
@@ -444,31 +466,108 @@ public class Day1YarnCommands : MonoBehaviour
         }
 
         AudioSource source = GetSfxAudioSource();
+        float effectiveDuration = duration > 0 ? duration : clip.length;
+
         if (source != null)
         {
-            source.clip = clip;
-            source.loop = false;
-            source.Play();
-            yield return new WaitForSeconds(clip.length);
+            if (Instance != null)
+            {
+                Instance.StartPlaySfx(source, clip, effectiveDuration, fadeOutTime);
+            }
+            else
+            {
+                source.clip = clip;
+                source.volume = 1f;
+                source.Play();
+            }
+            yield return new WaitForSeconds(effectiveDuration);
         }
         else
         {
-            yield return new WaitForSeconds(clip.length);
+            yield return new WaitForSeconds(effectiveDuration);
         }
     }
 
     /// <summary>
-    /// 停止音效: <<stop_sfx>>
+    /// 停止音效: 
+    /// <<stop_sfx>>
+    /// <<stop_sfx 0.5>> (在 0.5 秒内平滑淡出并停止)
     /// </summary>
     [YarnCommand("stop_sfx")]
-    public static void StopSfx()
+    public static void StopSfx(float fadeOutTime = 0.3f)
     {
-        Debug.Log("💬 [YarnCommand] stop_sfx");
+        Debug.Log($"💬 [YarnCommand] stop_sfx (fadeOut={fadeOutTime}s)");
         AudioSource source = GetSfxAudioSource();
         if (source != null && source.isPlaying)
         {
+            if (Instance != null && fadeOutTime > 0)
+            {
+                Instance.StartStopSfx(source, fadeOutTime);
+            }
+            else
+            {
+                source.Stop();
+            }
+        }
+    }
+
+    private void StartPlaySfx(AudioSource source, AudioClip clip, float duration, float fadeOutTime)
+    {
+        if (currentSfxFadeRoutine != null)
+        {
+            StopCoroutine(currentSfxFadeRoutine);
+            currentSfxFadeRoutine = null;
+        }
+
+        source.clip = clip;
+        source.volume = 1f;
+        source.loop = false;
+        source.Play();
+
+        if (duration > 0)
+        {
+            currentSfxFadeRoutine = StartCoroutine(FadeOutSfxRoutine(source, duration, fadeOutTime));
+        }
+    }
+
+    private void StartStopSfx(AudioSource source, float fadeOutTime)
+    {
+        if (currentSfxFadeRoutine != null)
+        {
+            StopCoroutine(currentSfxFadeRoutine);
+            currentSfxFadeRoutine = null;
+        }
+
+        if (fadeOutTime <= 0)
+        {
             source.Stop();
         }
+        else
+        {
+            currentSfxFadeRoutine = StartCoroutine(FadeOutSfxRoutine(source, fadeOutTime, fadeOutTime));
+        }
+    }
+
+    private IEnumerator FadeOutSfxRoutine(AudioSource source, float duration, float fadeOutTime)
+    {
+        float playDuration = Mathf.Max(0.05f, duration - fadeOutTime);
+        yield return new WaitForSeconds(playDuration);
+
+        float initialVolume = source.volume;
+        float elapsed = 0f;
+        while (elapsed < fadeOutTime && source != null)
+        {
+            elapsed += Time.deltaTime;
+            source.volume = Mathf.Lerp(initialVolume, 0f, elapsed / fadeOutTime);
+            yield return null;
+        }
+
+        if (source != null)
+        {
+            source.Stop();
+            source.volume = initialVolume;
+        }
+        currentSfxFadeRoutine = null;
     }
 
     /// <summary>

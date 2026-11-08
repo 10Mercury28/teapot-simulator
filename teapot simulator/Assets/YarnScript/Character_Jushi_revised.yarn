@@ -143,7 +143,7 @@ title: OfficeMan
 
 title: RockNRoll
 ---
-<<play_sfx "蝉鸣">>
+<<play_sfx "chanming" 5.5>>
 我: 它们一年中大多时间都住在地下，盛夏一出来就大喝大唱。
 我: 沉寂，然后怒吼、喧哗、交配，然后死亡。
 我: 哈哈哈。
