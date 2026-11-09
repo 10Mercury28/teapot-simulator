@@ -101,6 +101,7 @@ title: MindMaze_Continue
 
 title: MindMaze_1
 ---
+<<set_speakers "宝钗, 吕蒙, 柯湘">>
 // 第一段： 宝钗、吕蒙、柯湘 讨论角色本身对于想法不同的人的接受程度，成交成功解锁
 宝钗: 漫揾英雄泪，相离处士家。谢慈悲，剃度在莲台下。
 宝钗: 没缘法，转眼分离乍。赤条条，来去无牵挂。
@@ -163,6 +164,7 @@ title: MindMaze_1
 
 title: MindMaze_2
 ---
+<<set_speakers "柯湘, 吕蒙, 赫尔墨斯, 宝钗">>
 // 第二段:柯湘、吕蒙、赫尔墨斯、宝钗；交心解锁
 我: 我其实非常期待和您聊聊。
 我: 我特别想要你告诉我，什么是信仰，什么是佛学，什么是宗教。
@@ -249,6 +251,7 @@ title: MindMaze_2
 
 title: MindMaze_3
 ---
+<<set_speakers "MBTI, 伍尔夫, 宝钗">>
 // 第三段:MBTI、伍尔夫、宝钗；无条件解锁
 MBTI: 你是不是累了，需要休息吗宝？
 MBTI: 付出情绪劳动，一直 嗯嗯嗯 很累吧。
@@ -282,6 +285,7 @@ MBTI: 你的教育只是给你这么一个让话不要掉在地上的机会了�
 
 title: MindMaze_4
 ---
+<<set_speakers "名妓, 比尔博, 赫尔墨斯, 伍尔夫, 宝钗, 柯湘">>
 // 第四段: 名妓、比尔博、赫尔墨斯等；无条件解锁
 名妓: 昔张岱得木龙，起丁丑诗社，恳诸公赐之名，并赋小言咏之。
 名妓: 张子不吝笔墨，记满座高朋之题咏，诸名盈帙；
@@ -407,6 +411,7 @@ title: MindMaze_4
 
 title: MindMaze_5
 ---
+<<set_speakers "all">>
 我: 啊啊啊啊啊啊啊啊啊啊啊啊啊啊！
 “赫尔墨斯”: 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊！
 我: 啊啊啊啊啊啊啊啊啊啊啊！
@@ -538,5 +543,10 @@ MBTI: 作为你的一部分，你一难受，我也跟你不舒服啊，宝。
 
 title: MindMaze_End
 ---
-/// maybe some yarn command
+<<if $MindDone5>>
+    <<load_scene "StudioDesk">>
+<<else>>
+    <<load_scene "chooseToolBasedOnCut">>
+<<endif>>
+<<stop>>
 ===
