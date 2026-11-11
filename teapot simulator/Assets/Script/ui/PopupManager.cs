@@ -18,7 +18,33 @@ using UnityEngine.SceneManagement;
 [RequireComponent(typeof(Canvas))]
 public class PopupManager : MonoBehaviour
 {
-    public static PopupManager Instance { get; private set; }
+    private static PopupManager _instance;
+    public static PopupManager Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = FindObjectOfType<PopupManager>();
+                if (_instance == null)
+                {
+                    GameObject prefab = Resources.Load<GameObject>("PopupCanvas");
+                    if (prefab != null)
+                    {
+                        GameObject go = Instantiate(prefab);
+                        go.name = "PopupCanvas";
+                        _instance = go.GetComponent<PopupManager>();
+                        Debug.Log("🔔 [PopupManager] 场景中未找到 PopupCanvas，已自动从 Resources 加载实例化。");
+                    }
+                }
+            }
+            return _instance;
+        }
+        private set
+        {
+            _instance = value;
+        }
+    }
 
     [Header("=== 控制器引用 ===")]
     [Tooltip("窄横幅 UI 控制器")]
@@ -75,15 +101,15 @@ public class PopupManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
+        if (_instance == null)
         {
-            Instance = this;
+            _instance = this;
             if (dontDestroyOnLoad)
             {
                 DontDestroyOnLoad(gameObject);
             }
         }
-        else if (Instance != this)
+        else if (_instance != this)
         {
             Destroy(gameObject);
             return;
@@ -334,24 +360,11 @@ public class PopupManager : MonoBehaviour
 
     private void HandleOrderConfirmed()
     {
-        StopVoiceSound();
+        StopAllSounds();
 
         PopupWindowDataSO confirmedData = CurrentData;
         OnOrderConfirmed?.Invoke(confirmedData);
-
-        // 如果配置了跳转场景
-        if (confirmedData != null && !string.IsNullOrEmpty(confirmedData.targetSceneOnConfirm))
-        {
-            Debug.Log($"🚀 [PopupManager] 订单确认，跳转场景: {confirmedData.targetSceneOnConfirm}");
-            if (SceneBlinkTransition.Instance != null)
-            {
-                SceneBlinkTransition.Instance.LoadSceneConcealed(confirmedData.targetSceneOnConfirm);
-            }
-            else
-            {
-                SceneManager.LoadScene(confirmedData.targetSceneOnConfirm);
-            }
-        }
+        OnPopupClosed?.Invoke(confirmedData);
 
         if (drawerUI != null)
         {
@@ -359,6 +372,20 @@ public class PopupManager : MonoBehaviour
         }
 
         CurrentData = null;
+
+        // 如果配置了跳转场景（例如美团跑腿确认取件 -> 纯黑渐变进 endScene）
+        if (confirmedData != null && !string.IsNullOrEmpty(confirmedData.targetSceneOnConfirm))
+        {
+            Debug.Log($"🚀 [PopupManager] 订单确认，跳转场景: {confirmedData.targetSceneOnConfirm}");
+            if (confirmedData.targetSceneOnConfirm == "endScene")
+            {
+                GlobalProgressManager.EnsureInstance().TransitionToScene("endScene", "", 2);
+            }
+            else
+            {
+                GlobalProgressManager.EnsureInstance().TransitionToScene(confirmedData.targetSceneOnConfirm);
+            }
+        }
     }
 
     private void StopLoopSound()

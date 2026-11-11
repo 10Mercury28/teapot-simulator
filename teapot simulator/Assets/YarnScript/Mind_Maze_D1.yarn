@@ -544,9 +544,9 @@ MBTI: 作为你的一部分，你一难受，我也跟你不舒服啊，宝。
 title: MindMaze_End
 ---
 <<if $MindDone5>>
-    <<load_scene "StudioDesk">>
+    <<load_scene "StudioDesk" "" 1>>
 <<else>>
-    <<load_scene "chooseToolBasedOnCut">>
+    <<load_scene "chooseToolBasedOnCut" "Day 2" 2>>
 <<endif>>
 <<stop>>
 ===

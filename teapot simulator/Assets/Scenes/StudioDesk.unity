@@ -389,6 +389,9 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: d26a5f72440fc8f47913349c3a296a81, type: 3}
   popupManager: {fileID: 1680065456}
   barcodeScanner: {fileID: 0}
+  startDayMode: 0
+  debugSimulateLikeUForD2: 0
+  debugSimulateCicadaForD2: 0
 --- !u!1 &1444130827
 GameObject:
   m_ObjectHideFlags: 0
@@ -629,7 +632,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4368502024732009333, guid: 34b5fc89c14922d458d20635ffcadc6b, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -900
+      value: -709.99994
       objectReference: {fileID: 0}
     - target: {fileID: 5837940533610859689, guid: 34b5fc89c14922d458d20635ffcadc6b, type: 3}
       propertyPath: m_Name

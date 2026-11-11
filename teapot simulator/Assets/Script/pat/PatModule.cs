@@ -84,14 +84,16 @@ public class PatModule : MonoBehaviour
 
     private List<SpriteRenderer> sprites = new List<SpriteRenderer>();
 
-    // Snapshot variables
-    private Texture2D snapshotTex;
+    // Snapshot variables (GPU-only RenderTexture avoids ReadPixels stall & format mismatch)
+    private static RenderTexture sharedFallbackRT;
+    public bool HasFirstFrameReady { get; private set; }
 
     void Start()
     {
         controller = GetComponentInParent<PatSequenceController>();
 
         HideAll();
+        EnsureFallbackInitialized();
 
         sprites.Clear();
         GetComponentsInChildren(true, sprites);
@@ -183,11 +185,13 @@ public class PatModule : MonoBehaviour
         timer = 0f;
         isInterrupted = false;
         hasTriggeredInterrupt = false;
+        HasFirstFrameReady = false;
 
         Collider2D col = GetComponent<Collider2D>();
         if (col != null) col.enabled = true;
 
         HideAll();
+        EnsureFallbackInitialized();
         SetTargetAlpha(alphaInactive);
 
         // 提前让主视频和失败视频准备好，无缝衔接
@@ -201,79 +205,104 @@ public class PatModule : MonoBehaviour
     IEnumerator PlayTransitionLoop()
     {
         if (transitionVideo == null || transitionRaw == null || transitionVideo.clip == null)
+        {
+            HasFirstFrameReady = true;
             yield break;
-
-        transitionRaw.enabled = true;
-        transitionRaw.color = Color.white;
+        }
 
         if (transitionVideo.targetTexture != null)
             transitionRaw.texture = transitionVideo.targetTexture;
 
         transitionVideo.playbackSpeed = Mathf.Max(0.1f, transitionSpeed);
+        transitionVideo.isLooping = true;
 
-        Debug.Log($"▶️ [{name}] Transition 开始播放");
-
-        System.Action playLoop = null;
-        playLoop = () => {
-            if (currentState == PatState.TransitionLoop)
+        if (!transitionVideo.isPrepared)
+        {
+            bool ready = false;
+            transCtrl?.PrepareNow(() => ready = true);
+            float prepTimeout = 1.5f;
+            while (!ready && prepTimeout > 0f && currentState == PatState.TransitionLoop)
             {
-                transCtrl?.PlayFull(playLoop);
+                prepTimeout -= Time.unscaledDeltaTime;
+                yield return null;
             }
-        };
+        }
 
-        // 启动第一次循环
-        playLoop();
+        if (currentState != PatState.TransitionLoop)
+        {
+            transitionVideo.isLooping = false;
+            yield break;
+        }
+
+        transitionVideo.time = 0.0;
+        transitionVideo.Play();
+        yield return StartCoroutine(WaitForVideoFrameRendered(transitionVideo));
+
+        if (currentState != PatState.TransitionLoop)
+        {
+            transitionVideo.isLooping = false;
+            yield break;
+        }
+
+        transitionRaw.color = Color.white;
+        transitionRaw.enabled = true;
+        yield return new WaitForEndOfFrame();
+
+        // Fail -> Transition 切换时，等 Transition 真正画出首帧后再隐藏上层 Fail/Main RawImage
+        if (failRaw != null && failRaw.enabled) failRaw.enabled = false;
+        if (mainRaw != null && mainRaw.enabled) mainRaw.enabled = false;
+
+        HasFirstFrameReady = true;
+        Debug.Log($"▶️ [{name}] Transition 开始播放 (原生无缝循环)");
 
         while (currentState == PatState.TransitionLoop)
         {
             yield return null;
         }
 
-        transCtrl?.StopAndReset();
-        transitionRaw.enabled = false;
-        Debug.Log($"⏹ [{name}] Transition 结束");
+        transitionVideo.isLooping = false;
+        Debug.Log($"⏹ [{name}] Transition 状态退出");
     }
 
     IEnumerator SwitchToMain()
     {
-        // 瞬间截图当前正在播放的 Transition，更新到那个始终垫底的背景图上
+        // 先截当前 Transition 画面垫底并暂停（不立刻关闭 transitionRaw）
         UpdateFallbackBackground(transitionVideo);
-
-        // 现在可以立刻无缝关掉之前的视频了，屏幕最底下的 -1 Canvas 已经印上了我们的定格画
-        transCtrl?.StopAndReset();
-        if (transitionRaw != null) transitionRaw.enabled = false;
-        if (failRaw != null) failRaw.enabled = false;
+        transCtrl?.Pause();
 
         if (mainVideo != null && mainRaw != null && mainVideo.clip != null)
         {
             if (mainVideo.targetTexture != null) mainRaw.texture = mainVideo.targetTexture;
-            mainRaw.color = Color.white;
-            mainRaw.enabled = true;
 
-            // 准备并让主视频播放一瞬间以建立首帧
+            // 准备并让主视频真正渲染出第一帧，再揭开显示
             bool isReady = false;
             mainCtrl?.PrepareNow(() => isReady = true);
-            
             while (!isReady) yield return null;
 
+            double targetTime = 0.0;
             if (retainHitsOnInterrupt && hasTriggeredInterrupt && currentHits > 0)
             {
                 float progress = Mathf.Clamp01((float)currentHits / Mathf.Max(1, requiredHits));
-                mainVideo.time = progress * mainVideo.clip.length;
-            }
-            else
-            {
-                mainVideo.time = 0.0;
+                targetTime = progress * mainVideo.clip.length;
             }
 
+            long prevFrame = mainVideo.frame;
+            mainVideo.time = targetTime;
             mainVideo.Play();
 
-            // 稍微等待新视频输出第一帧画面（此时底下的画面会被新视频盖上）
-            yield return new WaitForSecondsRealtime(0.08f);
-
+            yield return StartCoroutine(WaitForVideoFrameRendered(mainVideo, 0.35f, prevFrame));
             mainCtrl?.Pause();
+
+            mainRaw.color = Color.white;
+            mainRaw.enabled = true;
+            yield return new WaitForEndOfFrame();
+
             Debug.Log($"🖼️ [{name}] Main 首帧已建立 (time={mainVideo.time:F2}s, hits={currentHits})");
         }
+
+        transCtrl?.StopAndReset();
+        if (transitionRaw != null) transitionRaw.enabled = false;
+        if (failRaw != null) failRaw.enabled = false;
 
         if (!retainHitsOnInterrupt || !hasTriggeredInterrupt)
         {
@@ -334,11 +363,9 @@ public class PatModule : MonoBehaviour
         currentState = PatState.Done;
 
         mainCtrl?.Pause();
+        SnapshotCurrentFrameToFallback();
         
-        // ⚠️ 取消这里的延迟隐藏！
-        // 因为 0.2 秒的死板延迟经常会快于成功视频加载的时间，导致漏出蓝屏。
-        // 现在我们把隐藏的控制权交给 PatSequenceController。
-        // 它会在确认成功视频真正有画面后，调用 ForceHideAndRelease()。
+        // 保持当前模块最后一帧可见，交由 PatSequenceController 在下一模块/成功视频真正首帧上屏后再隐藏释放。
 
         SetTargetAlpha(alphaComplete);
         ApplyAlphaInstant(alphaComplete);
@@ -350,11 +377,27 @@ public class PatModule : MonoBehaviour
         controller?.OnModuleCompleted(this);
     }
 
+    public void SnapshotCurrentFrameToFallback()
+    {
+        if (mainRaw != null && mainRaw.enabled && mainVideo != null)
+            UpdateFallbackBackground(mainVideo);
+        else if (transitionRaw != null && transitionRaw.enabled && transitionVideo != null)
+            UpdateFallbackBackground(transitionVideo);
+        else if (failRaw != null && failRaw.enabled && failVideo != null)
+            UpdateFallbackBackground(failVideo);
+    }
+
     /// <summary>
-    /// 由 PatSequenceController 在成功视频真正开始播放后调用，确保无缝衔接
+    /// 由 PatSequenceController 在成功视频或下一模块真正渲染首帧后调用，确保无缝衔接
     /// </summary>
     public void ForceHideAndRelease()
     {
+        if (PopupManager.Instance != null)
+        {
+            PopupManager.Instance.OnPopupClosed -= HandlePopupClosed;
+        }
+        StopAllCoroutines();
+        if (transitionVideo != null) transitionVideo.isLooping = false;
         HideAll();
         transCtrl?.Release();
         mainCtrl?.Release();
@@ -369,31 +412,50 @@ public class PatModule : MonoBehaviour
         mainCtrl?.Pause();
         SetTargetAlpha(alphaInactive);
         
-        // 瞬间截图当前的主视频画面，印到底层背景上
+        // 截当前主视频画面到垫底背景，并暂留 mainRaw 直到 fail 首帧就绪
         UpdateFallbackBackground(mainVideo);
 
         // FAIL VIDEO
         if (failVideo != null && failRaw != null && failVideo.clip != null)
         {
             if (failVideo.targetTexture != null) failRaw.texture = failVideo.targetTexture;
-            failRaw.color = Color.white;
-            failRaw.enabled = true;
+            failVideo.isLooping = false;
+
+            if (!failVideo.isPrepared)
+            {
+                bool ready = false;
+                failCtrl?.PrepareNow(() => ready = true);
+                while (!ready) yield return null;
+            }
+
+            long prevFrame = failVideo.frame;
+            failVideo.time = 0.0;
+            failVideo.Play();
 
             Debug.Log($"💥 [{name}] Fail Video 开始");
+            yield return StartCoroutine(WaitForVideoFrameRendered(failVideo, 0.35f, prevFrame));
 
-            bool failDone = false;
-            failCtrl?.PlayFull(() => failDone = true);
-            
-            // 稍等 Fail 出画面，然后撤掉主视频
-            yield return new WaitForSecondsRealtime(0.08f);
+            failRaw.color = Color.white;
+            failRaw.enabled = true;
+            yield return new WaitForEndOfFrame();
+
             if (mainRaw != null) mainRaw.enabled = false;
             if (transitionRaw != null) transitionRaw.enabled = false;
 
-            while (!failDone) yield return null;
+            double clipLen = failVideo.clip != null ? failVideo.clip.length : failVideo.length;
+            float maxWait = Mathf.Max(0.5f, (float)clipLen + 0.5f);
+            float elapsed = 0f;
+            while (failVideo.isPlaying && elapsed < maxWait)
+            {
+                // 持续保存最后有效帧或临近结尾前确保 fallback 为最新画面
+                if (failVideo.frame >= 0 && elapsed > 0.05f)
+                    UpdateFallbackBackground(failVideo);
+                elapsed += Time.unscaledDeltaTime;
+                yield return null;
+            }
 
-            // Fail结束，切回 Transition
             UpdateFallbackBackground(failVideo);
-            failRaw.enabled = false;
+            failCtrl?.StopAndReset();
         }
         else
         {
@@ -401,12 +463,14 @@ public class PatModule : MonoBehaviour
             if (transitionRaw != null) transitionRaw.enabled = false;
         }
 
+        // 注意：若 failRaw 仍开着，PlayTransitionLoop 会在 transition 首帧绘制完毕后统一关闭 failRaw
         currentState = PatState.TransitionLoop;
         StartCoroutine(PlayTransitionLoop());
     }
 
     public void Deactivate()
     {
+        SnapshotCurrentFrameToFallback();
         currentState = PatState.Inactive;
         timer = 0f;
 
@@ -424,13 +488,13 @@ public class PatModule : MonoBehaviour
         isInterrupted = false;
 
         StopAllCoroutines();
+        if (transitionVideo != null) transitionVideo.isLooping = false;
 
         transCtrl?.StopAndReset();
         mainCtrl?.Pause();
         failCtrl?.StopAndReset();
 
-        // ⚠️ 修复模块切换蓝屏：延迟 0.15 秒再隐藏，
-        // 给下一个模块的视频留出足够的时间加载第一帧，完美无缝衔接。
+        // ⚠️ 保险延迟隐藏：正常切换已由 PatSequenceController 等下一模块首帧渲染后调用 ForceHideAndRelease
         StartCoroutine(DelayedDeactivateRoutine());
 
         Collider2D col = GetComponent<Collider2D>();
@@ -495,27 +559,55 @@ public class PatModule : MonoBehaviour
     }
 
     // ==============================================
-    // Snapshot 黑科技：更新垫底的 Canvas 背景图
+    // GPU 垫底截图：零 ReadPixels 回读卡顿与格式兼容问题
     // ==============================================
+    private void EnsureFallbackInitialized()
+    {
+        if (fallbackBackground == null) return;
+        fallbackBackground.enabled = true;
+        if (fallbackBackground.texture == null)
+        {
+            fallbackBackground.color = Color.black;
+        }
+    }
+
     private void UpdateFallbackBackground(VideoPlayer vp)
     {
         if (fallbackBackground == null || vp == null || vp.targetTexture == null) return;
 
         RenderTexture rtTex = vp.targetTexture;
-        if (snapshotTex == null || snapshotTex.width != rtTex.width || snapshotTex.height != rtTex.height)
+        if (sharedFallbackRT == null || !sharedFallbackRT.IsCreated() ||
+            sharedFallbackRT.width != rtTex.width || sharedFallbackRT.height != rtTex.height ||
+            sharedFallbackRT.format != rtTex.format)
         {
-            if (snapshotTex != null) Destroy(snapshotTex);
-            snapshotTex = new Texture2D(rtTex.width, rtTex.height, TextureFormat.RGB24, false);
+            if (sharedFallbackRT != null)
+            {
+                sharedFallbackRT.Release();
+                Destroy(sharedFallbackRT);
+            }
+            sharedFallbackRT = new RenderTexture(rtTex.width, rtTex.height, 0, rtTex.format);
+            sharedFallbackRT.name = "RT_PatFallbackSnapshot";
+            sharedFallbackRT.Create();
         }
 
-        RenderTexture currentActiveRT = RenderTexture.active;
-        RenderTexture.active = rtTex;
-        snapshotTex.ReadPixels(new Rect(0, 0, rtTex.width, rtTex.height), 0, 0);
-        snapshotTex.Apply();
-        RenderTexture.active = currentActiveRT;
-
-        fallbackBackground.texture = snapshotTex;
+        Graphics.Blit(rtTex, sharedFallbackRT);
+        fallbackBackground.texture = sharedFallbackRT;
         fallbackBackground.color = Color.white;
+        fallbackBackground.enabled = true;
+    }
+
+    private static IEnumerator WaitForVideoFrameRendered(VideoPlayer vp, float timeoutSeconds = 0.35f, long previousFrame = long.MinValue)
+    {
+        if (vp == null) yield break;
+        float t = 0f;
+        while (t < timeoutSeconds)
+        {
+            if (vp.frame >= 0 && (previousFrame == long.MinValue || vp.frame != previousFrame || t > 0.05f))
+                break;
+            t += Time.unscaledDeltaTime;
+            yield return null;
+        }
+        yield return new WaitForEndOfFrame();
     }
 
     // ==============================================

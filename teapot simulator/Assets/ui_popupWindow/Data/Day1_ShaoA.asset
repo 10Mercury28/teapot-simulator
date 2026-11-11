@@ -19,11 +19,11 @@ MonoBehaviour:
   bannerBackground: {fileID: 0}
   hasExpandedContent: 1
   drawerTitle: "AAA\u65E2\u767D\u5DE5\u4F5C\u5BA4 \u90B5\u8001\u5E08"
-  drawerBackground: {fileID: 0}
+  drawerBackground: {fileID: 21300000, guid: a5001d5224cee004c906d5879137424c, type: 3}
   drawerContentImage: {fileID: 21300000, guid: e4a4a051aef8f44f28a0dca2017d9b70, type: 3}
   drawerDetailText: 
   incomingLoopSfx: {fileID: 8300000, guid: a04ecf2458305b14f9dc60b540e65872, type: 3}
-  voiceClip: {fileID: 0}
+  voiceClip: {fileID: 8300000, guid: 2f48f6263b5ab4c0a88f6dd89003408d, type: 3}
   isDeliveryOrder: 0
   confirmButtonText: "\u786E\u8BA4\u53D6\u4EF6"
   targetSceneOnConfirm: 

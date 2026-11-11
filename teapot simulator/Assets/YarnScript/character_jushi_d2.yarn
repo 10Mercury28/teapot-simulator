@@ -49,13 +49,18 @@ position: 3541,912
     <<stop>>
 <<endif>>
 <<set $D2Started to true>>
-【15:49，老师发来消息：她又来了。】
+我: 【15:49，老师发来消息：她又来了。】
 <<if $LikeU>>
     【微信弹窗连着出现许多条未读语音。】
-    // HINT：在这里插入微信 UI 命令；不是 Yarn 内置功能。
+    <<show_popup_wait "Day2_HA">>
 <<else>>
     【老师只发来一条简短的消息。】
 <<endif>>
+<<wait 1>>
+<<play_sfx "doorbell">>
+<<wait 0.8>>
+<<show_character "jushi">>
+<<wait 0.3>>
 居士: 小姑娘！小姑娘！
 居士: 江湖救急江湖救急！
 居士: 快，给我做一个可以当给儿子女朋友当见面礼物的壶！ 
@@ -928,12 +933,18 @@ position: 265,2037
 居士: 小王，辛苦你了。
 你的目光随她走过巷子。今天也是没有别的活了。她上什么载具离开古南街呢？
 她的身影在巷口右转消失
+<<hide_character "jushi">>
 <<jump JushiD2_Teacher>>
 ===
 
 title: JushiD2_Teacher
 position: 265,2262
 ---
+<<wait 0.4>>
+<<play_sfx "doorbell">>
+<<wait 0.8>>
+<<show_character "teacher">>
+<<wait 0.3>>
 老师: （开着免提打着电话，推门进来）
 （她把袋子一把尞在桌子上，朝你努努嘴，捂住听筒）
 老师: 这是这个星期给你从黄龙山带过来的。都好的吧。
@@ -1011,9 +1022,14 @@ position: 232,2487
 title: JushiD2_Order
 position: 265,2712
 ---
-// HINT：在此呼叫你的跑腿订单 UI；这是 Unity 端的功能。
-【订单：古南街404室 → 宜兴陶都半岛酒店（原凯宾斯基）1314室；17:30取件，18:00送达；贵重物品。】
+<<hide_character "teacher">>
+我:【订单：古南街404室 → 宜兴陶都半岛酒店（原凯宾斯基）1314室；17:30取件，18:00送达；贵重物品。】
+<<show_popup_wait "BoorBash">>
+<<if $D2Finished>>
+    <<stop>>
+<<endif>>
 -> 确认订单，结束一天。
     <<set $D2Finished to true>>
+    <<load_scene "endScene" "" 2>>
     <<stop>>
 ===

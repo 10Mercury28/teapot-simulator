@@ -22,11 +22,18 @@ public class BeforeStartController : MonoBehaviour
     [Header("需要在开始时禁用的对象")]
     public List<GameObject> disableObjects;
 
-    private bool sceneUnlocked = false;
+    [Header("流程协同")]
+    [Tooltip("若为 true，点击开始按钮后仅隐藏按钮并保持视频播放，实际淡出和解锁由 CutSequenceController 接管")]
+    public bool deferUnlockToSequenceController = false;
 
-    IEnumerator Start()
+    private bool sceneUnlocked = false;
+    private bool userClickedStart = false;
+
+    public bool HasUserClickedStart() => userClickedStart;
+
+    void Awake()
     {
-        // ========= 自动绑定组件 =========
+        // ========= 自动绑定组件（在首帧渲染前即藏好开始按钮，防闪一帧） =========
         if (beforeStartCanvas == null)
             beforeStartCanvas = GetComponent<CanvasGroup>();
 
@@ -39,19 +46,6 @@ public class BeforeStartController : MonoBehaviour
         if (triggerButton == null)
             triggerButton = GetComponentInChildren<Button>(true);
 
-        // ========= 播放引导视频 =========
-        if (videoPlayer != null)
-        {
-            if (videoRaw != null && videoPlayer.targetTexture != null)
-            {
-                videoRaw.texture = videoPlayer.targetTexture;
-                videoRaw.enabled = true;
-            }
-            videoPlayer.isLooping = true;
-            videoPlayer.Play();
-        }
-
-        // ========= 初始化禁用对象 =========
         if (disableObjects != null)
         {
             foreach (var obj in disableObjects)
@@ -61,7 +55,6 @@ public class BeforeStartController : MonoBehaviour
             }
         }
 
-        // ========= 初始化 Canvas =========
         if (beforeStartCanvas != null)
         {
             beforeStartCanvas.alpha = 1f;
@@ -69,7 +62,6 @@ public class BeforeStartController : MonoBehaviour
             beforeStartCanvas.blocksRaycasts = true;
         }
 
-        // ========= 初始化按钮 =========
         if (triggerButton != null)
         {
             var btnTmp = triggerButton.GetComponentInChildren<TMPro.TMP_Text>();
@@ -93,6 +85,29 @@ public class BeforeStartController : MonoBehaviour
 
             triggerButton.interactable = false;
         }
+    }
+
+    IEnumerator Start()
+    {
+        // ========= 播放引导视频 =========
+        if (videoPlayer != null)
+        {
+            if (videoRaw != null && videoPlayer.targetTexture != null)
+            {
+                videoRaw.texture = videoPlayer.targetTexture;
+                videoRaw.enabled = true;
+            }
+            videoPlayer.isLooping = true;
+            if (!videoPlayer.isPrepared)
+            {
+                videoPlayer.Prepare();
+                while (!videoPlayer.isPrepared)
+                {
+                    yield return null;
+                }
+            }
+            videoPlayer.Play();
+        }
 
         // ========= 正常等待流程 =========
         float waitTime = Mathf.Min(lockDuration, 3f);
@@ -105,8 +120,8 @@ public class BeforeStartController : MonoBehaviour
 
     void Update()
     {
-        // 如果在演示期间玩家点击了鼠标，且已超过 1.5 秒，可提前唤出开始按钮
-        if (!sceneUnlocked && Time.timeSinceLevelLoad > 1.5f && Input.GetMouseButtonDown(0))
+        // 如果在演示期间玩家点击了鼠标，且已超过 1.5 秒且未点击开始，可提前唤出开始按钮
+        if (!sceneUnlocked && !userClickedStart && Time.timeSinceLevelLoad > 1.5f && Input.GetMouseButtonDown(0))
         {
             if (triggerButton != null && !triggerButton.interactable)
             {
@@ -141,23 +156,43 @@ public class BeforeStartController : MonoBehaviour
 
     private void OnButtonClicked()
     {
-        if (sceneUnlocked) return;
+        if (userClickedStart) return;
 
-        sceneUnlocked = true;
-        StartCoroutine(UnlockSequence());
-    }
+        userClickedStart = true;
 
-    private IEnumerator UnlockSequence()
-    {
-        // 停止引导视频，释放解码资源
-        if (videoPlayer != null)
+        // 立即隐藏并禁用开始按钮，但可保持引导/待机视频继续播放
+        if (triggerButton != null)
         {
-            videoPlayer.Stop();
+            triggerButton.interactable = false;
+            CanvasGroup btnCanvas = triggerButton.GetComponent<CanvasGroup>();
+            if (btnCanvas != null)
+                btnCanvas.alpha = 0f;
+            else
+                triggerButton.gameObject.SetActive(false);
         }
 
+        // 若未启用外部协同控制，按原逻辑直接解锁
+        if (!deferUnlockToSequenceController)
+        {
+            sceneUnlocked = true;
+            StartCoroutine(UnlockSequence(fadeDuration));
+        }
+    }
+
+    /// <summary>
+    /// 由外部控制器（如 CutSequenceController）在打断弹窗关闭后调用，平滑淡出并结束引导视频
+    /// </summary>
+    public void FadeOutAndUnlock(float fadeTime = 0.5f)
+    {
+        if (sceneUnlocked) return;
+        sceneUnlocked = true;
+        StartCoroutine(UnlockSequence(fadeTime));
+    }
+
+    private IEnumerator UnlockSequence(float fadeTime = 0.5f)
+    {
         // Canvas 淡出
         float t = 0f;
-        float fadeTime = 0.5f;
 
         while (t < fadeTime)
         {
@@ -172,6 +207,12 @@ public class BeforeStartController : MonoBehaviour
             beforeStartCanvas.alpha = 0f;
             beforeStartCanvas.interactable = false;
             beforeStartCanvas.blocksRaycasts = false;
+        }
+
+        // 停止引导视频，释放解码资源
+        if (videoPlayer != null)
+        {
+            videoPlayer.Stop();
         }
 
         // 启用被禁用对象

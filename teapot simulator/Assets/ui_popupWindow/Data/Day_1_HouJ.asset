@@ -19,7 +19,7 @@ MonoBehaviour:
   bannerBackground: {fileID: 0}
   hasExpandedContent: 1
   drawerTitle: "\u987E\u5BA2 \u4FAF\u8389\u5C45\u58EB \u8001\u677F\u670B\u53CB"
-  drawerBackground: {fileID: 0}
+  drawerBackground: {fileID: 21300000, guid: a5001d5224cee004c906d5879137424c, type: 3}
   drawerContentImage: {fileID: 21300000, guid: 3866e98d799d14aeea466953c9266412, type: 3}
   drawerDetailText: 
   incomingLoopSfx: {fileID: 8300000, guid: a04ecf2458305b14f9dc60b540e65872, type: 3}

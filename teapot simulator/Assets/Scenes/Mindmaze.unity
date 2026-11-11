@@ -520,7 +520,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4368502024732009333, guid: 34b5fc89c14922d458d20635ffcadc6b, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -900.0004
+      value: -759.99994
       objectReference: {fileID: 0}
     - target: {fileID: 5837940533610859689, guid: 34b5fc89c14922d458d20635ffcadc6b, type: 3}
       propertyPath: m_Name
@@ -796,6 +796,8 @@ MonoBehaviour:
   characterNameText: {fileID: 1255731436}
   lineCanvasGroup: {fileID: 0}
   characters: []
+  debugSimulateJushiSuccess: 0
+  debugSimulateLikeU: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

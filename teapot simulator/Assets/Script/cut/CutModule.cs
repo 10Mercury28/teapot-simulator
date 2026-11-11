@@ -112,6 +112,47 @@ public class CutModule : MonoBehaviour
     public ModuleState currentState = ModuleState.Inactive;
 
     public bool complete => currentState == ModuleState.Done;
+    public bool IsMainFrameReady { get; private set; }
+
+
+    // ============================================================
+    // 弹窗打断配置 (Popup Interruption)
+    // ============================================================
+
+    [Header("=== 入场弹窗打断配置 (Enter Interruption) ===")]
+    [Tooltip("是否在准备好 Idle 待机后触发弹窗打断（如 Day 2 居士微信、老师微信）")]
+    public bool enableEnterInterrupt = false;
+
+    [Tooltip("是否必须前一天'交心'（LikeU）才触发。若为 true，未交心则跳过；为 false 则无条件触发。")]
+    public bool requireLikeU = false;
+
+    [Tooltip("关联的弹窗数据 SO（如 Day2_HA 或 Day2_ShaoA）")]
+    public PopupWindowDataSO interruptPopupSO;
+
+    [Tooltip("弹窗唯一 ID（若未指定 SO，则通过 ID 自动在 PopupManager 检索）")]
+    public string interruptPopupId = "";
+
+    [Header("=== 转场准备打断配置 (Transition Interruption) ===")]
+    [Tooltip("是否在播放转场/准备视频期间触发打断弹窗（例如 Cut 1 转场至 Cut 2 时弹出老师通知）")]
+    public bool enableTransitionInterrupt = false;
+
+    [Tooltip("转场视频是否一直保持/循环播放，直到弹窗关闭才结束转场（对应'显示视频直至弹窗结束'）")]
+    public bool transitionHoldUntilPopupClosed = true;
+
+    [Tooltip("转场关联的弹窗数据 SO")]
+    public PopupWindowDataSO transitionPopupSO;
+
+    [Tooltip("转场弹窗唯一 ID")]
+    public string transitionPopupId = "";
+
+    [Header("打断运行时状态 (只读)")]
+    [SerializeField] private bool isInterrupted = false;
+    [SerializeField] private bool hasTriggeredInterrupt = false;
+    [SerializeField] private bool isTransitionInterrupted = false;
+    [SerializeField] private bool hasTriggeredTransitionInterrupt = false;
+
+    public bool IsInterrupted() => isInterrupted;
+    public bool IsTransitionInterrupted() => isTransitionInterrupted;
 
 
     // ============================================================
@@ -138,6 +179,7 @@ public class CutModule : MonoBehaviour
     public void Initialize(CutSequenceController ctrl)
     {
         controller = ctrl;
+        IsMainFrameReady = false;
 
         if (debugLog) Debug.Log($"✂️ [{name}] CutModule 初始化启动");
 
@@ -164,14 +206,16 @@ public class CutModule : MonoBehaviour
             transition.isLooping = false;
         }
 
-        // 4. 准备主视频并建立第 0 帧（仅准备当前立即可见的主视频，避免多视频并发抢占解码器）
+        // 4. ⭐ 若配置了入场弹窗打断，立即拉起弹窗并置 isInterrupted = true（使背景待机/开场白视频继续动态播放）
+        CheckAndTriggerEnterInterrupt();
+
+        // 5. 准备主视频并建立第 0 帧（先准备好第 0 帧再打开 rawA，避免模块切换时漏底）
         StartCoroutine(SetupMainVideoInitialFrame());
     }
 
     private IEnumerator SetupMainVideoInitialFrame()
     {
-        EnableOnly(rawA);
-        SetRegionsActive(true);
+        SetRegionsActive(false);
         ApplyRegionsAlpha(idleAlpha);
 
         if (videoA != null)
@@ -184,10 +228,15 @@ public class CutModule : MonoBehaviour
             yield return StartCoroutine(RenderFirstFrame(videoA));
         }
 
+        EnableOnly(rawA);
+        SetRegionsActive(!isInterrupted);
+        ApplyRegionsAlpha(idleAlpha);
+
         progress = 0f;
         inB = false;
         hasReachedEnd = false;
         currentState = ModuleState.Idle;
+        IsMainFrameReady = true;
 
         if (debugLog) Debug.Log($"🎬 [{name}] Cut 主视频第 0 帧准备完毕，进入 Idle 等待切割");
     }
@@ -197,10 +246,22 @@ public class CutModule : MonoBehaviour
         if (vp == null) yield break;
         vp.time = 0;
         vp.Play();
-        yield return new WaitForEndOfFrame();
-        yield return new WaitForSecondsRealtime(0.06f);
+        yield return StartCoroutine(WaitForVideoFirstFrame(vp, 0.4f));
         vp.Pause();
-        vp.time = 0;
+    }
+
+    private static IEnumerator WaitForVideoFirstFrame(VideoPlayer vp, float timeoutSeconds = 0.4f, long previousFrame = long.MinValue)
+    {
+        if (vp == null) yield break;
+        float t = 0f;
+        while (t < timeoutSeconds)
+        {
+            if (vp.frame >= 0 && (previousFrame == long.MinValue || vp.frame != previousFrame || t > 0.05f))
+                break;
+            t += Time.unscaledDeltaTime;
+            yield return null;
+        }
+        yield return new WaitForEndOfFrame();
     }
 
 
@@ -230,6 +291,12 @@ public class CutModule : MonoBehaviour
         switch (currentState)
         {
             case ModuleState.Idle:
+                // 弹窗打断挂起中，锁定切割输入
+                if (isInterrupted)
+                {
+                    return;
+                }
+
                 if (Input.GetMouseButtonDown(0) && IsInside(mouseWorld, areaA))
                 {
                     if (!CanDrawTrail())
@@ -419,8 +486,6 @@ public class CutModule : MonoBehaviour
 
     private IEnumerator FailRoutine()
     {
-        EnableOnly(rawB);
-
         if (videoB != null)
         {
             if (!videoB.isPrepared)
@@ -430,13 +495,16 @@ public class CutModule : MonoBehaviour
                 while (!prepared) yield return null;
             }
 
-            // 从与切割进度对应的倒放位置起播
+            // 从与切割进度对应的倒放位置起播，先确认 RenderTexture 渲染出帧再切 rawB，杜绝 1 帧穿帮
             double startTime = videoB.length * Mathf.Clamp01(1f - progress);
+            long prevFrame = videoB.frame;
             videoB.isLooping = false;
             videoB.time = startTime;
             videoB.Play();
 
-            yield return null;
+            yield return StartCoroutine(WaitForVideoFirstFrame(videoB, 0.35f, prevFrame));
+            EnableOnly(rawB);
+
             float maxFailDuration = Mathf.Max(0.5f, (float)(videoB.length - startTime) + 0.2f);
             float failTimer = 0f;
             while (videoB.isPlaying && failTimer < maxFailDuration)
@@ -444,8 +512,12 @@ public class CutModule : MonoBehaviour
                 failTimer += Time.deltaTime;
                 yield return null;
             }
-            videoB.Stop();
-            videoB.time = 0;
+            // 暂定在最后一帧，等 videoA 第 0 帧重绘完成后再 Stop 并切回 rawA
+            videoB.Pause();
+        }
+        else
+        {
+            EnableOnly(rawB);
         }
 
         // ⭐ 彻底重置并强制刷新 videoA 回到第 0 帧
@@ -456,6 +528,11 @@ public class CutModule : MonoBehaviour
 
         // 返回 RawA
         EnableOnly(rawA);
+        if (videoB != null)
+        {
+            videoB.Stop();
+            videoB.time = 0;
+        }
         SetRegionsActive(true);
         ApplyRegionsAlpha(idleAlpha);
 
@@ -510,14 +587,24 @@ public class CutModule : MonoBehaviour
             completeRoot.SetActive(false);
         }
 
-        // 3. TRANSITION 转场阶段
+        // 3. TRANSITION 转场阶段：保持 rawA 直至 transition 首帧渲染出来再切换至 rawTrans
         currentState = ModuleState.Transition;
-        EnableOnly(rawTrans);
 
         if (transition != null && (transition.clip != null || !string.IsNullOrEmpty(transition.url)))
         {
-            float maxWait = transitionDuration > 0f ? transitionDuration : -1f;
-            yield return StartCoroutine(PlayOneShotVideo(transition, maxWait, allowSkipTransitionOnClick));
+            if (enableTransitionInterrupt && (!string.IsNullOrEmpty(transitionPopupId) || transitionPopupSO != null))
+            {
+                yield return StartCoroutine(PlayTransitionVideoUntilPopupClosed(transition, () => EnableOnly(rawTrans)));
+            }
+            else
+            {
+                float maxWait = transitionDuration > 0f ? transitionDuration : -1f;
+                yield return StartCoroutine(PlayOneShotVideo(transition, maxWait, allowSkipTransitionOnClick, () => EnableOnly(rawTrans)));
+            }
+        }
+        else
+        {
+            EnableOnly(rawTrans);
         }
 
         // 4. 当前 Cut 彻底完成
@@ -529,18 +616,16 @@ public class CutModule : MonoBehaviour
             activeTrail = null;
         }
 
-        // ⭐ 停止当前视频，不强制震荡 enabled 避免 Direct3D 解码器卡死
-        ReleaseResources();
-
         if (debugLog) Debug.Log($"✅ [{name}] CutModule 全部流程结束，通知 Controller 启动下一个 Cut");
 
-        // 5. 通知 CutSequenceController
+        // 5. 通知 CutSequenceController（若有 Controller 接管，则交由它等下一模块首帧就绪后再调用 ReleaseResources）
         if (controller != null)
         {
             controller.OnModuleCompleted(this);
         }
         else
         {
+            ReleaseResources();
             Debug.LogWarning($"⚠️ [{name}] CutSequenceController 为 null！");
         }
     }
@@ -548,7 +633,7 @@ public class CutModule : MonoBehaviour
     /// <summary>
     /// 单次精确播放视频：强制关闭循环，结合 loopPointReached、时长上限与可跳过防护
     /// </summary>
-    private IEnumerator PlayOneShotVideo(VideoPlayer vp, float maxDuration = -1f, bool allowSkip = false)
+    private IEnumerator PlayOneShotVideo(VideoPlayer vp, float maxDuration = -1f, bool allowSkip = false, System.Action onFirstFrameRendered = null)
     {
         if (vp == null) yield break;
 
@@ -566,8 +651,11 @@ public class CutModule : MonoBehaviour
             }
         }
 
+        long prevFrame = vp.frame;
         vp.time = 0;
         vp.Play();
+        yield return StartCoroutine(WaitForVideoFirstFrame(vp, 0.35f, prevFrame));
+        onFirstFrameRendered?.Invoke();
 
         bool finished = false;
         VideoPlayer.EventHandler endHandler = (player) => { finished = true; };
@@ -596,7 +684,7 @@ public class CutModule : MonoBehaviour
         }
 
         vp.loopPointReached -= endHandler;
-        vp.Stop();
+        vp.Pause();
     }
 
     /// <summary>
@@ -608,6 +696,180 @@ public class CutModule : MonoBehaviour
         ctrlB?.StopAndReset();
         ctrlTrans?.StopAndReset();
         ctrlComplete?.StopAndReset();
+    }
+
+    // ============================================================
+    // 弹窗打断逻辑
+    // ============================================================
+
+    private void CheckAndTriggerEnterInterrupt()
+    {
+        if (!enableEnterInterrupt || hasTriggeredInterrupt) return;
+
+        // 若需要交心，检查前一天是否达成交心
+        if (requireLikeU && !GlobalProgressManager.IsLikeU)
+        {
+            if (debugLog) Debug.Log($"ℹ️ [{name}] requireLikeU 为 true 但未达成交心，跳过本次居士弹窗打断。");
+            return;
+        }
+
+        hasTriggeredInterrupt = true;
+        isInterrupted = true;
+        SetRegionsActive(false);
+
+        string popupDesc = interruptPopupSO != null ? interruptPopupSO.name : interruptPopupId;
+        if (debugLog) Debug.Log($"🔔 [{name}] 触发切壶入场打断弹窗！Popup: '{popupDesc}'");
+
+        if (PopupManager.Instance != null)
+        {
+            PopupManager.Instance.OnPopupClosed += HandlePopupClosed;
+            if (interruptPopupSO != null)
+            {
+                PopupManager.Instance.Show(interruptPopupSO);
+            }
+            else if (!string.IsNullOrEmpty(interruptPopupId))
+            {
+                PopupManager.Instance.ShowById(interruptPopupId);
+            }
+            else
+            {
+                Debug.LogWarning($"⚠️ [{name}] enableEnterInterrupt 为 true，但未指定 interruptPopupSO 或 interruptPopupId！");
+                isInterrupted = false;
+                SetRegionsActive(true);
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"⚠️ [{name}] 未找到 PopupManager 实例，无法拉起打断弹窗！");
+            isInterrupted = false;
+            SetRegionsActive(true);
+        }
+    }
+
+    private void HandlePopupClosed(PopupWindowDataSO data)
+    {
+        if (PopupManager.Instance != null)
+        {
+            PopupManager.Instance.OnPopupClosed -= HandlePopupClosed;
+        }
+
+        if (!isInterrupted) return;
+
+        isInterrupted = false;
+        SetRegionsActive(true);
+        ApplyRegionsAlpha(idleAlpha);
+        if (debugLog) Debug.Log($"🔓 [{name}] 弹窗已处理关闭，解除切壶打断，玩家现在可以开始切割！");
+    }
+
+    // ============================================================
+    // 转场准备打断视频逻辑 (Transition Video Until Popup Closed)
+    // ============================================================
+
+    private IEnumerator PlayTransitionVideoUntilPopupClosed(VideoPlayer vp, System.Action onFirstFrameRendered = null)
+    {
+        if (vp == null) yield break;
+
+        isTransitionInterrupted = true;
+        hasTriggeredTransitionInterrupt = true;
+
+        vp.isLooping = true;
+        vp.playOnAwake = false;
+
+        if (!vp.isPrepared)
+        {
+            vp.Prepare();
+            float prepTimeout = 2f;
+            while (!vp.isPrepared && prepTimeout > 0f)
+            {
+                prepTimeout -= Time.unscaledDeltaTime;
+                yield return null;
+            }
+        }
+
+        long prevFrame = vp.frame;
+        vp.time = 0;
+        vp.Play();
+        yield return StartCoroutine(WaitForVideoFirstFrame(vp, 0.35f, prevFrame));
+        onFirstFrameRendered?.Invoke();
+
+        if (debugLog) Debug.Log($"🎬 [{name}] 播放准备/转场视频，并保持播放直至弹窗结束: {vp.name}");
+
+        // 稍微等待 0.25 秒让转场画面稳定展开
+        yield return new WaitForSeconds(0.25f);
+
+        TriggerTransitionInterruptPopup();
+
+        // 核心挂起：等待弹窗完全关闭！
+        while (isTransitionInterrupted)
+        {
+            yield return null;
+        }
+
+        if (debugLog) Debug.Log($"🔓 [{name}] 转场准备打断弹窗已结束，定格转场末帧等待下一 Cut 就绪！");
+
+        vp.isLooping = false;
+        vp.Pause();
+    }
+
+    private void TriggerTransitionInterruptPopup()
+    {
+        string popupDesc = transitionPopupSO != null ? transitionPopupSO.name : transitionPopupId;
+        if (debugLog) Debug.Log($"🔔 [{name}] 触发切壶转场准备打断弹窗！Popup: '{popupDesc}'");
+
+        if (PopupManager.Instance != null)
+        {
+            PopupManager.Instance.OnPopupClosed += HandleTransitionPopupClosed;
+            if (transitionPopupSO != null)
+            {
+                PopupManager.Instance.Show(transitionPopupSO);
+            }
+            else if (!string.IsNullOrEmpty(transitionPopupId))
+            {
+                PopupManager.Instance.ShowById(transitionPopupId);
+            }
+            else
+            {
+                Debug.LogWarning($"⚠️ [{name}] enableTransitionInterrupt 为 true，但未指定 transitionPopupSO 或 transitionPopupId！");
+                isTransitionInterrupted = false;
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"⚠️ [{name}] 未找到 PopupManager 实例，无法拉起转场打断弹窗！");
+            isTransitionInterrupted = false;
+        }
+    }
+
+    private void HandleTransitionPopupClosed(PopupWindowDataSO data)
+    {
+        if (PopupManager.Instance != null)
+        {
+            PopupManager.Instance.OnPopupClosed -= HandleTransitionPopupClosed;
+        }
+
+        if (!isTransitionInterrupted) return;
+
+        isTransitionInterrupted = false;
+        if (debugLog) Debug.Log($"🔓 [{name}] 转场弹窗已关闭！");
+    }
+
+    private void OnDisable()
+    {
+        if (PopupManager.Instance != null)
+        {
+            PopupManager.Instance.OnPopupClosed -= HandlePopupClosed;
+            PopupManager.Instance.OnPopupClosed -= HandleTransitionPopupClosed;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (PopupManager.Instance != null)
+        {
+            PopupManager.Instance.OnPopupClosed -= HandlePopupClosed;
+            PopupManager.Instance.OnPopupClosed -= HandleTransitionPopupClosed;
+        }
+        ReleaseResources();
     }
 
 

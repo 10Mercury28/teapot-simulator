@@ -63,6 +63,13 @@ public class MindMazeAnimationController : MonoBehaviour
     [Tooltip("场景内所有角色的动画绑定列表")]
     public List<CharacterEntry> characters = new List<CharacterEntry>();
 
+    [Header("=== 独立测试变量模拟（单开场景时生效） ===")]
+    [Tooltip("调试模拟前一天居士交易成功 ($JushiSuccess = true)，未勾选则按真实进度走")]
+    public bool debugSimulateJushiSuccess = false;
+
+    [Tooltip("调试模拟前一天与居士交心 ($LikeU = true)")]
+    public bool debugSimulateLikeU = false;
+
     private CharacterEntry currentSpeaker = null;
     private string lastDetectedSpeakerName = "";
 
@@ -77,6 +84,8 @@ public class MindMazeAnimationController : MonoBehaviour
             Destroy(this);
             return;
         }
+
+        GlobalProgressManager.EnsureInstance();
 
         // 自动解析依赖组件
         ResolveDependencies();
@@ -98,10 +107,16 @@ public class MindMazeAnimationController : MonoBehaviour
         FreezeAllCharacters();
     }
 
+    private void Start()
+    {
+        SyncVarsToYarn();
+    }
+
     private void OnEnable()
     {
         if (dialogueRunner != null)
         {
+            dialogueRunner.onDialogueStart?.AddListener(SyncVarsToYarn);
             dialogueRunner.onNodeStart?.AddListener(OnNodeStart);
             dialogueRunner.onDialogueComplete?.AddListener(OnDialogueComplete);
         }
@@ -111,9 +126,17 @@ public class MindMazeAnimationController : MonoBehaviour
     {
         if (dialogueRunner != null)
         {
+            dialogueRunner.onDialogueStart?.RemoveListener(SyncVarsToYarn);
             dialogueRunner.onNodeStart?.RemoveListener(OnNodeStart);
             dialogueRunner.onDialogueComplete?.RemoveListener(OnDialogueComplete);
         }
+    }
+
+    private void SyncVarsToYarn()
+    {
+        if (debugSimulateJushiSuccess) GlobalProgressManager.JushiSuccess = true;
+        if (debugSimulateLikeU) GlobalProgressManager.IsLikeU = true;
+        GlobalProgressManager.SyncGlobalVarsToYarn(dialogueRunner);
     }
 
     private void ResolveDependencies()

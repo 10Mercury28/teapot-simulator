@@ -26,4 +26,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/endScene.unity
     guid: f4e35813f40f5425db7cd21a6b72b11f
+  - enabled: 1
+    path: Assets/Scenes/Mindmaze.unity
+    guid: eb2e62e552edf974eb5d2af06a5a74b3
+  - enabled: 1
+    path: Assets/Scenes/StudioDesk.unity
+    guid: c7b56a4102f823f4d98a1b7672c65534
   m_configObjects: {}

@@ -406,7 +406,7 @@ title: JushiD1_SaleComplete
 居士: 包装得真利索。我走了，你也早点收拾休息。
 我: 好的侯居士，您慢走。
 <<hide_character "jushi">>
-//<<load_scene "TestYarn">>
+<<load_scene "Mindmaze" "入夜" 1>>
 <<stop>>
 ===
 
@@ -419,7 +419,7 @@ title: FailEnd
 <<hide_character "jushi">>
 <<set $JushiFailed to true>>
 <<show_popup_wait "Day1_fail">>
-//<<load_scene "TestYarn">> 
+<<load_scene "Mindmaze" "入夜" 1>>
 <<stop>>
 ===
  

@@ -86,6 +86,25 @@ public class Day1YarnCommands : MonoBehaviour
     [Tooltip("扫码枪组件引用（留空会自动查找或自动添加）")]
     public BarcodeScanner barcodeScanner;
 
+    public enum StudioDeskStartMode
+    {
+        AutoFromGlobalProgress = 0, // 自动按 GlobalProgressManager.CurrentDay 决定 Day 1 / Day 2
+        ForceDay1 = 1,              // 调试强制启动 Day 1 (Character_Jushi)
+        ForceDay2 = 2               // 调试强制启动 Day 2 (Character_Jushi_D2)
+    }
+
+    [Header("=== 柜台场景 Day 1 / Day 2 自动分流（复用 StudioDesk） ===")]
+    [Tooltip("自动按全局进度决定进入 Day 1 或 Day 2 剧情；单场景调试时可切换强制 Day 1 / Day 2")]
+    public StudioDeskStartMode startDayMode = StudioDeskStartMode.AutoFromGlobalProgress;
+
+    [Tooltip("调试进入 Day 2 时，模拟前一天已交心 ($LikeU = true)")]
+    public bool debugSimulateLikeUForD2 = false;
+
+    [Tooltip("调试进入 Day 2 时，模拟 Day 1 聊过蝉/摇滚 ($D1TalkedCicada = true)")]
+    public bool debugSimulateCicadaForD2 = false;
+
+    private bool dialogueHooksBound = false;
+
     private void Awake()
     {
         if (Instance == null)
@@ -97,6 +116,8 @@ public class Day1YarnCommands : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
+        GlobalProgressManager.EnsureInstance();
 
         // 自动装配组件
         if (dialogueRunner == null)
@@ -132,6 +153,85 @@ public class Day1YarnCommands : MonoBehaviour
         {
             barcodeScanner = FindObjectOfType<BarcodeScanner>();
         }
+
+        BindDialogueHooks();
+        ConfigureStudioDeskEntry();
+    }
+
+    private void Start()
+    {
+        SyncStateToYarn();
+    }
+
+    private void OnDestroy()
+    {
+        if (dialogueHooksBound && dialogueRunner != null)
+        {
+            dialogueRunner.onDialogueStart?.RemoveListener(SyncStateToYarn);
+            dialogueRunner.onNodeComplete?.RemoveListener(OnNodeCompletedCaptureVars);
+            dialogueRunner.onDialogueComplete?.RemoveListener(OnDialogueCompletedCaptureVars);
+            dialogueHooksBound = false;
+        }
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
+
+    private void BindDialogueHooks()
+    {
+        if (dialogueHooksBound || dialogueRunner == null) return;
+
+        dialogueRunner.onDialogueStart?.AddListener(SyncStateToYarn);
+        dialogueRunner.onNodeComplete?.AddListener(OnNodeCompletedCaptureVars);
+        dialogueRunner.onDialogueComplete?.AddListener(OnDialogueCompletedCaptureVars);
+        dialogueHooksBound = true;
+    }
+
+    private void ConfigureStudioDeskEntry()
+    {
+        if (dialogueRunner == null) return;
+
+        string activeScene = SceneManager.GetActiveScene().name;
+        bool isStudioDesk = activeScene.IndexOf("StudioDesk", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                            dialogueRunner.startNode == "Character_Jushi" ||
+                            dialogueRunner.startNode == "Character_Jushi_D2";
+
+        if (!isStudioDesk) return;
+
+        int targetDay = GlobalProgressManager.CurrentDay;
+        if (startDayMode == StudioDeskStartMode.ForceDay1)
+        {
+            targetDay = 1;
+            GlobalProgressManager.CurrentDay = 1;
+        }
+        else if (startDayMode == StudioDeskStartMode.ForceDay2)
+        {
+            targetDay = 2;
+            GlobalProgressManager.CurrentDay = 2;
+        }
+
+        if (debugSimulateLikeUForD2) GlobalProgressManager.IsLikeU = true;
+        if (debugSimulateCicadaForD2) GlobalProgressManager.TalkedCicada = true;
+
+        string targetNode = targetDay >= 2 ? "Character_Jushi_D2" : "Character_Jushi";
+        dialogueRunner.startNode = targetNode;
+        Debug.Log($"🏪 [Day1YarnCommands] 柜台场景自动分流：Day={targetDay}, startNode='{targetNode}', LikeU={GlobalProgressManager.IsLikeU}, TalkedCicada={GlobalProgressManager.TalkedCicada}");
+    }
+
+    private void SyncStateToYarn()
+    {
+        GlobalProgressManager.SyncGlobalVarsToYarn(dialogueRunner);
+    }
+
+    private void OnNodeCompletedCaptureVars(string _)
+    {
+        GlobalProgressManager.CaptureYarnVarsToGlobal(dialogueRunner);
+    }
+
+    private void OnDialogueCompletedCaptureVars()
+    {
+        GlobalProgressManager.CaptureYarnVarsToGlobal(dialogueRunner);
     }
 
     // ============================================================
@@ -145,6 +245,11 @@ public class Day1YarnCommands : MonoBehaviour
     public static void ShowPopup(string popupId)
     {
         Debug.Log($"💬 [YarnCommand] show_popup: '{popupId}'");
+        if (popupId.IndexOf("HouJ", StringComparison.OrdinalIgnoreCase) >= 0 || popupId.IndexOf("LikeU", StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+            GlobalProgressManager.IsLikeU = true;
+            Debug.Log("🤝 [Day1YarnCommands] 检测到居士交心弹窗，全局设置 IsLikeU = true！");
+        }
         PopupManager pm = GetPopupManager();
         if (pm != null)
         {
@@ -163,6 +268,11 @@ public class Day1YarnCommands : MonoBehaviour
     public static IEnumerator ShowPopupWait(string popupId)
     {
         Debug.Log($"💬 [YarnCommand] show_popup_wait: '{popupId}'");
+        if (popupId.IndexOf("HouJ", StringComparison.OrdinalIgnoreCase) >= 0 || popupId.IndexOf("LikeU", StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+            GlobalProgressManager.IsLikeU = true;
+            Debug.Log("🤝 [Day1YarnCommands] 检测到居士交心弹窗，全局设置 IsLikeU = true！");
+        }
         PopupManager pm = GetPopupManager();
         if (pm == null)
         {
@@ -171,12 +281,21 @@ public class Day1YarnCommands : MonoBehaviour
         }
 
         bool isClosed = false;
+        bool confirmedWithSceneTransition = false;
         void OnPopupClosedHandler(PopupWindowDataSO data)
         {
             isClosed = true;
         }
+        void OnOrderConfirmedHandler(PopupWindowDataSO data)
+        {
+            if (data != null && !string.IsNullOrEmpty(data.targetSceneOnConfirm))
+            {
+                confirmedWithSceneTransition = true;
+            }
+        }
 
         pm.OnPopupClosed += OnPopupClosedHandler;
+        pm.OnOrderConfirmed += OnOrderConfirmedHandler;
         pm.ShowById(popupId);
 
         // 挂起等待玩家交互关闭抽屉或确认订单
@@ -186,7 +305,27 @@ public class Day1YarnCommands : MonoBehaviour
         }
 
         pm.OnPopupClosed -= OnPopupClosedHandler;
-        Debug.Log($"💬 [YarnCommand] show_popup_wait 完成: '{popupId}'，继续推进 Yarn 对白。");
+        pm.OnOrderConfirmed -= OnOrderConfirmedHandler;
+
+        if (confirmedWithSceneTransition)
+        {
+            DialogueRunner runner = GetDialogueRunner();
+            if (runner != null && runner.VariableStorage != null)
+            {
+                runner.VariableStorage.SetValue("$D2Finished", true);
+            }
+        }
+        Debug.Log($"💬 [YarnCommand] show_popup_wait 完成: '{popupId}' (orderTransition={confirmedWithSceneTransition})，继续推进 Yarn 对白。");
+    }
+
+    /// <summary>
+    /// 设置居士交心状态: <<set_like_u true>>
+    /// </summary>
+    [YarnCommand("set_like_u")]
+    public static void SetLikeU(bool likeU = true)
+    {
+        GlobalProgressManager.IsLikeU = likeU;
+        Debug.Log($"🤝 [YarnCommand] set_like_u: {likeU}");
     }
 
     /// <summary>
@@ -263,43 +402,28 @@ public class Day1YarnCommands : MonoBehaviour
         // 1. 判断是否是居士
         if (lower == "jushi" || lower == "居士" || lower == "houj" || lower == "houjushi" || lower == "character_jushi")
         {
-            if (Instance != null && Instance.jushiObject != null)
-            {
-                ApplyVisibility(Instance.jushiObject, visible);
-            }
-            else
-            {
-                GameObject go = FindObjectByNameOrTag("Jushi", "居士", "Character_Jushi", "FaceCaputureCanvas");
-                if (go != null) ApplyVisibility(go, visible);
-            }
+            GameObject target = (Instance != null && Instance.jushiObject != null)
+                ? Instance.jushiObject
+                : FindObjectByNameOrTag("Jushi", "居士", "Character_Jushi", "FaceCaputureCanvas");
+            if (target != null) ApplyVisibility(target, visible);
 
-            // 同步转头观察控制器开关（以及内部 displayImage）
             FacePerspectiveSwitcher switcher = Instance != null ? Instance.jushiFaceSwitcher : null;
+            if (switcher == null && target != null) switcher = target.GetComponentInChildren<FacePerspectiveSwitcher>(true);
             if (switcher == null) switcher = GameObject.FindObjectOfType<FacePerspectiveSwitcher>(true);
-            if (switcher != null)
-            {
-                switcher.enabled = visible;
-                if (switcher.displayImage != null)
-                {
-                    switcher.displayImage.enabled = visible;
-                }
-                Debug.Log($"💬 [Day1YarnCommands] 居士转头控制器 FacePerspectiveSwitcher: {visible}");
-            }
+            SyncFaceSwitcherVisibility(switcher, visible, "居士");
             return;
         }
 
         // 2. 判断是否是老师/店长邵苇
         if (lower == "teacher" || lower == "老师" || lower == "shao" || lower == "shaowei" || lower == "shaoa")
         {
-            if (Instance != null && Instance.teacherObject != null)
-            {
-                ApplyVisibility(Instance.teacherObject, visible);
-            }
-            else
-            {
-                GameObject go = FindObjectByNameOrTag("Teacher", "老师", "ShaoWei");
-                if (go != null) ApplyVisibility(go, visible);
-            }
+            GameObject target = (Instance != null && Instance.teacherObject != null)
+                ? Instance.teacherObject
+                : FindObjectByNameOrTag("Teacher", "老师", "ShaoWei", "Shao");
+            if (target != null) ApplyVisibility(target, visible);
+
+            FacePerspectiveSwitcher switcher = target != null ? target.GetComponentInChildren<FacePerspectiveSwitcher>(true) : null;
+            SyncFaceSwitcherVisibility(switcher, visible, "老师");
             return;
         }
 
@@ -325,6 +449,18 @@ public class Day1YarnCommands : MonoBehaviour
         {
             Debug.LogWarning($"⚠️ [Day1YarnCommands] 未在场景中找到名为 '{name}' 的对象以设置显隐！");
         }
+    }
+
+    private static void SyncFaceSwitcherVisibility(FacePerspectiveSwitcher switcher, bool visible, string characterLabel)
+    {
+        if (switcher == null) return;
+
+        switcher.enabled = visible;
+        if (switcher.displayImage != null)
+        {
+            switcher.displayImage.enabled = visible;
+        }
+        Debug.Log($"💬 [Day1YarnCommands] {characterLabel}转头控制器 FacePerspectiveSwitcher: {visible}");
     }
 
     /// <summary>
@@ -671,20 +807,22 @@ public class Day1YarnCommands : MonoBehaviour
     // ============================================================
 
     /// <summary>
-    /// 加载新场景: <<load_scene "scene_name">>
+    /// 加载新场景（支持可选黑屏字卡文字与天数设置）:
+    /// <<load_scene "Mindmaze" "入夜">>
+    /// <<load_scene "chooseToolBasedOnCut" "Day 2" 2>>
     /// </summary>
     [YarnCommand("load_scene")]
-    public static void LoadScene(string sceneName)
+    public static IEnumerator LoadScene(string sceneName, string blackScreenText = "", int nextDay = 0)
     {
-        Debug.Log($"🚀 [YarnCommand] load_scene: '{sceneName}'");
-        if (SceneBlinkTransition.Instance != null)
+        DialogueRunner runner = GetDialogueRunner();
+        if (runner != null)
         {
-            SceneBlinkTransition.Instance.LoadSceneConcealed(sceneName);
+            GlobalProgressManager.CaptureYarnVarsToGlobal(runner);
         }
-        else
-        {
-            SceneManager.LoadScene(sceneName);
-        }
+
+        Debug.Log($"🚀 [YarnCommand] load_scene: '{sceneName}' (blackText='{blackScreenText}', nextDay={nextDay})");
+        GlobalProgressManager global = GlobalProgressManager.EnsureInstance();
+        yield return global.TransitionToSceneWaitForCover(sceneName, blackScreenText, nextDay);
     }
 
     // ============================================================
@@ -708,9 +846,21 @@ public class Day1YarnCommands : MonoBehaviour
         yield return ScanBarcodeInternal(expectedBarcode);
     }
 
+    private static readonly (KeyCode primary, KeyCode secondary, string barcode, string label)[] DebugScanShortcuts =
+    {
+        (KeyCode.Alpha1, KeyCode.Keypad1, "03-GongChun",   "供春壶"),
+        (KeyCode.Alpha2, KeyCode.Keypad2, "09-H2zhuangjj", "梅桩壶"),
+        (KeyCode.F1,     KeyCode.None,    "03-GongChun",   "供春壶"),
+        (KeyCode.F2,     KeyCode.None,    "09-H2zhuangjj", "梅桩壶"),
+        (KeyCode.F3,     KeyCode.Keypad3, "09-H1FoShouJ",  "佛手提梁壶"),
+        (KeyCode.F4,     KeyCode.Keypad4, "05-HeHuanHu",   "合欢壶"),
+        (KeyCode.F5,     KeyCode.Keypad5, "04-FangXingHj", "方片壶"),
+        (KeyCode.F9,     KeyCode.None,    "WRONG-TEST",    "错误条码测试"),
+    };
+
     private static IEnumerator ScanBarcodeInternal(string expectedBarcode)
     {
-        Debug.Log($"📷 [YarnCommand] 开始等待扫码，期望条码: '{expectedBarcode}'");
+        Debug.Log($"📷 [YarnCommand] 开始等待扫码，期望条码: '{expectedBarcode}'（无扫码枪调试：F1=供春, F2=梅桩, F3=佛手, F4=合欢, F5=方片, F9=错码; 兼容数字键1/2）");
 
         BarcodeScanner scanner = GetBarcodeScanner();
         DialogueRunner runner = GetDialogueRunner();
@@ -742,22 +892,19 @@ public class Day1YarnCommands : MonoBehaviour
 
         try
         {
-            // 挂起等待扫码枪输入（扫码枪会在末尾发送回车），或通过键盘 1 / 2 快速测试
+            // 挂起等待扫码枪输入（扫码枪会在末尾发送回车），或通过功能键/小键盘快速模拟测试（避免抢占 0/3/4/5/9 条码字符）
             while (!received)
             {
-                if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
+                for (int i = 0; i < DebugScanShortcuts.Length; i++)
                 {
-                    scannedValue = "03-GongChun";
-                    received = true;
-                    Debug.Log($"⌨️ [Day1YarnCommands] 键盘快捷键 1 模拟扫码: '{scannedValue}'");
-                    break;
-                }
-                if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
-                {
-                    scannedValue = "09-H2zhuangjj";
-                    received = true;
-                    Debug.Log($"⌨️ [Day1YarnCommands] 键盘快捷键 2 模拟扫码: '{scannedValue}'");
-                    break;
+                    var s = DebugScanShortcuts[i];
+                    if (Input.GetKeyDown(s.primary) || (s.secondary != KeyCode.None && Input.GetKeyDown(s.secondary)))
+                    {
+                        scannedValue = s.barcode;
+                        received = true;
+                        Debug.Log($"⌨️ [Day1YarnCommands] 调试快捷键模拟扫码 ({s.label}): '{scannedValue}'");
+                        break;
+                    }
                 }
 
                 yield return null;

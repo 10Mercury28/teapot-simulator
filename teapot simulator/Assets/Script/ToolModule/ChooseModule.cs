@@ -69,7 +69,7 @@ public class ChooseModule : MonoBehaviour
     void Start()
     {
         mainCam = Camera.main;
-        global = GlobalProgressManager.Instance;
+        global = GlobalProgressManager.EnsureInstance();
         BindControllers();
         HideAll();
         SetAreaAlpha(normalAlpha);
@@ -79,7 +79,7 @@ public class ChooseModule : MonoBehaviour
     public void Init(ChooseController ctrl)
     {
         controller = ctrl;
-        global = GlobalProgressManager.Instance;
+        global = GlobalProgressManager.EnsureInstance();
         BindControllers();
         HideAll();
         SetAreaAlpha(normalAlpha);
@@ -114,9 +114,9 @@ public class ChooseModule : MonoBehaviour
             {
                 if (areaA != null && areaA.OverlapPoint(mouseWorld))
                 {
-                    if (global != null && global.currentOrder != orderIndex)
+                    if (global != null && global.GetExpectedToolOrderIndex() != orderIndex)
                     {
-                        Debug.Log($"❌ Wrong order clicked on {moduleName}");
+                        Debug.Log($"❌ Wrong order clicked on {moduleName} (expected={global.GetExpectedToolOrderIndex()}, module={orderIndex})");
                         StartSequence(PlayWrongOrderSelf());
                         return;
                     }
@@ -381,7 +381,7 @@ public class ChooseModule : MonoBehaviour
     {
         if (dottedLine == null || global == null) return;
 
-        float targetAlpha = (global.currentOrder == orderIndex)
+        float targetAlpha = (global.GetExpectedToolOrderIndex() == orderIndex)
             ? dottedAlphaActive
             : dottedAlphaInactive;
 

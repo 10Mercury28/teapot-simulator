@@ -38,7 +38,19 @@ public class PatSequenceController : MonoBehaviour
             );
 
         // ===============================================
-        // 顺序执行所有 Module
+        // 先确保所有模块干净处于隐藏态
+        // ===============================================
+
+        for (int j = 0; j < modules.Length; j++)
+        {
+            if (modules[j] != null)
+            {
+                modules[j].ForceHideAndRelease();
+            }
+        }
+
+        // ===============================================
+        // 顺序执行所有 Module (双缓冲交接，严禁未就绪前撤掉上一模块)
         // ===============================================
 
         for (int i = 0; i < modules.Length; i++)
@@ -55,30 +67,29 @@ public class PatSequenceController : MonoBehaviour
                 continue;
             }
 
-            // -------------------------------------------
-            // 关闭所有非当前 module
-            // -------------------------------------------
-
-            for (int j = 0; j < modules.Length; j++)
-            {
-                if (
-                    j != i &&
-                    modules[j] != null
-                )
-                {
-                    modules[j].Deactivate();
-                }
-            }
-
             Debug.Log(
                 $"🎯 [Sequence] 开始 Module {i}: {current.name}"
             );
 
-            // -------------------------------------------
-            // 只在这里 Activate
-            // -------------------------------------------
-
+            // 启动当前模块
             current.Activate();
+
+            // 等当前模块渲染出首帧，再彻底隐藏释放上一个模块，杜绝任何 1 帧漏蓝屏
+            float handoffWait = 0f;
+            while (!current.HasFirstFrameReady && !current.complete && handoffWait < 1.5f)
+            {
+                handoffWait += Time.unscaledDeltaTime;
+                yield return null;
+            }
+            yield return new WaitForEndOfFrame();
+
+            for (int j = 0; j < i; j++)
+            {
+                if (modules[j] != null)
+                {
+                    modules[j].ForceHideAndRelease();
+                }
+            }
 
             // -------------------------------------------
             // 等当前 Module 完成
@@ -124,13 +135,14 @@ public class PatSequenceController : MonoBehaviour
         // Advance
         // ===============================================
 
-        if (GlobalProgressManager.Instance != null)
+        GlobalProgressManager global = GlobalProgressManager.EnsureInstance();
+        if (global != null)
         {
             Debug.Log(
                 "🌍 [PatSequenceController] AdvanceOrder()"
             );
 
-            GlobalProgressManager.Instance.AdvanceOrder();
+            global.AdvanceOrder();
         }
         else
         {
@@ -305,8 +317,9 @@ public class PatSequenceController : MonoBehaviour
         successRawImage.color =
             Color.white;
 
+        // 先保持 successRawImage 关闭，避免首帧尚未解码完成时遮挡或透明闪烁
         successRawImage.enabled =
-            true;
+            false;
 
         // ===============================================
         // 再确保 Prepare
@@ -335,13 +348,13 @@ public class PatSequenceController : MonoBehaviour
         );
 
         // ===============================================
-        // 等真正开始
+        // 等真正开始且第 0 帧写入 RenderTexture
         // ===============================================
 
         float startTimeout = 2f;
 
         while (
-            !successVideoPlayer.isPlaying &&
+            (!successVideoPlayer.isPlaying || successVideoPlayer.frame < 0) &&
             startTimeout > 0f
         )
         {
@@ -359,6 +372,9 @@ public class PatSequenceController : MonoBehaviour
 
             yield break;
         }
+
+        successRawImage.enabled = true;
+        yield return new WaitForEndOfFrame();
         
         // ⚠️ 修复最终蓝屏闪烁：
         // 只有在这里（确认 successVideo 真的已经开始播放，有画面了），我们再去关闭所有的模块！

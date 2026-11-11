@@ -26,5 +26,5 @@ MonoBehaviour:
   voiceClip: {fileID: 0}
   isDeliveryOrder: 1
   confirmButtonText: 
-  targetSceneOnConfirm: 
+  targetSceneOnConfirm: endScene
   interruptWorkAndFail: 0

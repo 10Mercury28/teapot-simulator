@@ -103,6 +103,7 @@ public class FacePerspectiveSwitcher : MonoBehaviour
     private WebCamTexture webCamTexture;
     private TextureFrame textureFrame;
     private FaceDetector faceDetector;
+    private Coroutine initializeRoutine;
     private Coroutine detectionLoopRoutine;
     private Coroutine fadeRoutine;
 
@@ -111,7 +112,7 @@ public class FacePerspectiveSwitcher : MonoBehaviour
     private bool isMediaPipeReady = false;
     private bool isSimulatingWithKeyboard = false;
 
-    private void Start()
+    private void OnEnable()
     {
         // 校验显示组件
         if (displayImage == null)
@@ -123,11 +124,28 @@ public class FacePerspectiveSwitcher : MonoBehaviour
             }
         }
 
-        // 初始展示正中图片
+        // 重置视角状态与图像透明度，初始展示正中图片
+        rawTargetOffset = 0f;
+        SmoothedFaceOffsetX = 0f;
+        IsFaceDetected = false;
+        isSimulatingWithKeyboard = false;
+        if (displayImage != null)
+        {
+            Color c = displayImage.color;
+            c.a = 1f;
+            displayImage.color = c;
+        }
         ApplyPerspective(ViewingPerspective.Center, instant: true);
 
-        // 启动摄像头与 MediaPipe
-        StartCoroutine(InitializePipelineRoutine());
+        // 启动摄像头与 MediaPipe（每次激活时开启，隐藏时在 OnDisable 彻底释放摄像头）
+        ReleasePipelineResources();
+        initializeRoutine = StartCoroutine(InitializePipelineRoutine());
+    }
+
+    private void OnDisable()
+    {
+        // 角色退场/被隐藏时立刻停止 WebCamTexture，避免锁死摄像头导致下一个角色（如老师）取流超时
+        ReleasePipelineResources();
     }
 
     private void Update()
@@ -324,6 +342,18 @@ public class FacePerspectiveSwitcher : MonoBehaviour
 
     private IEnumerator InitializePipelineRoutine()
     {
+        // 让出 1 帧，确保前一个角色在 OnDisable 停止摄像头后硬件句柄已彻底交还给系统
+        yield return null;
+
+        // 兜底检查：若场景中仍有未激活角色残留占用 WebCamTexture，强行释放后再抢占
+        foreach (var other in FindObjectsOfType<FacePerspectiveSwitcher>(true))
+        {
+            if (other != null && other != this && (!other.enabled || !other.gameObject.activeInHierarchy))
+            {
+                other.ReleasePipelineResources();
+            }
+        }
+
         // 1. 检查摄像头硬件设备
         if (WebCamTexture.devices.Length == 0)
         {
@@ -474,8 +504,29 @@ public class FacePerspectiveSwitcher : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (detectionLoopRoutine != null) StopCoroutine(detectionLoopRoutine);
-        if (fadeRoutine != null) StopCoroutine(fadeRoutine);
+        ReleasePipelineResources();
+    }
+
+    public void ReleasePipelineResources()
+    {
+        if (initializeRoutine != null)
+        {
+            StopCoroutine(initializeRoutine);
+            initializeRoutine = null;
+        }
+        if (detectionLoopRoutine != null)
+        {
+            StopCoroutine(detectionLoopRoutine);
+            detectionLoopRoutine = null;
+        }
+        if (fadeRoutine != null)
+        {
+            StopCoroutine(fadeRoutine);
+            fadeRoutine = null;
+        }
+
+        isMediaPipeReady = false;
+        IsFaceDetected = false;
 
         if (faceDetector != null)
         {
@@ -485,7 +536,11 @@ public class FacePerspectiveSwitcher : MonoBehaviour
 
         if (webCamTexture != null)
         {
-            webCamTexture.Stop();
+            if (webCamTexture.isPlaying)
+            {
+                webCamTexture.Stop();
+            }
+            Destroy(webCamTexture);
             webCamTexture = null;
         }
 

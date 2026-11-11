@@ -15,7 +15,7 @@ public class ChooseController : MonoBehaviour
 
     void Start()
     {
-        global = GlobalProgressManager.Instance;
+        global = GlobalProgressManager.EnsureInstance();
         InitializeModules();
         PlayIntroSequence();
     }
@@ -29,8 +29,9 @@ public class ChooseController : MonoBehaviour
             return;
         }
 
-        global = GlobalProgressManager.Instance;
-        Debug.Log($"[ChooseController] InitializeModules started. global.currentOrder = {(global != null ? global.currentOrder : 0)}");
+        global = GlobalProgressManager.EnsureInstance();
+        int expectedOrder = global != null ? global.GetExpectedToolOrderIndex() : 0;
+        Debug.Log($"[ChooseController] InitializeModules started. Day={GlobalProgressManager.CurrentDay}, global.currentOrder={(global != null ? global.currentOrder : 0)}, expectedToolOrder={expectedOrder}");
 
         for (int i = 0; i < chooseModules.Count; i++)
         {
@@ -38,15 +39,15 @@ public class ChooseController : MonoBehaviour
             {
                 chooseModules[i].Init(this);  // ✅ 必须初始化！
                 
-                // ⚠️ 正确逻辑：必须用 Inspector 里填写的 orderIndex 来和全局进度对比！
-                bool active = (global != null) ? (chooseModules[i].orderIndex == global.currentOrder) : (i == 0);
+                // ⚠️ 用 GlobalProgressManager.GetExpectedToolOrderIndex() 匹配 Day 1 (orderIndex=0) 与 Day 2 (orderIndex=2)
+                bool active = (global != null) ? (chooseModules[i].orderIndex == expectedOrder) : (i == 0);
                 Debug.Log($"[ChooseController] module '{chooseModules[i].moduleName}' (orderIndex={chooseModules[i].orderIndex}) -> SetModuleActive({active})");
                 
                 chooseModules[i].SetModuleActive(active);
             }
         }
 
-        Debug.Log($"✅ 模块初始化完成，当前全局进度索引 {(global != null ? global.currentOrder : 0)}");
+        Debug.Log($"✅ 模块初始化完成，当前 Day={GlobalProgressManager.CurrentDay}, 激活工具索引 {expectedOrder}");
     }
 
     private void PlayIntroSequence()
@@ -99,11 +100,12 @@ public class ChooseController : MonoBehaviour
         // 但为了严谨，我们同样修正这里的激活判断：
         if (chooseModules != null && global != null)
         {
+            int expectedOrder = global.GetExpectedToolOrderIndex();
             for (int i = 0; i < chooseModules.Count; i++)
             {
                 if (chooseModules[i] != null)
                 {
-                    bool active = (chooseModules[i].orderIndex == global.currentOrder);
+                    bool active = (chooseModules[i].orderIndex == expectedOrder);
                     chooseModules[i].SetModuleActive(active);
                 }
             }

@@ -154,6 +154,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   closeDuration: 0.5
+  blackTextTransitionPrefab: {fileID: 8608053381913989517, guid: 9c7ab3e7dadf67e4c85e13c281a54d51, type: 3}
+  blackFadeInDuration: 0.45
+  textFadeInDuration: 0.35
+  textHoldDuration: 1.2
+  blackFadeOutDuration: 0.55
 --- !u!4 &121370191
 Transform:
   m_ObjectHideFlags: 0
@@ -200,12 +205,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentOrder: 0
+  currentDay: 1
   sceneTransitioning: 0
+  jushiLikeU: 0
+  jushiSuccess: 0
+  talkedCicada: 0
   sceneSequence:
   - chooseToolBasedOnCut
   - patScene
+  - StudioDesk
+  - Mindmaze
   - chooseToolBasedOnCut
   - cutScene
+  - StudioDesk
   - endScene
   debugLog: 1
 --- !u!1001 &1765691407
