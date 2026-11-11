@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b70a6d73a09c41e4889619fbf448e167, type: 3}
+  m_Name: EBoorBash
+  m_EditorClassIdentifier: 
+  popupId: EBoorBash
+  bannerTitle: "\u3010BoorBash\u3011"
+  bannerSummary: One-on-One Local Delivery Order Awaiting Confirmation
+  avatarSprite: {fileID: 21300000, guid: da982c5c6f71a2c41a7c51cdc7092758, type: 3}
+  bannerBackground: {fileID: 0}
+  hasExpandedContent: 1
+  drawerTitle: "Express Local Delivery \xB7 Valuable Items"
+  drawerBackground: {fileID: 21300000, guid: 5394b5d1d9dd065459ea403d65d51822, type: 3}
+  drawerContentImage: {fileID: 21300000, guid: c32bd4a8b5767416da0b9bb9f5368ce6, type: 3}
+  drawerDetailText: 
+  incomingLoopSfx: {fileID: 8300000, guid: a04ecf2458305b14f9dc60b540e65872, type: 3}
+  voiceClip: {fileID: 0}
+  isDeliveryOrder: 1
+  confirmButtonText: 
+  targetSceneOnConfirm: 
+  interruptWorkAndFail: 0
