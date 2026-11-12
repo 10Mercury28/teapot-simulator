@@ -33,6 +33,9 @@ using Yarn.Unity;
 /// 
 /// 4. 场景跳转：
 ///    - <<load_scene "scene_name">>     : 调用 SceneBlinkTransition 闭眼平滑转场（或标准 LoadScene）
+///
+/// 5. 对话暂停/隐藏恢复：
+///    - <<pause_dialogue>>              : 隐藏对白与选项 UI，保留桌面与角色立绘供自由观察，按空格键 (Space) 重新拉起对白
 /// </summary>
 public class Day1YarnCommands : MonoBehaviour
 {
@@ -943,5 +946,73 @@ public class Day1YarnCommands : MonoBehaviour
     {
         if (Instance != null && Instance.dialogueRunner != null) return Instance.dialogueRunner;
         return GameObject.FindObjectOfType<DialogueRunner>();
+    }
+
+    // ============================================================
+    // 6. 对话暂停观察指令 (Pause Dialogue Until Space)
+    // ============================================================
+
+    /// <summary>
+    /// 暂停并隐藏对白界面（保留人物立绘、视角转头与桌面互动），按空格键后重新拉起对白。
+    /// 用法：在剧本任意需要停顿的位置插入 <<pause_dialogue>>
+    /// </summary>
+    [YarnCommand("pause_dialogue")]
+    public static IEnumerator PauseDialogue()
+    {
+        DialogueRunner runner = GetDialogueRunner();
+        Canvas dialogueCanvas = runner != null ? runner.GetComponentInChildren<Canvas>(true) : null;
+        if (dialogueCanvas == null)
+        {
+            LinePresenter lp = GameObject.FindObjectOfType<LinePresenter>(true);
+            if (lp != null) dialogueCanvas = lp.GetComponentInParent<Canvas>();
+        }
+
+        LineAdvancer advancer = runner != null
+            ? runner.GetComponentInChildren<LineAdvancer>(true)
+            : GameObject.FindObjectOfType<LineAdvancer>(true);
+        Yarn.Unity.LineAdvancerInput.KeyCodes keyCodes = advancer != null
+            ? advancer.GetComponent<Yarn.Unity.LineAdvancerInput.KeyCodes>()
+            : GameObject.FindObjectOfType<Yarn.Unity.LineAdvancerInput.KeyCodes>(true);
+
+        bool prevCanvasEnabled = dialogueCanvas != null && dialogueCanvas.enabled;
+        bool prevAdvancerEnabled = advancer != null && advancer.enabled;
+        bool prevKeyCodesEnabled = keyCodes != null && keyCodes.enabled;
+
+        Debug.Log("⏸️ [YarnCommand] pause_dialogue: 已隐藏对白框进入自由观察，按空格键 (Space) 重新拉起对白。");
+
+        try
+        {
+            if (dialogueCanvas != null) dialogueCanvas.enabled = false;
+            if (advancer != null) advancer.enabled = false;
+            if (keyCodes != null) keyCodes.enabled = false;
+
+            // 先让出至少 1 帧并等上一句推进用的空格键彻底松开
+            yield return null;
+            while (Input.GetKey(KeyCode.Space))
+            {
+                yield return null;
+            }
+
+            while (true)
+            {
+                bool modalBlocking = Time.timeScale <= 0f ||
+                                     (PopupManager.Instance != null && PopupManager.Instance.CurrentData != null);
+                if (!modalBlocking && Input.GetKeyDown(KeyCode.Space))
+                {
+                    break;
+                }
+                yield return null;
+            }
+
+            // 等当前按空格的帧过去，再恢复 LineAdvancer/KeyCodes，避免同一帧把下一句也跳过
+            yield return null;
+        }
+        finally
+        {
+            if (dialogueCanvas != null) dialogueCanvas.enabled = prevCanvasEnabled;
+            if (advancer != null) advancer.enabled = prevAdvancerEnabled;
+            if (keyCodes != null) keyCodes.enabled = prevKeyCodesEnabled;
+            Debug.Log("▶️ [YarnCommand] pause_dialogue: 已按空格恢复并重新拉起对白。");
+        }
     }
 }
