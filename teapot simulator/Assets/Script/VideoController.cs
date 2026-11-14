@@ -60,11 +60,27 @@ public class VideoController : MonoBehaviour
 
     private IEnumerator PrepareRoutine(System.Action onPrepared)
     {
-        vp.Prepare();
-        while (!vp.isPrepared)
+        if (vp == null)
         {
+            onPrepared?.Invoke();
+            yield break;
+        }
+
+        if (!vp.enabled) vp.enabled = true;
+
+        vp.Prepare();
+        float timeout = 2.5f;
+        while (!vp.isPrepared && timeout > 0f)
+        {
+            timeout -= Time.unscaledDeltaTime;
             yield return null;
         }
+
+        if (!vp.isPrepared)
+        {
+            Debug.LogWarning($"⚠️ [VideoController] Prepare 超时: {vp.name} (已强制放行，避免主流程卡死)");
+        }
+
         onPrepared?.Invoke();
     }
 
@@ -130,9 +146,12 @@ public class VideoController : MonoBehaviour
             yield return null;
         }
         
-        // 等待播放结束
-        while (vp.isPlaying)
+        // 等待播放结束，增加最大安全超时保护
+        float maxWait = (vp.length > 0 ? (float)vp.length : 5f) + 1.5f;
+        float elapsed = 0f;
+        while (vp.isPlaying && elapsed < maxWait)
         {
+            elapsed += Time.unscaledDeltaTime;
             yield return null;
         }
         

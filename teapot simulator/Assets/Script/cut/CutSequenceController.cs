@@ -135,9 +135,16 @@ public class CutSequenceController : MonoBehaviour
             if (modules[0].IsInterrupted())
             {
                 Debug.Log("🔔 [CutSequenceController] Cut 1 处于弹窗打断挂起状态，保持待机/开场白视频动态循环播放，直至弹窗关闭...");
-                while (modules[0].IsInterrupted())
+                float interruptTimeout = 25f;
+                while (modules[0].IsInterrupted() && interruptTimeout > 0f)
                 {
+                    interruptTimeout -= Time.unscaledDeltaTime;
                     yield return null;
+                }
+                if (modules[0].IsInterrupted())
+                {
+                    Debug.LogWarning("⚠️ [CutSequenceController] Cut 1 打断等待超时 (25s)，强制解除打断！");
+                    modules[0].ForceClearInterrupt();
                 }
                 Debug.Log("🔓 [CutSequenceController] 弹窗已关闭！开始平滑淡出待机视频，切入第 0 帧供玩家切割。");
             }
@@ -241,17 +248,25 @@ public class CutSequenceController : MonoBehaviour
 
     private IEnumerator HandoffToNextModuleRoutine(CutModule previousModule, CutModule nextModule)
     {
+        // 1. 先释放上一个模块不再使用的 A/B 视频解码器，减轻 macOS 并发解码压力
+        if (previousModule != null)
+        {
+            previousModule.ReleaseMainAndFailVideos();
+        }
+
+        // 2. 启动下一个模块并等待首帧
         nextModule.gameObject.SetActive(true);
         nextModule.Initialize(this);
 
         float waitReady = 0f;
-        while (!nextModule.IsMainFrameReady && waitReady < 1.5f)
+        while (!nextModule.IsMainFrameReady && waitReady < 2f)
         {
             waitReady += Time.unscaledDeltaTime;
             yield return null;
         }
         yield return new WaitForEndOfFrame();
 
+        // 3. 彻底释放上一个模块的所有资源（包括转场）并关闭
         if (previousModule != null)
         {
             previousModule.ReleaseResources();

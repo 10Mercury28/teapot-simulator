@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b70a6d73a09c41e4889619fbf448e167, type: 3}
   m_Name: Day2_ShaoA
   m_EditorClassIdentifier: 
-  popupId: EDay2_ShaoA
+  popupId: Day2_ShaoA
   bannerTitle: "\u3010\u5FAE\u4FE1\u6D88\u606F\u3011"
   bannerSummary: "AAA\u65E2\u767D\u5DE5\u4F5C\u5BA4 \u90B5\u8001\u5E08"
   avatarSprite: {fileID: 21300000, guid: 0833a359402bc0043ae4fbae5a331e24, type: 3}

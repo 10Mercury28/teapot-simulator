@@ -111,7 +111,16 @@ public sealed class OrientPearlUIFlow : MonoBehaviour
                 unfinishedWorkflowDialog.SetActive(true);
             return;
         }
-        onStartNewProject?.Invoke();
+        if (onStartNewProject != null && onStartNewProject.GetPersistentEventCount() > 0)
+            onStartNewProject.Invoke();
+        else
+            LoadGameScene("begin");
+    }
+
+    public void LoadGameScene(string sceneName)
+    {
+        if (string.IsNullOrEmpty(sceneName)) sceneName = "begin";
+        UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
     }
 
     public void DismissUnfinishedWorkflowDialog()

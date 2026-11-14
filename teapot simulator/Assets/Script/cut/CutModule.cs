@@ -220,9 +220,22 @@ public class CutModule : MonoBehaviour
 
         if (videoA != null)
         {
+            if (!videoA.enabled) videoA.enabled = true;
+
             bool prepared = false;
             ctrlA?.PrepareNow(() => prepared = true);
-            while (!prepared) yield return null;
+
+            float timeout = 2.5f;
+            while (!prepared && timeout > 0f)
+            {
+                timeout -= Time.unscaledDeltaTime;
+                yield return null;
+            }
+
+            if (!prepared)
+            {
+                Debug.LogWarning($"⚠️ [{name}] 主视频 Prepare 超时，继续流程避免卡死");
+            }
 
             // 强制渲染一次首帧到 RenderTexture
             yield return StartCoroutine(RenderFirstFrame(videoA));
@@ -244,6 +257,7 @@ public class CutModule : MonoBehaviour
     private IEnumerator RenderFirstFrame(VideoPlayer vp)
     {
         if (vp == null) yield break;
+        if (!vp.enabled) vp.enabled = true;
         vp.time = 0;
         vp.Play();
         yield return StartCoroutine(WaitForVideoFirstFrame(vp, 0.4f));
@@ -488,11 +502,19 @@ public class CutModule : MonoBehaviour
     {
         if (videoB != null)
         {
+            if (!videoB.enabled) videoB.enabled = true;
+
             if (!videoB.isPrepared)
             {
                 bool prepared = false;
                 ctrlB?.PrepareNow(() => prepared = true);
-                while (!prepared) yield return null;
+
+                float timeout = 2.0f;
+                while (!prepared && timeout > 0f)
+                {
+                    timeout -= Time.unscaledDeltaTime;
+                    yield return null;
+                }
             }
 
             // 从与切割进度对应的倒放位置起播，先确认 RenderTexture 渲染出帧再切 rawB，杜绝 1 帧穿帮
@@ -688,14 +710,30 @@ public class CutModule : MonoBehaviour
     }
 
     /// <summary>
-    /// 停止所有视频并重置
+    /// 仅释放主视频与失败视频的解码器资源（转场阶段交接时先释放前序视频，减轻 macOS 并发解码压力）
+    /// </summary>
+    public void ReleaseMainAndFailVideos()
+    {
+        ctrlA?.Release();
+        ctrlB?.Release();
+        if (videoA != null) { videoA.Stop(); videoA.enabled = false; }
+        if (videoB != null) { videoB.Stop(); videoB.enabled = false; }
+    }
+
+    /// <summary>
+    /// 停止所有视频并彻底释放硬件解码器资源（macOS AVFoundation 防卡死）
     /// </summary>
     public void ReleaseResources()
     {
-        ctrlA?.StopAndReset();
-        ctrlB?.StopAndReset();
-        ctrlTrans?.StopAndReset();
-        ctrlComplete?.StopAndReset();
+        ctrlA?.Release();
+        ctrlB?.Release();
+        ctrlTrans?.Release();
+        ctrlComplete?.Release();
+
+        if (videoA != null) { videoA.Stop(); videoA.enabled = false; }
+        if (videoB != null) { videoB.Stop(); videoB.enabled = false; }
+        if (transition != null) { transition.Stop(); transition.enabled = false; }
+        if (completeVideo != null) { completeVideo.Stop(); completeVideo.enabled = false; }
     }
 
     // ============================================================
@@ -723,17 +761,20 @@ public class CutModule : MonoBehaviour
         if (PopupManager.Instance != null)
         {
             PopupManager.Instance.OnPopupClosed += HandlePopupClosed;
+            bool shown = false;
             if (interruptPopupSO != null)
             {
-                PopupManager.Instance.Show(interruptPopupSO);
+                shown = PopupManager.Instance.Show(interruptPopupSO);
             }
             else if (!string.IsNullOrEmpty(interruptPopupId))
             {
-                PopupManager.Instance.ShowById(interruptPopupId);
+                shown = PopupManager.Instance.ShowById(interruptPopupId);
             }
-            else
+
+            if (!shown)
             {
-                Debug.LogWarning($"⚠️ [{name}] enableEnterInterrupt 为 true，但未指定 interruptPopupSO 或 interruptPopupId！");
+                Debug.LogWarning($"⚠️ [{name}] enableEnterInterrupt 为 true，但弹窗拉起失败，自动解除打断！");
+                PopupManager.Instance.OnPopupClosed -= HandlePopupClosed;
                 isInterrupted = false;
                 SetRegionsActive(true);
             }
@@ -800,8 +841,35 @@ public class CutModule : MonoBehaviour
         TriggerTransitionInterruptPopup();
 
         // 核心挂起：等待弹窗完全关闭！
+        float interruptTimer = 0f;
         while (isTransitionInterrupted)
         {
+            // 防御保护 1：如果没有任何活跃弹窗，自动恢复
+            if (PopupManager.Instance != null && !PopupManager.Instance.HasActivePopup)
+            {
+                isTransitionInterrupted = false;
+                break;
+            }
+
+            // 防御保护 2：允许玩家在转场视频播放 4 秒后点击屏幕提前跳过/推进
+            if (interruptTimer > 4f && Input.GetMouseButtonDown(0))
+            {
+                if (debugLog) Debug.Log($"⏩ [{name}] 玩家点击提前跳过转场弹窗打断");
+                if (PopupManager.Instance != null) PopupManager.Instance.CloseAll();
+                isTransitionInterrupted = false;
+                break;
+            }
+
+            // 防御保护 3：安全超时（25 秒），避免死锁
+            interruptTimer += Time.unscaledDeltaTime;
+            if (interruptTimer > 25f)
+            {
+                Debug.LogWarning($"⚠️ [{name}] 转场打断超时 (25s)，自动收起并进入下一 Cut");
+                if (PopupManager.Instance != null) PopupManager.Instance.CloseAll();
+                isTransitionInterrupted = false;
+                break;
+            }
+
             yield return null;
         }
 
@@ -819,17 +887,20 @@ public class CutModule : MonoBehaviour
         if (PopupManager.Instance != null)
         {
             PopupManager.Instance.OnPopupClosed += HandleTransitionPopupClosed;
+            bool shown = false;
             if (transitionPopupSO != null)
             {
-                PopupManager.Instance.Show(transitionPopupSO);
+                shown = PopupManager.Instance.Show(transitionPopupSO);
             }
             else if (!string.IsNullOrEmpty(transitionPopupId))
             {
-                PopupManager.Instance.ShowById(transitionPopupId);
+                shown = PopupManager.Instance.ShowById(transitionPopupId);
             }
-            else
+
+            if (!shown)
             {
-                Debug.LogWarning($"⚠️ [{name}] enableTransitionInterrupt 为 true，但未指定 transitionPopupSO 或 transitionPopupId！");
+                Debug.LogWarning($"⚠️ [{name}] enableTransitionInterrupt 为 true，但未指定有效弹窗或拉起失败，解除转场打断！");
+                PopupManager.Instance.OnPopupClosed -= HandleTransitionPopupClosed;
                 isTransitionInterrupted = false;
             }
         }
@@ -851,6 +922,14 @@ public class CutModule : MonoBehaviour
 
         isTransitionInterrupted = false;
         if (debugLog) Debug.Log($"🔓 [{name}] 转场弹窗已关闭！");
+    }
+
+    public void ForceClearInterrupt()
+    {
+        isInterrupted = false;
+        isTransitionInterrupted = false;
+        SetRegionsActive(true);
+        ApplyRegionsAlpha(idleAlpha);
     }
 
     private void OnDisable()

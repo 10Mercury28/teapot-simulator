@@ -101,8 +101,10 @@ public class BeforeStartController : MonoBehaviour
             if (!videoPlayer.isPrepared)
             {
                 videoPlayer.Prepare();
-                while (!videoPlayer.isPrepared)
+                float prepTimeout = 2.5f;
+                while (!videoPlayer.isPrepared && prepTimeout > 0f)
                 {
+                    prepTimeout -= Time.unscaledDeltaTime;
                     yield return null;
                 }
             }

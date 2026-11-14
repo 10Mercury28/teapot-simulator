@@ -105,6 +105,7 @@ public sealed class OrientPearlSettingsUI : MonoBehaviour
         if (volumeSlider != null)
         {
             float value = volumeSlider.value;
+            AudioListener.volume = value; // 全局控制所有 AudioSource 与视频音量
             if (volumePercent != null)
                 volumePercent.text = Mathf.RoundToInt(value * 100f) + "%";
             if (audioMixer != null)

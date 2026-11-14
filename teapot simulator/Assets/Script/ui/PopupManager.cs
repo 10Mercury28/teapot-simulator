@@ -98,6 +98,7 @@ public class PopupManager : MonoBehaviour
 
     // 当前活跃数据
     public PopupWindowDataSO CurrentData { get; private set; }
+    public bool HasActivePopup => CurrentData != null;
 
     private void Awake()
     {
@@ -188,12 +189,12 @@ public class PopupManager : MonoBehaviour
     /// <summary>
     /// 根据 ScriptableObject 数据弹出窗口
     /// </summary>
-    public void Show(PopupWindowDataSO data)
+    public bool Show(PopupWindowDataSO data)
     {
         if (data == null)
         {
             Debug.LogError("❌ [PopupManager] Show 传入的 PopupWindowDataSO 为空！");
-            return;
+            return false;
         }
 
         CurrentData = data;
@@ -223,6 +224,7 @@ public class PopupManager : MonoBehaviour
         }
 
         OnPopupShown?.Invoke(data);
+        return true;
     }
 
     /// <summary>
@@ -266,18 +268,19 @@ public class PopupManager : MonoBehaviour
     /// <summary>
     /// 根据预注册的 popupId 或资产名称弹出窗口
     /// </summary>
-    public void ShowById(string id)
+    public bool ShowById(string id)
     {
-        if (string.IsNullOrEmpty(id)) return;
+        if (string.IsNullOrEmpty(id)) return false;
 
         PopupWindowDataSO found = FindPopupData(id);
         if (found != null)
         {
-            Show(found);
+            return Show(found);
         }
         else
         {
             Debug.LogWarning($"⚠️ [PopupManager] 未能找到 ID/名称匹配 '{id}' 的弹窗数据！");
+            return false;
         }
     }
 
@@ -288,10 +291,15 @@ public class PopupManager : MonoBehaviour
     {
         StopAllSounds();
 
+        PopupWindowDataSO closedData = CurrentData;
         if (bannerUI != null) bannerUI.Hide();
         if (drawerUI != null) drawerUI.Hide();
 
         CurrentData = null;
+        if (closedData != null)
+        {
+            OnPopupClosed?.Invoke(closedData);
+        }
     }
 
     // ============================================================
