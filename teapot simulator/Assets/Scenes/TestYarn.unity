@@ -710,7 +710,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2817667056579584550, guid: afecb5a77ba7c7c449ec8b7cf12b5a9e, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3097388586508825738, guid: afecb5a77ba7c7c449ec8b7cf12b5a9e, type: 3}
       propertyPath: m_LocalScale.x
@@ -873,7 +873,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5000495280965018202, guid: 37ff570b8d69a8a45885a8c332d2df75, type: 3}
       propertyPath: startNode
-      value: Character_Jushi
+      value: JushiD2_Start
       objectReference: {fileID: 0}
     - target: {fileID: 5980759695828298279, guid: 37ff570b8d69a8a45885a8c332d2df75, type: 3}
       propertyPath: m_Name
