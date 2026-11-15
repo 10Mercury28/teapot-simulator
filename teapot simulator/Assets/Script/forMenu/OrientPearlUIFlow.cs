@@ -117,9 +117,18 @@ public sealed class OrientPearlUIFlow : MonoBehaviour
             LoadGameScene("begin");
     }
 
+    public void LoadGameScene(int buildIndex)
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene(buildIndex);
+    }
+
     public void LoadGameScene(string sceneName)
     {
-        if (string.IsNullOrEmpty(sceneName)) sceneName = "begin";
+        if (string.IsNullOrEmpty(sceneName) || sceneName == "1")
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene(1);
+            return;
+        }
         UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
     }
 
