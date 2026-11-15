@@ -265,8 +265,6 @@ public class GlobalProgressManager : MonoBehaviour
             return;
         }
 
-        if (sceneName == "endScene") sceneName = "Ending";
-
         EnsureValidSceneSequence();
         sceneTransitioning = true;
         currentOrder++;
