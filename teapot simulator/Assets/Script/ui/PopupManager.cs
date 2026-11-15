@@ -385,9 +385,9 @@ public class PopupManager : MonoBehaviour
         if (confirmedData != null && !string.IsNullOrEmpty(confirmedData.targetSceneOnConfirm))
         {
             Debug.Log($"🚀 [PopupManager] 订单确认，跳转场景: {confirmedData.targetSceneOnConfirm}");
-            if (confirmedData.targetSceneOnConfirm == "endScene")
+            if (confirmedData.targetSceneOnConfirm == "endScene" || confirmedData.targetSceneOnConfirm == "Ending")
             {
-                GlobalProgressManager.EnsureInstance().TransitionToScene("endScene", "", 2);
+                GlobalProgressManager.EnsureInstance().TransitionToScene("Ending", "", 2);
             }
             else
             {

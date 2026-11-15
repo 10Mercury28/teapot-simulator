@@ -96,7 +96,7 @@ public class GlobalProgressManager : MonoBehaviour
         "chooseToolBasedOnCut", // 4: Day 2 选切壶工具 (orderIndex = 2)
         "cutScene",             // 5: Day 2 切壶
         "StudioDesk",           // 6: Day 2 柜台接待 (Character_Jushi_D2)
-        "endScene"              // 7: 结局通关
+        "Ending"                // 7: 结局通关
     };
 
     // ----------------------------------------------------
@@ -198,6 +198,7 @@ public class GlobalProgressManager : MonoBehaviour
                 currentOrder = CurrentDay >= 2 ? 4 : 0;
                 break;
             case "endScene":
+            case "Ending":
                 currentDay = 2;
                 CurrentDayStatic = 2;
                 currentOrder = 7;
@@ -264,6 +265,8 @@ public class GlobalProgressManager : MonoBehaviour
             return;
         }
 
+        if (sceneName == "endScene") sceneName = "Ending";
+
         EnsureValidSceneSequence();
         sceneTransitioning = true;
         currentOrder++;
@@ -303,6 +306,8 @@ public class GlobalProgressManager : MonoBehaviour
             return;
         }
 
+        if (sceneName == "endScene") sceneName = "Ending";
+
         EnsureValidSceneSequence();
         sceneTransitioning = true;
 
@@ -321,6 +326,7 @@ public class GlobalProgressManager : MonoBehaviour
     public IEnumerator TransitionToSceneWaitForCover(string sceneName, string blackScreenText = "", int nextDay = 0)
     {
         if (sceneTransitioning) yield break;
+        if (sceneName == "endScene") sceneName = "Ending";
 
         EnsureValidSceneSequence();
         sceneTransitioning = true;
@@ -384,6 +390,7 @@ public class GlobalProgressManager : MonoBehaviour
                 currentOrder = 5;
                 break;
             case "endScene":
+            case "Ending":
                 currentOrder = 7;
                 break;
         }
