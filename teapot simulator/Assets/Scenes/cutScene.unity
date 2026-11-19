@@ -917,6 +917,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1872015921}
     - target: {fileID: 5131923561969355875, guid: 7fc1924702af245c89c5e75272d11f4e, type: 3}
+      propertyPath: autoStartMaxWaitSeconds
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5131923561969355875, guid: 7fc1924702af245c89c5e75272d11f4e, type: 3}
       propertyPath: disableObjects.Array.size
       value: 1
       objectReference: {fileID: 0}
