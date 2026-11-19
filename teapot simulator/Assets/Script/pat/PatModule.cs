@@ -20,6 +20,8 @@ public class PatModule : MonoBehaviour
     [Header("Gameplay")]
     public int requiredHits = 20;
     public float timeLimit = 3f;
+    [Tooltip("优先使用对应 UI Frame 矩形直接判定点击（所见即所得，无需对齐世界空间 BoxCollider2D）")]
+    public bool useFrameUIForHitTest = true;
 
     [Header("🔔 弹窗打断配置 (Popup Interruption)")]
     [Tooltip("是否在此模块启用拍泥打断弹窗？(例如 Module 2 和 Module 4 勾选启用)")]
@@ -80,6 +82,7 @@ public class PatModule : MonoBehaviour
     private float timer;
 
     private PatSequenceController controller;
+    private PatUIController patUI;
     private float targetAlpha;
 
     private List<SpriteRenderer> sprites = new List<SpriteRenderer>();
@@ -91,6 +94,7 @@ public class PatModule : MonoBehaviour
     void Start()
     {
         controller = GetComponentInParent<PatSequenceController>();
+        patUI = GetComponent<PatUIController>();
 
         HideAll();
         EnsureFallbackInitialized();
@@ -114,22 +118,20 @@ public class PatModule : MonoBehaviour
         if (!active)
             return;
 
+        if (BeforeStartController.IsAnyBeforeStartBlocking)
+            return;
+
+        if (Time.timeScale <= 0f)
+            return;
+
+        if (PopupManager.ExistingInstance != null && PopupManager.ExistingInstance.HasActivePopup)
+            return;
+
         // 鼠标点击判定
         bool clickedOnModule = false;
         if (Input.GetMouseButtonDown(0))
         {
-            Vector3 screenPos = Input.mousePosition;
-            if (Camera.main != null)
-            {
-                screenPos.z = Mathf.Abs(Camera.main.transform.position.z);
-                Vector3 mouse = Camera.main.ScreenToWorldPoint(screenPos);
-                Vector2 pos = new Vector2(mouse.x, mouse.y);
-                Collider2D col = GetComponent<Collider2D>();
-                if (col != null && col.OverlapPoint(pos))
-                {
-                    clickedOnModule = true;
-                }
-            }
+            clickedOnModule = IsPointerInsideModule(Input.mousePosition);
         }
 
         switch (currentState)
@@ -170,6 +172,42 @@ public class PatModule : MonoBehaviour
                 }
                 break;
         }
+    }
+
+    public bool IsPointerInsideModule(Vector2 screenPos)
+    {
+        if (useFrameUIForHitTest)
+        {
+            if (patUI == null)
+                patUI = GetComponent<PatUIController>();
+
+            if (patUI != null && patUI.frameImage != null && patUI.frameImage.gameObject.activeInHierarchy)
+            {
+                RectTransform rect = patUI.frameImage.rectTransform;
+                Canvas rootCanvas = patUI.frameImage.canvas;
+                Camera uiCam = null;
+
+                if (rootCanvas != null && rootCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
+                {
+                    uiCam = rootCanvas.worldCamera != null ? rootCanvas.worldCamera : Camera.main;
+                }
+
+                return RectTransformUtility.RectangleContainsScreenPoint(rect, screenPos, uiCam);
+            }
+        }
+
+        if (Camera.main != null)
+        {
+            Vector3 sp = new Vector3(screenPos.x, screenPos.y, Mathf.Abs(Camera.main.transform.position.z));
+            Vector3 mouse = Camera.main.ScreenToWorldPoint(sp);
+            Collider2D col = GetComponent<Collider2D>();
+            if (col != null && col.OverlapPoint(new Vector2(mouse.x, mouse.y)))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void Activate()
@@ -392,10 +430,7 @@ public class PatModule : MonoBehaviour
     /// </summary>
     public void ForceHideAndRelease()
     {
-        if (PopupManager.Instance != null)
-        {
-            PopupManager.Instance.OnPopupClosed -= HandlePopupClosed;
-        }
+        UnsubscribePopup();
         StopAllCoroutines();
         if (transitionVideo != null) transitionVideo.isLooping = false;
         HideAll();
@@ -474,10 +509,7 @@ public class PatModule : MonoBehaviour
         currentState = PatState.Inactive;
         timer = 0f;
 
-        if (PopupManager.Instance != null)
-        {
-            PopupManager.Instance.OnPopupClosed -= HandlePopupClosed;
-        }
+        UnsubscribePopup();
 
         if (interruptIdleRoutine != null)
         {
@@ -651,10 +683,7 @@ public class PatModule : MonoBehaviour
 
     private void HandlePopupClosed(PopupWindowDataSO data)
     {
-        if (PopupManager.Instance != null)
-        {
-            PopupManager.Instance.OnPopupClosed -= HandlePopupClosed;
-        }
+        UnsubscribePopup();
 
         if (!isInterrupted) return;
 
@@ -677,11 +706,17 @@ public class PatModule : MonoBehaviour
         }
     }
 
+    private void UnsubscribePopup()
+    {
+        PopupManager mgr = PopupManager.ExistingInstance;
+        if (mgr != null)
+        {
+            mgr.OnPopupClosed -= HandlePopupClosed;
+        }
+    }
+
     private void OnDestroy()
     {
-        if (PopupManager.Instance != null)
-        {
-            PopupManager.Instance.OnPopupClosed -= HandlePopupClosed;
-        }
+        UnsubscribePopup();
     }
 }

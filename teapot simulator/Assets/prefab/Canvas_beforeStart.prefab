@@ -53,6 +53,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b29bab856d036451689d8a8bb19fff6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  requireStartButton: 0
+  autoStartMaxWaitSeconds: 0
   beforeStartCanvas: {fileID: 0}
   triggerButton: {fileID: 0}
   videoPlayer: {fileID: 0}
@@ -61,6 +63,7 @@ MonoBehaviour:
   fadeDuration: 1.5
   finalButtonAlpha: 0.7
   disableObjects: []
+  deferUnlockToSequenceController: 0
 --- !u!223 &3183380939388846851
 Canvas:
   m_ObjectHideFlags: 0

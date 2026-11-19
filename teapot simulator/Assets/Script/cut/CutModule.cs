@@ -789,9 +789,9 @@ public class CutModule : MonoBehaviour
 
     private void HandlePopupClosed(PopupWindowDataSO data)
     {
-        if (PopupManager.Instance != null)
+        if (PopupManager.ExistingInstance != null)
         {
-            PopupManager.Instance.OnPopupClosed -= HandlePopupClosed;
+            PopupManager.ExistingInstance.OnPopupClosed -= HandlePopupClosed;
         }
 
         if (!isInterrupted) return;
@@ -845,7 +845,7 @@ public class CutModule : MonoBehaviour
         while (isTransitionInterrupted)
         {
             // 防御保护 1：如果没有任何活跃弹窗，自动恢复
-            if (PopupManager.Instance != null && !PopupManager.Instance.HasActivePopup)
+            if (PopupManager.ExistingInstance != null && !PopupManager.ExistingInstance.HasActivePopup)
             {
                 isTransitionInterrupted = false;
                 break;
@@ -855,7 +855,7 @@ public class CutModule : MonoBehaviour
             if (interruptTimer > 4f && Input.GetMouseButtonDown(0))
             {
                 if (debugLog) Debug.Log($"⏩ [{name}] 玩家点击提前跳过转场弹窗打断");
-                if (PopupManager.Instance != null) PopupManager.Instance.CloseAll();
+                if (PopupManager.ExistingInstance != null) PopupManager.ExistingInstance.CloseAll();
                 isTransitionInterrupted = false;
                 break;
             }
@@ -865,7 +865,7 @@ public class CutModule : MonoBehaviour
             if (interruptTimer > 25f)
             {
                 Debug.LogWarning($"⚠️ [{name}] 转场打断超时 (25s)，自动收起并进入下一 Cut");
-                if (PopupManager.Instance != null) PopupManager.Instance.CloseAll();
+                if (PopupManager.ExistingInstance != null) PopupManager.ExistingInstance.CloseAll();
                 isTransitionInterrupted = false;
                 break;
             }
@@ -913,9 +913,9 @@ public class CutModule : MonoBehaviour
 
     private void HandleTransitionPopupClosed(PopupWindowDataSO data)
     {
-        if (PopupManager.Instance != null)
+        if (PopupManager.ExistingInstance != null)
         {
-            PopupManager.Instance.OnPopupClosed -= HandleTransitionPopupClosed;
+            PopupManager.ExistingInstance.OnPopupClosed -= HandleTransitionPopupClosed;
         }
 
         if (!isTransitionInterrupted) return;
@@ -932,22 +932,24 @@ public class CutModule : MonoBehaviour
         ApplyRegionsAlpha(idleAlpha);
     }
 
+    private void UnsubscribeAllPopups()
+    {
+        PopupManager mgr = PopupManager.ExistingInstance;
+        if (mgr != null)
+        {
+            mgr.OnPopupClosed -= HandlePopupClosed;
+            mgr.OnPopupClosed -= HandleTransitionPopupClosed;
+        }
+    }
+
     private void OnDisable()
     {
-        if (PopupManager.Instance != null)
-        {
-            PopupManager.Instance.OnPopupClosed -= HandlePopupClosed;
-            PopupManager.Instance.OnPopupClosed -= HandleTransitionPopupClosed;
-        }
+        UnsubscribeAllPopups();
     }
 
     private void OnDestroy()
     {
-        if (PopupManager.Instance != null)
-        {
-            PopupManager.Instance.OnPopupClosed -= HandlePopupClosed;
-            PopupManager.Instance.OnPopupClosed -= HandleTransitionPopupClosed;
-        }
+        UnsubscribeAllPopups();
         ReleaseResources();
     }
 

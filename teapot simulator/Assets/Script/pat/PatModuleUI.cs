@@ -1,31 +1,47 @@
 using UnityEngine;
 
 /// <summary>
-/// PatModuleUI (Final)
-/// - 根据 PatModule 状态驱动 UI
-/// - fail / transition / waiting → dim
-/// - main → bright
-/// - complete → alpha = 0
+/// PatModuleUI
+/// - 根据 PatModule 状态驱动 UI（仅显示当前正在交互的模块）
+/// - Inactive: SetInactive (alpha = 0，完全隐藏)
+/// - Fail / Transition / Waiting: ShowStart (dim)
+/// - Main Patting: BuildStack / Bright (bright, visual cue actively animated)
+/// - Click Hit: OnHit (punch scale + flash)
+/// - Complete: HideOnComplete (alpha = 0)
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(PatModule))]
 [RequireComponent(typeof(PatUIController))]
 public class PatModuleUI : MonoBehaviour
 {
-    PatModule module;
-    PatUIController ui;
+    private PatModule module;
+    private PatUIController ui;
 
-    bool stackBuilt = false;
-    bool completedHidden = false;
-    int lastHits = -1;
+    private bool stackBuilt = false;
+    private bool completedHidden = false;
+    private bool inactiveHidden = false;
+    private int lastHits = -1;
 
-    void Awake()
+    private void Awake()
     {
         module = GetComponent<PatModule>();
         ui = GetComponent<PatUIController>();
     }
 
-    void Update()
+    private void Start()
+    {
+        // 初始待机状态：若模块尚未激活，完全隐藏 UI
+        if (ui != null && module != null)
+        {
+            if (!module.active && !module.complete)
+            {
+                ui.SetInactive();
+                inactiveHidden = true;
+            }
+        }
+    }
+
+    private void Update()
     {
         if (!module || !ui) return;
 
@@ -42,11 +58,24 @@ public class PatModuleUI : MonoBehaviour
             {
                 ui.HideOnComplete();   // alpha = 0
                 completedHidden = true;
+                inactiveHidden = false;
             }
             return;
         }
 
-        if (!module.active) return;
+        if (!module.active)
+        {
+            if (!inactiveHidden)
+            {
+                ui.SetInactive();
+                inactiveHidden = true;
+                stackBuilt = false;
+                lastHits = -1;
+            }
+            return;
+        }
+
+        inactiveHidden = false;
 
         // ===================== Dim 状态 =====================
         if (failShowing || transitionShowing || inTransition)
