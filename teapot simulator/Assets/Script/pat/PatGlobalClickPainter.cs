@@ -29,17 +29,39 @@ public class PatGlobalClickPainter : MonoBehaviour
 
     void Update()
     {
-        // Check box colliders
+        if (Time.timeScale <= 0f || BeforeStartController.IsAnyBeforeStartBlocking)
+            return;
+
+        if (PopupManager.ExistingInstance != null && PopupManager.ExistingInstance.HasActivePopup)
+            return;
+
+        // Check module hit areas (UI Frame or fallback BoxCollider2D)
         if (Input.GetMouseButtonDown(0))
         {
-            Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector2 pos = new Vector2(mouse.x, mouse.y);
-
             foreach (var col in boxAreas)
             {
-                if (col != null && col.OverlapPoint(pos))
+                if (col == null) continue;
+
+                PatModule pm = col.GetComponent<PatModule>();
+                if (pm != null)
                 {
-                    SpawnStampWorldPosition(Input.mousePosition);
+                    if (pm.active && pm.IsPointerInsideModule(Input.mousePosition))
+                    {
+                        SpawnStampWorldPosition(Input.mousePosition);
+                        break;
+                    }
+                }
+                else if (Camera.main != null)
+                {
+                    Vector3 sp = Input.mousePosition;
+                    sp.z = Mathf.Abs(Camera.main.transform.position.z);
+                    Vector3 mouse = Camera.main.ScreenToWorldPoint(sp);
+                    Vector2 pos = new Vector2(mouse.x, mouse.y);
+                    if (col.OverlapPoint(pos))
+                    {
+                        SpawnStampWorldPosition(Input.mousePosition);
+                        break;
+                    }
                 }
             }
         }

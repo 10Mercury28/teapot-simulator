@@ -1179,78 +1179,6 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!1 &3651602613382286859
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 549474342575102487}
-  - component: {fileID: 27000329205862654}
-  - component: {fileID: 109441242011894783}
-  m_Layer: 5
-  m_Name: FallbackBackground
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &549474342575102487
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3651602613382286859}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 8344123180767018057}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &27000329205862654
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3651602613382286859}
-  m_CullTransparentMesh: 1
---- !u!114 &109441242011894783
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3651602613382286859}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Texture: {fileID: 0}
-  m_UVRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
 --- !u!1 &3728962602395628085
 GameObject:
   m_ObjectHideFlags: 0
@@ -1336,108 +1264,6 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!1 &3900453989369539858
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8344123180767018057}
-  - component: {fileID: 6356551942627372217}
-  - component: {fileID: 2989421135155881469}
-  - component: {fileID: 7874336757766476026}
-  m_Layer: 5
-  m_Name: Canvas
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &8344123180767018057
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3900453989369539858}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0, y: 0, z: 0}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 549474342575102487}
-  m_Father: {fileID: 5548637444694548176}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0, y: 0}
---- !u!223 &6356551942627372217
-Canvas:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3900453989369539858}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_RenderMode: 1
-  m_Camera: {fileID: 0}
-  m_PlaneDistance: 1
-  m_PixelPerfect: 0
-  m_ReceivesEvents: 1
-  m_OverrideSorting: 0
-  m_OverridePixelPerfect: 0
-  m_SortingBucketNormalizedSize: 0
-  m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
-  m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 0
-  m_SortingOrder: 0
-  m_TargetDisplay: 0
---- !u!114 &2989421135155881469
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3900453989369539858}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_UiScaleMode: 1
-  m_ReferencePixelsPerUnit: 100
-  m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 1920, y: 1080}
-  m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0.5
-  m_PhysicalUnit: 3
-  m_FallbackScreenDPI: 96
-  m_DefaultSpriteDPI: 96
-  m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
---- !u!114 &7874336757766476026
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3900453989369539858}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 0
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
 --- !u!1 &3912425669342140621
 GameObject:
   m_ObjectHideFlags: 0
@@ -1895,7 +1721,6 @@ Transform:
   m_LocalScale: {x: 0.02, y: 0.02, z: 0.02}
   m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 8344123180767018057}
   - {fileID: 1430453272890922718}
   - {fileID: 1609466257251913621}
   m_Father: {fileID: 1702730219290416924}
@@ -3020,10 +2845,6 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: a94ec545300142398e26b2e3f2cb94c4, type: 2}
     - target: {fileID: 2571078154482157703, guid: 6f2a46ee5aca445dd8bfea3252be14d6, type: 3}
-      propertyPath: fallbackBackground
-      value: 
-      objectReference: {fileID: 109441242011894783}
-    - target: {fileID: 2571078154482157703, guid: 6f2a46ee5aca445dd8bfea3252be14d6, type: 3}
       propertyPath: enableInterruptPopup
       value: 1
       objectReference: {fileID: 0}
@@ -3330,7 +3151,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiGroup: {fileID: 2875871868824487483}
+  frameImage: {fileID: 1953614731219803219}
   startImage: {fileID: 2899289014306983996}
+  startAnimator: {fileID: 0}
+  enablePunchScale: 1
+  punchScaleMultiplier: 1.18
+  punchDuration: 0.12
+  enableHitFlash: 1
+  hitFlashColor: {r: 1, g: 1, b: 0.85, a: 1}
+  hitFlashBrightness: 1.4
+  hitFlashDuration: 0.06
+  clickFeedbackImage: {fileID: 1953614731219803219}
+  clickSprite: {fileID: 21300000, guid: f6d995bbb8d514a818692fd49905263a, type: 3}
+  dimAlpha: 0.6
+  brightAlpha: 1
   stackRoot: {fileID: 3540639741715225}
   stackSprites:
   - {fileID: 21300000, guid: 7efb9f131cc0e459a959c16c7c84f348, type: 3}
@@ -3346,10 +3180,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: c0d38db930d8a4893a4d7494bd0a04f7, type: 3}
   - {fileID: 21300000, guid: e9cb390b6becf48e48f1b5afeaf1d963, type: 3}
   - {fileID: 21300000, guid: 932f6bc344e07424bbfb1cc92bbf5a97, type: 3}
-  clickFeedbackImage: {fileID: 1953614731219803219}
-  clickSprite: {fileID: 21300000, guid: f6d995bbb8d514a818692fd49905263a, type: 3}
-  dimAlpha: 0.6
-  brightAlpha: 1
 --- !u!114 &3818180291501766287
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3547,10 +3377,6 @@ PrefabInstance:
       propertyPath: interruptHitCount
       value: 5
       objectReference: {fileID: 0}
-    - target: {fileID: 2571078154482157703, guid: 6f2a46ee5aca445dd8bfea3252be14d6, type: 3}
-      propertyPath: fallbackBackground
-      value: 
-      objectReference: {fileID: 109441242011894783}
     - target: {fileID: 2571078154482157703, guid: 6f2a46ee5aca445dd8bfea3252be14d6, type: 3}
       propertyPath: enableInterruptPopup
       value: 1
@@ -3803,7 +3629,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiGroup: {fileID: 4562950097997699779}
+  frameImage: {fileID: 263283511136190635}
   startImage: {fileID: 3496951881288895684}
+  startAnimator: {fileID: 0}
+  enablePunchScale: 1
+  punchScaleMultiplier: 1.18
+  punchDuration: 0.12
+  enableHitFlash: 1
+  hitFlashColor: {r: 1, g: 1, b: 0.85, a: 1}
+  hitFlashBrightness: 1.4
+  hitFlashDuration: 0.06
+  clickFeedbackImage: {fileID: 263283511136190635}
+  clickSprite: {fileID: 21300000, guid: f6d995bbb8d514a818692fd49905263a, type: 3}
+  dimAlpha: 0.6
+  brightAlpha: 1
   stackRoot: {fileID: 1781007606508896225}
   stackSprites:
   - {fileID: 21300000, guid: 7efb9f131cc0e459a959c16c7c84f348, type: 3}
@@ -3819,10 +3658,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: c0d38db930d8a4893a4d7494bd0a04f7, type: 3}
   - {fileID: 21300000, guid: e9cb390b6becf48e48f1b5afeaf1d963, type: 3}
   - {fileID: 21300000, guid: 932f6bc344e07424bbfb1cc92bbf5a97, type: 3}
-  clickFeedbackImage: {fileID: 263283511136190635}
-  clickSprite: {fileID: 21300000, guid: f6d995bbb8d514a818692fd49905263a, type: 3}
-  dimAlpha: 0.6
-  brightAlpha: 1
 --- !u!114 &213826392958523951
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4112,10 +3947,6 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 3363918552771078959}
     - target: {fileID: 2571078154482157703, guid: 6f2a46ee5aca445dd8bfea3252be14d6, type: 3}
-      propertyPath: fallbackBackground
-      value: 
-      objectReference: {fileID: 109441242011894783}
-    - target: {fileID: 2571078154482157703, guid: 6f2a46ee5aca445dd8bfea3252be14d6, type: 3}
       propertyPath: transitionVideoPlayer
       value: 
       objectReference: {fileID: 0}
@@ -4400,7 +4231,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiGroup: {fileID: 3000556981576040748}
+  frameImage: {fileID: 1536178995558193988}
   startImage: {fileID: 2770117739502622507}
+  startAnimator: {fileID: 0}
+  enablePunchScale: 1
+  punchScaleMultiplier: 1.18
+  punchDuration: 0.12
+  enableHitFlash: 1
+  hitFlashColor: {r: 1, g: 1, b: 0.85, a: 1}
+  hitFlashBrightness: 1.4
+  hitFlashDuration: 0.06
+  clickFeedbackImage: {fileID: 1536178995558193988}
+  clickSprite: {fileID: 21300000, guid: f6d995bbb8d514a818692fd49905263a, type: 3}
+  dimAlpha: 0.6
+  brightAlpha: 1
   stackRoot: {fileID: 1027292020893230094}
   stackSprites:
   - {fileID: 21300000, guid: 7efb9f131cc0e459a959c16c7c84f348, type: 3}
@@ -4416,10 +4260,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: c0d38db930d8a4893a4d7494bd0a04f7, type: 3}
   - {fileID: 21300000, guid: e9cb390b6becf48e48f1b5afeaf1d963, type: 3}
   - {fileID: 21300000, guid: 932f6bc344e07424bbfb1cc92bbf5a97, type: 3}
-  clickFeedbackImage: {fileID: 1536178995558193988}
-  clickSprite: {fileID: 21300000, guid: f6d995bbb8d514a818692fd49905263a, type: 3}
-  dimAlpha: 0.6
-  brightAlpha: 1
 --- !u!114 &2684267090814316967
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4632,10 +4472,6 @@ PrefabInstance:
       propertyPath: transitionVideo
       value: 
       objectReference: {fileID: 5325776010913035377}
-    - target: {fileID: 2571078154482157703, guid: 6f2a46ee5aca445dd8bfea3252be14d6, type: 3}
-      propertyPath: fallbackBackground
-      value: 
-      objectReference: {fileID: 109441242011894783}
     - target: {fileID: 2571078154482157703, guid: 6f2a46ee5aca445dd8bfea3252be14d6, type: 3}
       propertyPath: transitionVideoPlayer
       value: 
@@ -4889,7 +4725,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiGroup: {fileID: 8666020568559504959}
+  frameImage: {fileID: 4951258983386502231}
   startImage: {fileID: 8617235534354356280}
+  startAnimator: {fileID: 0}
+  enablePunchScale: 1
+  punchScaleMultiplier: 1.18
+  punchDuration: 0.12
+  enableHitFlash: 1
+  hitFlashColor: {r: 1, g: 1, b: 0.85, a: 1}
+  hitFlashBrightness: 1.4
+  hitFlashDuration: 0.06
+  clickFeedbackImage: {fileID: 4951258983386502231}
+  clickSprite: {fileID: 21300000, guid: f6d995bbb8d514a818692fd49905263a, type: 3}
+  dimAlpha: 0.6
+  brightAlpha: 1
   stackRoot: {fileID: 6892286172394973981}
   stackSprites:
   - {fileID: 21300000, guid: 7efb9f131cc0e459a959c16c7c84f348, type: 3}
@@ -4905,10 +4754,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: c0d38db930d8a4893a4d7494bd0a04f7, type: 3}
   - {fileID: 21300000, guid: e9cb390b6becf48e48f1b5afeaf1d963, type: 3}
   - {fileID: 21300000, guid: 932f6bc344e07424bbfb1cc92bbf5a97, type: 3}
-  clickFeedbackImage: {fileID: 4951258983386502231}
-  clickSprite: {fileID: 21300000, guid: f6d995bbb8d514a818692fd49905263a, type: 3}
-  dimAlpha: 0.6
-  brightAlpha: 1
 --- !u!114 &554838298827262025
 MonoBehaviour:
   m_ObjectHideFlags: 0

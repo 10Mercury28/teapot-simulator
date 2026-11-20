@@ -6,6 +6,14 @@ using System.Collections.Generic;
 
 public class BeforeStartController : MonoBehaviour
 {
+    [Header("开始按钮开关")]
+    [Tooltip("是否需要点击「开始」按钮才进入游玩；取消勾选后不显示开始按钮，播完开场动画后直接进入可游玩状态")]
+    public bool requireStartButton = true;
+
+    [Tooltip("仅在取消勾选 Require Start Button 时生效：0 = 播完整个开场视频后自动进入；> 0 = 播放指定秒数后自动淡出进入")]
+    [Min(0f)]
+    public float autoStartMaxWaitSeconds = 0f;
+
     [Header("UI 控制")]
     public CanvasGroup beforeStartCanvas;   // 整个 BeforeStart Canvas
     public Button triggerButton;            // 开始按钮
@@ -26,13 +34,26 @@ public class BeforeStartController : MonoBehaviour
     [Tooltip("若为 true，点击开始按钮后仅隐藏按钮并保持视频播放，实际淡出和解锁由 CutSequenceController 接管")]
     public bool deferUnlockToSequenceController = false;
 
+    private static BeforeStartController _activeInstance;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        _activeInstance = null;
+    }
+
+    public static bool IsAnyBeforeStartBlocking => _activeInstance != null && _activeInstance.IsBeforeStartActive();
+
     private bool sceneUnlocked = false;
     private bool userClickedStart = false;
+    private bool videoFinished = false;
 
     public bool HasUserClickedStart() => userClickedStart;
 
     void Awake()
     {
+        _activeInstance = this;
+
         // ========= 自动绑定组件（在首帧渲染前即藏好开始按钮，防闪一帧） =========
         if (beforeStartCanvas == null)
             beforeStartCanvas = GetComponent<CanvasGroup>();
@@ -45,6 +66,9 @@ public class BeforeStartController : MonoBehaviour
 
         if (triggerButton == null)
             triggerButton = GetComponentInChildren<Button>(true);
+
+        if (videoPlayer != null)
+            videoPlayer.isLooping = requireStartButton;
 
         if (disableObjects != null)
         {
@@ -64,31 +88,72 @@ public class BeforeStartController : MonoBehaviour
 
         if (triggerButton != null)
         {
-            var btnTmp = triggerButton.GetComponentInChildren<TMPro.TMP_Text>();
-            if (btnTmp != null && (btnTmp.text == "Button" || string.IsNullOrWhiteSpace(btnTmp.text)))
+            if (!requireStartButton)
             {
-                btnTmp.text = "开始";
+                triggerButton.interactable = false;
+                CanvasGroup btnCanvas = triggerButton.GetComponent<CanvasGroup>();
+                if (btnCanvas != null)
+                    btnCanvas.alpha = 0f;
+                triggerButton.gameObject.SetActive(false);
             }
-            var btnText = triggerButton.GetComponentInChildren<Text>();
-            if (btnText != null && (btnText.text == "Button" || string.IsNullOrWhiteSpace(btnText.text)))
+            else
             {
-                btnText.text = "开始";
+                triggerButton.gameObject.SetActive(true);
+
+                var btnTmp = triggerButton.GetComponentInChildren<TMPro.TMP_Text>();
+                if (btnTmp != null && (btnTmp.text == "Button" || string.IsNullOrWhiteSpace(btnTmp.text)))
+                {
+                    btnTmp.text = "开始";
+                }
+                var btnText = triggerButton.GetComponent<Text>();
+                if (btnText != null && (btnText.text == "Button" || string.IsNullOrWhiteSpace(btnText.text)))
+                {
+                    btnText.text = "开始";
+                }
+
+                // ⭐ 行为只注册一次
+                triggerButton.onClick.RemoveAllListeners();
+                triggerButton.onClick.AddListener(OnButtonClicked);
+
+                CanvasGroup btnCanvas = triggerButton.GetComponent<CanvasGroup>();
+                if (btnCanvas != null)
+                    btnCanvas.alpha = 0f;
+
+                triggerButton.interactable = false;
             }
-
-            // ⭐ 行为只注册一次
-            triggerButton.onClick.RemoveAllListeners();
-            triggerButton.onClick.AddListener(OnButtonClicked);
-
-            CanvasGroup btnCanvas = triggerButton.GetComponent<CanvasGroup>();
-            if (btnCanvas != null)
-                btnCanvas.alpha = 0f;
-
-            triggerButton.interactable = false;
         }
+    }
+
+    void OnEnable()
+    {
+        if (!sceneUnlocked)
+            _activeInstance = this;
+    }
+
+    void OnDisable()
+    {
+        if (_activeInstance == this)
+            _activeInstance = null;
+    }
+
+    void OnDestroy()
+    {
+        if (videoPlayer != null)
+            videoPlayer.loopPointReached -= HandleVideoLoopPointReached;
+
+        if (_activeInstance == this)
+            _activeInstance = null;
+    }
+
+    private void HandleVideoLoopPointReached(VideoPlayer vp)
+    {
+        videoFinished = true;
     }
 
     IEnumerator Start()
     {
+        videoFinished = false;
+
         // ========= 播放引导视频 =========
         if (videoPlayer != null)
         {
@@ -97,7 +162,11 @@ public class BeforeStartController : MonoBehaviour
                 videoRaw.texture = videoPlayer.targetTexture;
                 videoRaw.enabled = true;
             }
-            videoPlayer.isLooping = true;
+
+            videoPlayer.isLooping = requireStartButton;
+            videoPlayer.loopPointReached -= HandleVideoLoopPointReached;
+            videoPlayer.loopPointReached += HandleVideoLoopPointReached;
+
             if (!videoPlayer.isPrepared)
             {
                 videoPlayer.Prepare();
@@ -111,17 +180,51 @@ public class BeforeStartController : MonoBehaviour
             videoPlayer.Play();
         }
 
-        // ========= 正常等待流程 =========
-        float waitTime = Mathf.Min(lockDuration, 3f);
-        if (waitTime > 0f)
+        if (requireStartButton)
         {
-            yield return new WaitForSeconds(waitTime);
+            // ========= 正常等待流程 =========
+            float waitTime = Mathf.Min(lockDuration, 3f);
+            if (waitTime > 0f)
+            {
+                yield return new WaitForSeconds(waitTime);
+            }
+            yield return StartCoroutine(FadeInButton(fadeDuration));
         }
-        yield return StartCoroutine(FadeInButton(fadeDuration));
+        else
+        {
+            // ========= 自动开局流程：等待开场动画/时间结束后直接进入可游玩状态 =========
+            if (videoPlayer != null && videoPlayer.clip != null && videoPlayer.isPrepared)
+            {
+                float clipLen = videoPlayer.length > 0.05 ? (float)videoPlayer.length : (float)videoPlayer.clip.length;
+                float maxWait = autoStartMaxWaitSeconds > 0f
+                    ? autoStartMaxWaitSeconds
+                    : (clipLen > 0f ? clipLen + 2f : Mathf.Max(lockDuration, 3f));
+
+                float elapsed = 0f;
+                while (!videoFinished && elapsed < maxWait)
+                {
+                    elapsed += Time.deltaTime;
+                    yield return null;
+                }
+            }
+            else if (autoStartMaxWaitSeconds > 0f)
+            {
+                yield return new WaitForSeconds(autoStartMaxWaitSeconds);
+            }
+
+            if (videoPlayer != null)
+            {
+                videoPlayer.loopPointReached -= HandleVideoLoopPointReached;
+            }
+
+            BeginUnlockFlow();
+        }
     }
 
     void Update()
     {
+        if (!requireStartButton) return;
+
         // 如果在演示期间玩家点击了鼠标，且已超过 1.5 秒且未点击开始，可提前唤出开始按钮
         if (!sceneUnlocked && !userClickedStart && Time.timeSinceLevelLoad > 1.5f && Input.GetMouseButtonDown(0))
         {
@@ -157,6 +260,11 @@ public class BeforeStartController : MonoBehaviour
     // ================== 点击开始 ==================
 
     private void OnButtonClicked()
+    {
+        BeginUnlockFlow();
+    }
+
+    private void BeginUnlockFlow()
     {
         if (userClickedStart) return;
 
@@ -237,7 +345,7 @@ public class BeforeStartController : MonoBehaviour
 
     public void ForceShowButtonWithFade(float fadeTime)
     {
-        if (sceneUnlocked) return;
+        if (sceneUnlocked || !requireStartButton) return;
 
         StopAllCoroutines();
         StartCoroutine(FadeInButtonUnscaled(fadeTime));

@@ -19,10 +19,29 @@ using UnityEngine.SceneManagement;
 public class PopupManager : MonoBehaviour
 {
     private static PopupManager _instance;
+    private static bool _isQuitting = false;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        _instance = null;
+        _isQuitting = false;
+    }
+
+    /// <summary>
+    /// 获取当前已存在的 PopupManager 实例，绝不会自动实例化新物体（用于 OnDisable/OnDestroy 退订与清理）。
+    /// </summary>
+    public static PopupManager ExistingInstance => _instance;
+
     public static PopupManager Instance
     {
         get
         {
+            if (_isQuitting || !Application.isPlaying)
+            {
+                return _instance;
+            }
+
             if (_instance == null)
             {
                 _instance = FindObjectOfType<PopupManager>();
@@ -418,6 +437,11 @@ public class PopupManager : MonoBehaviour
         StopVoiceSound();
     }
 
+    private void OnApplicationQuit()
+    {
+        _isQuitting = true;
+    }
+
     private void OnDestroy()
     {
         if (bannerUI != null)
@@ -430,6 +454,11 @@ public class PopupManager : MonoBehaviour
         {
             drawerUI.OnCloseRequested -= HandleDrawerCloseRequested;
             drawerUI.OnOrderConfirmed -= HandleOrderConfirmed;
+        }
+
+        if (_instance == this)
+        {
+            _instance = null;
         }
     }
 }
