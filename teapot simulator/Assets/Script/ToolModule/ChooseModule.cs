@@ -188,6 +188,7 @@ public class ChooseModule : MonoBehaviour
         rawMain.enabled = true;
 
         // 预渲染第 0 帧到 RenderTexture，并给底层渲染管线 0.04s 缓冲防黑屏闪烁
+        ctrlMain?.CancelScrub();
         videoMain.time = 0;
         videoMain.Play();
         yield return new WaitForEndOfFrame();
@@ -240,6 +241,10 @@ public class ChooseModule : MonoBehaviour
     {
         if (vp == null || raw == null) yield break;
 
+        if (vp == videoMain)
+        {
+            ctrlMain?.CancelScrub();
+        }
         double len = vp.length > 0 ? vp.length : (vp.clip != null ? vp.clip.length : 1.0);
         vp.time = currentPercent * len;
         vp.Play();

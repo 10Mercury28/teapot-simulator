@@ -10,7 +10,19 @@ public class VideoController : MonoBehaviour
     public VideoPlayer vp { get; private set; }
     private double targetTime = -1.0;
     private float lastScrubTime = 0f;
-    private float scrubInterval = 0.033f; // 限制 Scrub 每秒最多 30 次，防掉帧
+    private float scrubInterval = 0.033f; // fallback 节流（用于回退/大跳跃 Seek）
+
+    private bool scrubMode = false;
+    private double scrubTargetTime = -1.0;
+    private bool isSeeking = false;
+    private float seekStartRealtime = 0f;
+    private bool hasPendingSeek = false;
+    private double pendingSeekTime = 0.0;
+    private bool waitingSeekFrame = false;
+    private float seekFrameWaitStartRealtime = 0f;
+    private float scrubPlayRequestedRealtime = -1f;
+    private bool scrubFrameReadySubscribed = false;
+    private bool scrubSeekSubscribed = false;
 
     /// <summary>
     /// 获取或创建 VideoController
@@ -90,7 +102,8 @@ public class VideoController : MonoBehaviour
     public void PlayChunk(double startTime, double duration)
     {
         if (vp == null || vp.clip == null) return;
-        
+
+        CancelScrub();
         targetTime = startTime + duration;
         
         if (!vp.isPrepared)
@@ -118,7 +131,8 @@ public class VideoController : MonoBehaviour
     public void PlayFull(System.Action onComplete = null)
     {
         if (vp == null) return;
-        
+
+        CancelScrub();
         targetTime = -1.0; // 清除可能残留的片段播放限制
 
         if (!vp.isPrepared)
@@ -159,40 +173,195 @@ public class VideoController : MonoBehaviour
     }
 
     /// <summary>
-    /// 平滑地进行进度搓划 (CutModule 核心功能)
+    /// 平滑地进行进度搓划 (CutModule / ChooseModule 核心功能)
+    /// Windows Media Foundation 对 H.264 High Profile B 帧视频执行 Pause + time + StepForward 会黑屏；
+    /// 改用「前向高倍速追帧 + 串行化 Seek 等首帧」驱动真实渲染输出。
     /// </summary>
-    public void ScrubTo(float progress)
+    public void ScrubTo(float progress, bool allowBackwardSeek = true)
     {
         if (vp == null || (vp.clip == null && string.IsNullOrEmpty(vp.url))) return;
-        
+
         if (!vp.isPrepared)
         {
             vp.Prepare();
-            return; 
+            return;
         }
 
-        // 限制 Scrub 的频率，否则强制 StepForward 会导致主线程卡顿
-        if (Time.unscaledTime - lastScrubTime < scrubInterval) return;
-        lastScrubTime = Time.unscaledTime;
+        if (vp.targetTexture != null && !vp.targetTexture.IsCreated())
+        {
+            vp.targetTexture.Create();
+        }
 
-        targetTime = -1.0; 
-        double len = vp.length > 0 ? vp.length : (vp.clip != null ? vp.clip.length : 1.0);
-        double time = len * Mathf.Clamp01(progress);
-        
-        if (vp.isPlaying) vp.Pause();
-        
-        vp.time = time;
-        vp.StepForward();
+        double len = vp.length > 0.01 ? vp.length : (vp.clip != null ? vp.clip.length : 1.0);
+        double maxTime = len > 0.08 ? (len - 0.05) : len;
+        double desiredTime = len * Mathf.Clamp01(progress);
+        if (desiredTime < 0.0) desiredTime = 0.0;
+        else if (desiredTime > maxTime) desiredTime = maxTime;
+
+        targetTime = -1.0;
+        vp.isLooping = false;
+        scrubMode = true;
+        scrubTargetTime = desiredTime;
+
+        if (isSeeking)
+        {
+            hasPendingSeek = true;
+            pendingSeekTime = desiredTime;
+            return;
+        }
+
+        double delta = desiredTime - vp.time;
+
+        if (delta > 0.015 && delta <= 2.2)
+        {
+            waitingSeekFrame = false;
+            UnsubscribeScrubFrameReady();
+
+            if (vp.canSetPlaybackSpeed && (!vp.isPlaying || Time.unscaledTime - lastScrubTime >= scrubInterval))
+            {
+                vp.playbackSpeed = Mathf.Clamp((float)(delta / 0.12), 1.0f, 4.0f);
+                lastScrubTime = Time.unscaledTime;
+            }
+
+            if (!vp.isPlaying)
+            {
+                vp.Play();
+                scrubPlayRequestedRealtime = Time.unscaledTime;
+            }
+        }
+        else if ((allowBackwardSeek && delta < -0.05) || delta > 2.2)
+        {
+            BeginSerializedSeek(desiredTime);
+        }
+        else
+        {
+            if (vp.canSetPlaybackSpeed) vp.playbackSpeed = 1f;
+            if (!waitingSeekFrame)
+            {
+                if (vp.isPlaying) vp.Pause();
+                scrubMode = false;
+            }
+        }
+    }
+
+    private void BeginSerializedSeek(double seekTime)
+    {
+        if (vp == null) return;
+
+        isSeeking = true;
+        seekStartRealtime = Time.unscaledTime;
+        lastScrubTime = Time.unscaledTime;
+        hasPendingSeek = false;
+        waitingSeekFrame = false;
+
+        if (vp.canSetPlaybackSpeed) vp.playbackSpeed = 1f;
+
+        if (!scrubSeekSubscribed)
+        {
+            vp.seekCompleted += HandleScrubSeekCompleted;
+            scrubSeekSubscribed = true;
+        }
+        if (!scrubFrameReadySubscribed)
+        {
+            vp.sendFrameReadyEvents = true;
+            vp.frameReady += HandleScrubFrameReady;
+            scrubFrameReadySubscribed = true;
+        }
+
+        vp.time = seekTime;
+        if (!vp.isPlaying)
+        {
+            vp.Play();
+            scrubPlayRequestedRealtime = Time.unscaledTime;
+        }
+    }
+
+    private void HandleScrubSeekCompleted(VideoPlayer source)
+    {
+        isSeeking = false;
+        UnsubscribeScrubSeek();
+
+        if (vp == null) return;
+
+        if (hasPendingSeek)
+        {
+            double next = pendingSeekTime;
+            hasPendingSeek = false;
+            scrubTargetTime = next;
+            double delta = next - vp.time;
+            if (delta < -0.05 || delta > 2.2)
+            {
+                BeginSerializedSeek(next);
+                return;
+            }
+        }
+
+        waitingSeekFrame = true;
+        seekFrameWaitStartRealtime = Time.unscaledTime;
+    }
+
+    private void HandleScrubFrameReady(VideoPlayer source, long frameIdx)
+    {
+        if (!waitingSeekFrame) return;
+
+        waitingSeekFrame = false;
+        UnsubscribeScrubFrameReady();
+
+        if (vp != null && (!scrubMode || vp.time >= scrubTargetTime - 0.03))
+        {
+            if (vp.canSetPlaybackSpeed) vp.playbackSpeed = 1f;
+            if (vp.isPlaying) vp.Pause();
+            scrubMode = false;
+        }
+    }
+
+    private void UnsubscribeScrubSeek()
+    {
+        if (vp != null && scrubSeekSubscribed)
+        {
+            vp.seekCompleted -= HandleScrubSeekCompleted;
+        }
+        scrubSeekSubscribed = false;
+    }
+
+    private void UnsubscribeScrubFrameReady()
+    {
+        if (vp != null && scrubFrameReadySubscribed)
+        {
+            vp.frameReady -= HandleScrubFrameReady;
+            vp.sendFrameReadyEvents = false;
+        }
+        scrubFrameReadySubscribed = false;
+    }
+
+    public void CancelScrub()
+    {
+        scrubMode = false;
+        scrubTargetTime = -1.0;
+        isSeeking = false;
+        hasPendingSeek = false;
+        waitingSeekFrame = false;
+        scrubPlayRequestedRealtime = -1f;
+
+        UnsubscribeScrubSeek();
+        UnsubscribeScrubFrameReady();
+
+        if (vp != null && vp.canSetPlaybackSpeed)
+        {
+            vp.playbackSpeed = 1f;
+        }
     }
 
     public void Pause()
     {
+        CancelScrub();
         targetTime = -1.0;
         if (vp != null) vp.Pause();
     }
     
     public void StopAndReset()
     {
+        CancelScrub();
         if (vp != null)
         {
             vp.Stop();
@@ -205,6 +374,7 @@ public class VideoController : MonoBehaviour
     /// </summary>
     public void Release()
     {
+        CancelScrub();
         if (vp != null)
         {
             vp.Stop();
@@ -214,10 +384,65 @@ public class VideoController : MonoBehaviour
         }
     }
 
+    private void OnDisable()
+    {
+        CancelScrub();
+    }
+
+    private void OnDestroy()
+    {
+        CancelScrub();
+    }
+
     void Update()
     {
+        if (vp == null) return;
+
+        if (scrubMode)
+        {
+            if (isSeeking && (Time.unscaledTime - seekStartRealtime > 0.8f))
+            {
+                isSeeking = false;
+                UnsubscribeScrubSeek();
+                waitingSeekFrame = true;
+                seekFrameWaitStartRealtime = Time.unscaledTime;
+            }
+
+            if (waitingSeekFrame && (Time.unscaledTime - seekFrameWaitStartRealtime > 0.4f))
+            {
+                waitingSeekFrame = false;
+                UnsubscribeScrubFrameReady();
+            }
+
+            if (!isSeeking && !waitingSeekFrame)
+            {
+                double remaining = scrubTargetTime - vp.time;
+                bool playGraceExpired = (scrubPlayRequestedRealtime < 0f) || (Time.unscaledTime - scrubPlayRequestedRealtime > 0.25f);
+
+                if (remaining <= 0.025 || (!vp.isPlaying && playGraceExpired))
+                {
+                    if (vp.canSetPlaybackSpeed) vp.playbackSpeed = 1f;
+                    if (vp.isPlaying) vp.Pause();
+                    scrubMode = false;
+                }
+                else
+                {
+                    if (!vp.isPlaying)
+                    {
+                        vp.Play();
+                        scrubPlayRequestedRealtime = Time.unscaledTime;
+                    }
+                    if (vp.canSetPlaybackSpeed)
+                    {
+                        vp.playbackSpeed = Mathf.Clamp((float)(remaining / 0.12), 0.75f, 4.0f);
+                    }
+                }
+            }
+            return;
+        }
+
         // 如果我们设定了 targetTime，就监控进度，到了就暂停
-        if (vp != null && targetTime >= 0.0 && vp.isPlaying)
+        if (targetTime >= 0.0 && vp.isPlaying)
         {
             if (vp.time >= targetTime || vp.time >= vp.length - 0.05)
             {

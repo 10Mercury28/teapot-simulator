@@ -1,40 +1,30 @@
 using UnityEngine;
-
+using UnityEngine.UI;
+using UnityEngine.Video;
 using System.Collections;
 
-
-
 public class CutSequenceController : MonoBehaviour
-
 {
-
     [Header("模块列表")]
-
     public CutModule[] modules;
 
-
-
     [Header("=== Day 2 弹窗打断配置 ===")]
-
-    [Tooltip("是否自动为 Cut 1 和 Cut 2 注入打断配置（Cut 1 绑定 Day2_HA 并检测交心，Cut 2 绑定 Day2_ShaoA 无条件弹出）")]
-
+    [Tooltip("是否自动为 Cut 1 和 Cut 2 注入打断配置（Cut 1 在 Prepare 时按交心弹出 Day2_HA，Cut 2 在 Prepare 时弹出 Day2_ShaoA）")]
     public bool autoConfigureDay2Popups = true;
 
-
-
     [Tooltip("调试开关：强制模拟前一天已交心（LikeU == true），方便直接在此场景测试居士弹窗")]
-
     public bool debugSimulateLikeU = false;
 
-
+    [Header("=== 全部完成后的 Complete 视频 ===")]
+    [Tooltip("两段 Cut 及收尾转场全部播完后，播放的最终完成视频（如 cut complete.mp4）")]
+    public VideoClip completeVideoClip;
 
     [Header("状态")]
-
     public bool isAllComplete = false;
 
-
-
     private bool hasSentGlobalSignal = false;
+    private RenderTexture runtimeCompleteRT;
+    private GameObject runtimeCompleteCanvasObj;
 
 
 
@@ -72,32 +62,30 @@ public class CutSequenceController : MonoBehaviour
         // 自动装配 Day 2 弹窗打断逻辑
         if (autoConfigureDay2Popups && modules != null)
         {
-            // Module 0 (Cut 1):
+            // Module 0 (Cut 1): 进入 Prepare 循环时，若前一天交心则弹出居士微信 (Day2_HA)
             if (modules.Length > 0 && modules[0] != null)
             {
-                // 1. 入场准备打断：居士微信 (Day2_HA), 仅在交心时触发
                 modules[0].enableEnterInterrupt = true;
                 modules[0].requireLikeU = true;
                 if (modules[0].interruptPopupSO == null && string.IsNullOrEmpty(modules[0].interruptPopupId))
                 {
                     modules[0].interruptPopupId = "Day2_HA";
                 }
-                Debug.Log("⚙️ [CutSequenceController] 已配置 Cut 1 居士入场弹窗打断 (Day2_HA, requireLikeU=true)");
-
-                // 2. 转场准备打断：老师微信 (Day2_ShaoA), Cut 1 切完进入转场准备视频时播放，并保持播放直至弹窗结束
-                modules[0].enableTransitionInterrupt = true;
-                modules[0].transitionHoldUntilPopupClosed = true;
-                if (modules[0].transitionPopupSO == null && string.IsNullOrEmpty(modules[0].transitionPopupId))
-                {
-                    modules[0].transitionPopupId = "Day2_ShaoA";
-                }
-                Debug.Log("⚙️ [CutSequenceController] 已配置 Cut 1 转场打断 (Day2_ShaoA, 保持转场视频直至弹窗结束)");
+                modules[0].enableTransitionInterrupt = false;
+                Debug.Log("⚙️ [CutSequenceController] 已配置 Cut 1 Prepare 入场弹窗 (Day2_HA, requireLikeU=true)");
             }
 
-            // Module 1 (Cut 2): 老师通知已在转场准备期间触发完毕，Cut 2 入场直接准备切割，无需重复打断
+            // Module 1 (Cut 2): 进入 Prepare 循环时无条件弹出老师微信 (Day2_ShaoA)
             if (modules.Length > 1 && modules[1] != null)
             {
-                modules[1].enableEnterInterrupt = false;
+                modules[1].enableEnterInterrupt = true;
+                modules[1].requireLikeU = false;
+                if (modules[1].interruptPopupSO == null && string.IsNullOrEmpty(modules[1].interruptPopupId))
+                {
+                    modules[1].interruptPopupId = "Day2_ShaoA";
+                }
+                modules[1].enableTransitionInterrupt = false;
+                Debug.Log("⚙️ [CutSequenceController] 已配置 Cut 2 Prepare 入场弹窗 (Day2_ShaoA, 无条件弹出)");
             }
         }
 
@@ -131,14 +119,22 @@ public class CutSequenceController : MonoBehaviour
 
             Debug.Log($"✂️ 启动第 1 个 Cut 模块：{modules[0].name}");
 
-            // ⭐ 若 Cut 1 触发了入场打断弹窗（如 Day 2 居士微信），保持开场白视频在背景继续动态循环播放！
-            if (modules[0].IsInterrupted())
+            // 先确保 Cut 1 的 Prepare 循环（或主视频第 0 帧）已实际绘出，避免淡出开场白时黑屏闪帧
+            float waitReady = 0f;
+            while (!modules[0].IsMainFrameReady && waitReady < 4.5f)
             {
-                Debug.Log("🔔 [CutSequenceController] Cut 1 处于弹窗打断挂起状态，保持待机/开场白视频动态循环播放，直至弹窗关闭...");
+                waitReady += Time.unscaledDeltaTime;
+                yield return null;
+            }
+
+            // 兼容旧流程：仅当 Cut 1 未配置独立 Prep 循环视频且触发弹窗时，才用开场白视频垫底循环等待
+            if (modules[0].IsInterrupted() && !modules[0].HasPrepVideo)
+            {
+                Debug.Log("🔔 [CutSequenceController] Cut 1 未配置 Prep 视频，弹窗期间继续由开场白视频垫底循环，直至弹窗关闭...");
                 float interruptTimeout = 25f;
                 while (modules[0].IsInterrupted() && interruptTimeout > 0f)
                 {
-                    interruptTimeout -= Time.unscaledDeltaTime;
+                    interruptTimeout -= Time.deltaTime;
                     yield return null;
                 }
                 if (modules[0].IsInterrupted())
@@ -146,19 +142,10 @@ public class CutSequenceController : MonoBehaviour
                     Debug.LogWarning("⚠️ [CutSequenceController] Cut 1 打断等待超时 (25s)，强制解除打断！");
                     modules[0].ForceClearInterrupt();
                 }
-                Debug.Log("🔓 [CutSequenceController] 弹窗已关闭！开始平滑淡出待机视频，切入第 0 帧供玩家切割。");
-            }
-
-            // 确保 Cut 1 主视频第 0 帧已实际绘出后再淡出开场白遮罩
-            float waitReady = 0f;
-            while (!modules[0].IsMainFrameReady && waitReady < 1.5f)
-            {
-                waitReady += Time.unscaledDeltaTime;
-                yield return null;
             }
         }
 
-        // 弹窗关闭后（或未触发弹窗时），平滑淡出 BeforeStart Canvas 并停止其视频
+        // 平滑淡出 BeforeStart Canvas 并停止开场白视频，切入 Cut 1 Prepare 循环（及按需弹出的居士微信）
         if (beforeStart != null)
         {
             beforeStart.FadeOutAndUnlock(0.5f);
@@ -166,7 +153,7 @@ public class CutSequenceController : MonoBehaviour
             {
                 yield return null;
             }
-            Debug.Log("🎬 [CutSequenceController] 开场白已完全淡出，正式进入 Cut 1 切割阶段！");
+            Debug.Log("🎬 [CutSequenceController] 开场白已完全淡出，正式进入 Cut 1 Prepare 阶段！");
         }
 
     }
@@ -231,19 +218,128 @@ public class CutSequenceController : MonoBehaviour
         }
 
         // ------------------------------------------------
-        // 所有 Cut 全部完成（保留最后一帧直至黑屏/闭眼转场完全盖住）
+        // 所有 Cut 全部完成：播放 completeVideoClip 后切下一场景
         // ------------------------------------------------
 
         isAllComplete = true;
 
-
-
         Debug.Log("🏁 所有 CutModules 完成");
 
+        StartCoroutine(PlayCompleteVideoThenAdvanceRoutine(module));
 
+    }
+
+    private IEnumerator PlayCompleteVideoThenAdvanceRoutine(CutModule lastModule)
+    {
+        if (completeVideoClip == null)
+        {
+            NotifyGlobalAdvance();
+            yield break;
+        }
+
+        runtimeCompleteCanvasObj = new GameObject("Canvas_CutComplete");
+        Canvas canvas = runtimeCompleteCanvasObj.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 500;
+
+        CanvasScaler scaler = runtimeCompleteCanvasObj.AddComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920f, 1080f);
+        scaler.matchWidthOrHeight = 0.5f;
+
+        GameObject rawGo = new GameObject("RawImage_CutComplete", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
+        rawGo.transform.SetParent(runtimeCompleteCanvasObj.transform, false);
+        RectTransform rt = rawGo.GetComponent<RectTransform>();
+        rt.anchorMin = Vector2.zero;
+        rt.anchorMax = Vector2.one;
+        rt.offsetMin = Vector2.zero;
+        rt.offsetMax = Vector2.zero;
+
+        RawImage rawImg = rawGo.GetComponent<RawImage>();
+        rawImg.color = Color.white;
+        rawImg.raycastTarget = false;
+        rawImg.enabled = false;
+
+        runtimeCompleteRT = new RenderTexture(1920, 1080, 0, RenderTextureFormat.ARGB32)
+        {
+            name = "RT_CutComplete",
+            hideFlags = HideFlags.DontSave
+        };
+        runtimeCompleteRT.Create();
+        rawImg.texture = runtimeCompleteRT;
+
+        VideoPlayer vp = runtimeCompleteCanvasObj.AddComponent<VideoPlayer>();
+        vp.playOnAwake = false;
+        vp.isLooping = false;
+        vp.renderMode = VideoRenderMode.RenderTexture;
+        vp.aspectRatio = VideoAspectRatio.FitInside;
+        vp.audioOutputMode = VideoAudioOutputMode.Direct;
+        vp.targetTexture = runtimeCompleteRT;
+        vp.clip = completeVideoClip;
+
+        vp.Prepare();
+        float prepTimeout = 2.5f;
+        while (!vp.isPrepared && prepTimeout > 0f)
+        {
+            prepTimeout -= Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        bool finished = false;
+        VideoPlayer.EventHandler endHandler = (player) => { finished = true; };
+        vp.loopPointReached += endHandler;
+
+        vp.time = 0;
+        vp.Play();
+
+        float firstFrameTimeout = 0.4f;
+        while (vp.frame < 0 && firstFrameTimeout > 0f)
+        {
+            firstFrameTimeout -= Time.unscaledDeltaTime;
+            yield return null;
+        }
+        yield return new WaitForEndOfFrame();
+
+        rawImg.enabled = true;
+        yield return new WaitForEndOfFrame();
+
+        // 确认 Complete 视频首帧已铺满画面后，再彻底释放最后一个 Cut 模块，避免切换闪黑
+        if (lastModule != null)
+        {
+            lastModule.ReleaseResources();
+            lastModule.gameObject.SetActive(false);
+        }
+
+        float clipLen = vp.length > 0.1 ? (float)vp.length : (float)completeVideoClip.length;
+        float maxWait = clipLen > 0.1f ? clipLen + 2f : 12f;
+        float elapsed = 0f;
+
+        while (!finished && elapsed < maxWait)
+        {
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        vp.loopPointReached -= endHandler;
+        vp.Pause();
 
         NotifyGlobalAdvance();
+    }
 
+    private void OnDestroy()
+    {
+        if (runtimeCompleteCanvasObj != null)
+        {
+            Destroy(runtimeCompleteCanvasObj);
+            runtimeCompleteCanvasObj = null;
+        }
+
+        if (runtimeCompleteRT != null)
+        {
+            runtimeCompleteRT.Release();
+            Destroy(runtimeCompleteRT);
+            runtimeCompleteRT = null;
+        }
     }
 
     private IEnumerator HandoffToNextModuleRoutine(CutModule previousModule, CutModule nextModule)
@@ -259,7 +355,7 @@ public class CutSequenceController : MonoBehaviour
         nextModule.Initialize(this);
 
         float waitReady = 0f;
-        while (!nextModule.IsMainFrameReady && waitReady < 2f)
+        while (!nextModule.IsMainFrameReady && waitReady < 4.0f)
         {
             waitReady += Time.unscaledDeltaTime;
             yield return null;

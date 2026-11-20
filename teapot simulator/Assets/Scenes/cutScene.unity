@@ -918,7 +918,7 @@ PrefabInstance:
       objectReference: {fileID: 1872015921}
     - target: {fileID: 5131923561969355875, guid: 7fc1924702af245c89c5e75272d11f4e, type: 3}
       propertyPath: autoStartMaxWaitSeconds
-      value: 5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5131923561969355875, guid: 7fc1924702af245c89c5e75272d11f4e, type: 3}
       propertyPath: disableObjects.Array.size
@@ -931,7 +931,7 @@ PrefabInstance:
     - target: {fileID: 8161090822426689033, guid: 7fc1924702af245c89c5e75272d11f4e, type: 3}
       propertyPath: m_VideoClip
       value: 
-      objectReference: {fileID: 32900000, guid: 99756b54b8cf74b7284d6e990dda0046, type: 3}
+      objectReference: {fileID: 32900000, guid: 08b9d20d49e0371489bfdfb72d4adf5f, type: 3}
     - target: {fileID: 8161090822426689033, guid: 7fc1924702af245c89c5e75272d11f4e, type: 3}
       propertyPath: m_ControlledAudioTrackCount
       value: 1
@@ -1285,6 +1285,7 @@ MonoBehaviour:
   - {fileID: 1120874372}
   autoConfigureDay2Popups: 1
   debugSimulateLikeU: 0
+  completeVideoClip: {fileID: 0}
   isAllComplete: 0
 --- !u!1 &724940244
 GameObject:
@@ -2335,6 +2336,10 @@ PrefabInstance:
       propertyPath: m_SortingOrder
       value: 61
       objectReference: {fileID: 0}
+    - target: {fileID: 6464360418085281186, guid: 8a636ed348f854c5a8b272f557ad3b7e, type: 3}
+      propertyPath: prepVideoClip
+      value: 
+      objectReference: {fileID: 32900000, guid: 954d13b4769f5274d8fe1df9e340abfe, type: 3}
     m_RemovedComponents:
     - {fileID: 2095847594166689305, guid: 8a636ed348f854c5a8b272f557ad3b7e, type: 3}
     m_RemovedGameObjects: []
@@ -3567,6 +3572,10 @@ PrefabInstance:
       value: -0.42
       objectReference: {fileID: 0}
     - target: {fileID: 991734360592324433, guid: 8a636ed348f854c5a8b272f557ad3b7e, type: 3}
+      propertyPath: m_VideoClip
+      value: 
+      objectReference: {fileID: 32900000, guid: 37c34db74c6ce134d992ced43c0d54c3, type: 3}
+    - target: {fileID: 991734360592324433, guid: 8a636ed348f854c5a8b272f557ad3b7e, type: 3}
       propertyPath: m_AspectRatio
       value: 2
       objectReference: {fileID: 0}
@@ -3820,7 +3829,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6464360418085281186, guid: 8a636ed348f854c5a8b272f557ad3b7e, type: 3}
       propertyPath: transitionDuration
-      value: 11
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6464360418085281186, guid: 8a636ed348f854c5a8b272f557ad3b7e, type: 3}
       propertyPath: trailAlphaThreshold
@@ -3866,6 +3875,10 @@ PrefabInstance:
       propertyPath: m_SortingOrder
       value: 40
       objectReference: {fileID: 0}
+    - target: {fileID: 6464360418085281186, guid: 8a636ed348f854c5a8b272f557ad3b7e, type: 3}
+      propertyPath: prepVideoClip
+      value: 
+      objectReference: {fileID: 32900000, guid: 4c9ba8a29972e4b48aaf89b9772fabcb, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 4270225784748541783, guid: 8a636ed348f854c5a8b272f557ad3b7e, type: 3}

@@ -20,6 +20,7 @@ public class PatModuleUI : MonoBehaviour
     private bool stackBuilt = false;
     private bool completedHidden = false;
     private bool inactiveHidden = false;
+    private bool popupHidden = false;
     private int lastHits = -1;
 
     private void Awake()
@@ -59,6 +60,7 @@ public class PatModuleUI : MonoBehaviour
                 ui.HideOnComplete();   // alpha = 0
                 completedHidden = true;
                 inactiveHidden = false;
+                popupHidden = false;
             }
             return;
         }
@@ -69,6 +71,7 @@ public class PatModuleUI : MonoBehaviour
             {
                 ui.SetInactive();
                 inactiveHidden = true;
+                popupHidden = false;
                 stackBuilt = false;
                 lastHits = -1;
             }
@@ -76,6 +79,23 @@ public class PatModuleUI : MonoBehaviour
         }
 
         inactiveHidden = false;
+
+        // ===================== 弹窗期间隐藏交互 UI =====================
+        bool popupShowing = module.IsInterrupted
+                            || (PopupManager.ExistingInstance != null && PopupManager.ExistingInstance.HasActivePopup);
+        if (popupShowing)
+        {
+            if (!popupHidden)
+            {
+                ui.SetInactive();
+                popupHidden = true;
+                stackBuilt = false;
+                lastHits = -1;
+            }
+            return;
+        }
+
+        popupHidden = false;
 
         // ===================== Dim 状态 =====================
         if (failShowing || transitionShowing || inTransition)

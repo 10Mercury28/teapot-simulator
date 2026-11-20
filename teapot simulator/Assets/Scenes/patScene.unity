@@ -1969,7 +1969,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4368502024732009333, guid: 34b5fc89c14922d458d20635ffcadc6b, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -709.9992
+      value: -710
       objectReference: {fileID: 0}
     - target: {fileID: 5837940533610859689, guid: 34b5fc89c14922d458d20635ffcadc6b, type: 3}
       propertyPath: m_Name
@@ -2318,7 +2318,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1178992295488728546, guid: f103c3256903f4ca985ab07c177da7ab, type: 3}
       propertyPath: idleDelay
-      value: 20
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 1178992295488728546, guid: f103c3256903f4ca985ab07c177da7ab, type: 3}
       propertyPath: blinkParent

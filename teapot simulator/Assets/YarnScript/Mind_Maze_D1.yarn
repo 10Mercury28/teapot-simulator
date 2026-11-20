@@ -16,6 +16,11 @@ position: 12,12
 <<declare $MindW5 = 0>>
 ===
 
+title: MindMaze_OpenScene
+---
+this is a placeholder needed to be replaced.
+===
+
 title: MindMaze_Start
 ---
 // 失败：强制进入第五段

@@ -33,12 +33,20 @@ public class CutModule : MonoBehaviour
     public VideoPlayer videoB;          // 失败视频
     public VideoPlayer transition;      // 转场视频
 
+    [Header("待机准备循环视频 (Prep Loop)")]
+    [Tooltip("可交互待机阶段循环播放的准备视频（如 cut prepare 1 / cut prepare 2）；留空则沿用主视频第 0 帧静止待机")]
+    public VideoClip prepVideoClip;
+    [Tooltip("可选：手动指定 Prep VideoPlayer；留空时若配了 prepVideoClip 会自动在运行时创建")]
+    public VideoPlayer prepVideo;
+    [Tooltip("可选：手动指定 Prep RawImage；留空时会自动在 rawA 同级创建对齐的全屏 RawImage")]
+    public RawImage rawPrep;
+
     [Header("转场视频时长控制")]
     [Tooltip("转场视频播放时长（秒）。设置比如 3.5 秒。0 表示等原视频全部播完。")]
     public float transitionDuration = 3.5f;
 
     [Tooltip("允许玩家在播放转场视频期间点击鼠标提前跳过直接进入下一个 Cut")]
-    public bool allowSkipTransitionOnClick = true;
+    public bool allowSkipTransitionOnClick = false;
 
     public RawImage rawA;
     public RawImage rawB;
@@ -48,6 +56,12 @@ public class CutModule : MonoBehaviour
     private VideoController ctrlB;
     private VideoController ctrlTrans;
     private VideoController ctrlComplete;
+    private VideoController ctrlPrep;
+    private RenderTexture runtimePrepRT;
+    private bool createdRuntimePrepVP = false;
+    private bool createdRuntimePrepRaw = false;
+    private bool mainFirstFrameRendered = false;
+    private Coroutine pendingShowMainRoutine = null;
 
 
     // ============================================================
@@ -113,6 +127,7 @@ public class CutModule : MonoBehaviour
 
     public bool complete => currentState == ModuleState.Done;
     public bool IsMainFrameReady { get; private set; }
+    public bool HasPrepVideo => prepVideoClip != null || (prepVideo != null && (prepVideo.clip != null || !string.IsNullOrEmpty(prepVideo.url)));
 
 
     // ============================================================
@@ -166,6 +181,7 @@ public class CutModule : MonoBehaviour
     private CutSequenceController controller;
 
     private float currentRegionsAlpha = 1f;
+    private bool regionsVisible = false;
 
     private readonly List<Graphic> graphics = new();
     private readonly List<SpriteRenderer> sprites = new();
@@ -180,19 +196,35 @@ public class CutModule : MonoBehaviour
     {
         controller = ctrl;
         IsMainFrameReady = false;
+        mainFirstFrameRendered = false;
+        if (pendingShowMainRoutine != null)
+        {
+            StopCoroutine(pendingShowMainRoutine);
+            pendingShowMainRoutine = null;
+        }
 
         if (debugLog) Debug.Log($"✂️ [{name}] CutModule 初始化启动");
 
         // 1. 缓存引导条图形并提升 SortingOrder 确保浮在全屏视频 Canvas 上
         CacheAlphaTargets();
 
-        // 2. 绑定 VideoController
+        // 2. 自动装配运行时 Prep 视频播放器与显示层（若配置了 prepVideoClip）
+        EnsurePrepVideoSetup();
+
+        // 3. 确保所有 VideoPlayer 的 RenderTexture 已创建并正确绑定到对应的 RawImage
+        EnsureVideoRenderTexture(videoA, rawA);
+        EnsureVideoRenderTexture(videoB, rawB);
+        EnsureVideoRenderTexture(transition, rawTrans);
+        EnsureVideoRenderTexture(prepVideo, rawPrep);
+
+        // 4. 绑定 VideoController
         ctrlA = VideoController.GetOrCreate(videoA);
         ctrlB = VideoController.GetOrCreate(videoB);
         ctrlTrans = VideoController.GetOrCreate(transition);
         ctrlComplete = VideoController.GetOrCreate(completeVideo);
+        ctrlPrep = VideoController.GetOrCreate(prepVideo);
 
-        // 3. 初始隐藏 Complete 与转场
+        // 5. 初始隐藏 Complete 与转场
         if (completeRoot != null) completeRoot.SetActive(false);
         if (completeVideo != null)
         {
@@ -206,11 +238,94 @@ public class CutModule : MonoBehaviour
             transition.isLooping = false;
         }
 
-        // 4. ⭐ 若配置了入场弹窗打断，立即拉起弹窗并置 isInterrupted = true（使背景待机/开场白视频继续动态播放）
-        CheckAndTriggerEnterInterrupt();
-
-        // 5. 准备主视频并建立第 0 帧（先准备好第 0 帧再打开 rawA，避免模块切换时漏底）
+        // 6. 先准备主视频第 0 帧与待机 Prep 循环视频，首帧就绪并切入待机后再按需弹入场弹窗
         StartCoroutine(SetupMainVideoInitialFrame());
+    }
+
+    private static void EnsureVideoRenderTexture(VideoPlayer vp, RawImage raw)
+    {
+        if (vp == null) return;
+        if (vp.targetTexture != null)
+        {
+            if (!vp.targetTexture.IsCreated())
+            {
+                vp.targetTexture.Create();
+            }
+            if (raw != null && raw.texture != vp.targetTexture)
+            {
+                raw.texture = vp.targetTexture;
+            }
+        }
+    }
+
+    private bool HasValidPrepSource()
+    {
+        return prepVideo != null && rawPrep != null && (prepVideo.clip != null || !string.IsNullOrEmpty(prepVideo.url));
+    }
+
+    private void EnsurePrepVideoSetup()
+    {
+        if (prepVideo == null && prepVideoClip != null)
+        {
+            GameObject vpGo = new GameObject("VP_Prep");
+            vpGo.transform.SetParent(transform, false);
+
+            prepVideo = vpGo.AddComponent<VideoPlayer>();
+            prepVideo.playOnAwake = false;
+            prepVideo.isLooping = true;
+            prepVideo.renderMode = VideoRenderMode.RenderTexture;
+            prepVideo.aspectRatio = VideoAspectRatio.FitInside;
+            prepVideo.audioOutputMode = VideoAudioOutputMode.Direct;
+            prepVideo.clip = prepVideoClip;
+
+            if (runtimePrepRT == null)
+            {
+                runtimePrepRT = new RenderTexture(1920, 1080, 0, RenderTextureFormat.ARGB32)
+                {
+                    name = $"RT_CutPrep_{name}",
+                    hideFlags = HideFlags.DontSave
+                };
+                runtimePrepRT.Create();
+            }
+
+            prepVideo.targetTexture = runtimePrepRT;
+            createdRuntimePrepVP = true;
+        }
+        else if (prepVideo != null && prepVideoClip != null && prepVideo.clip == null)
+        {
+            prepVideo.clip = prepVideoClip;
+        }
+
+        if (rawPrep == null && prepVideo != null && rawA != null)
+        {
+            GameObject rawGo = new GameObject("prep", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
+            rawGo.transform.SetParent(rawA.transform.parent, false);
+            rawGo.transform.SetSiblingIndex(rawA.transform.GetSiblingIndex());
+
+            RectTransform srcRt = rawA.rectTransform;
+            RectTransform dstRt = rawGo.GetComponent<RectTransform>();
+            dstRt.anchorMin = srcRt.anchorMin;
+            dstRt.anchorMax = srcRt.anchorMax;
+            dstRt.anchoredPosition = srcRt.anchoredPosition;
+            dstRt.sizeDelta = srcRt.sizeDelta;
+            dstRt.pivot = srcRt.pivot;
+            dstRt.localRotation = srcRt.localRotation;
+            dstRt.localScale = srcRt.localScale;
+            dstRt.localPosition = srcRt.localPosition;
+
+            rawPrep = rawGo.GetComponent<RawImage>();
+            rawPrep.color = Color.white;
+            rawPrep.raycastTarget = false;
+            rawPrep.uvRect = rawA.uvRect;
+            rawPrep.texture = prepVideo.targetTexture;
+            rawPrep.enabled = false;
+            createdRuntimePrepRaw = true;
+        }
+
+        if (prepVideo != null && rawPrep != null && prepVideo.targetTexture != null)
+        {
+            rawPrep.texture = prepVideo.targetTexture;
+        }
     }
 
     private IEnumerator SetupMainVideoInitialFrame()
@@ -237,13 +352,39 @@ public class CutModule : MonoBehaviour
                 Debug.LogWarning($"⚠️ [{name}] 主视频 Prepare 超时，继续流程避免卡死");
             }
 
-            // 强制渲染一次首帧到 RenderTexture
-            yield return StartCoroutine(RenderFirstFrame(videoA));
+            // 强制渲染一次首帧到 RenderTexture，确保开始切割瞬间切换零黑帧
+            yield return StartCoroutine(RenderFirstFrame(videoA, false));
         }
 
-        EnableOnly(rawA);
-        SetRegionsActive(!isInterrupted);
-        ApplyRegionsAlpha(idleAlpha);
+        if (HasValidPrepSource())
+        {
+            if (!prepVideo.enabled) prepVideo.enabled = true;
+            prepVideo.isLooping = true;
+
+            if (!prepVideo.isPrepared)
+            {
+                bool prepReady = false;
+                ctrlPrep?.PrepareNow(() => prepReady = true);
+
+                float prepTimeout = 2.5f;
+                while (!prepReady && prepTimeout > 0f)
+                {
+                    prepTimeout -= Time.unscaledDeltaTime;
+                    yield return null;
+                }
+            }
+
+            EnsureVideoRenderTexture(prepVideo, rawPrep);
+            prepVideo.time = 0;
+            prepVideo.Play();
+            yield return StartCoroutine(WaitForVideoFirstFrame(prepVideo, 0.6f));
+            EnableOnly(rawPrep);
+        }
+        else
+        {
+            EnsureVideoRenderTexture(videoA, rawA);
+            EnableOnly(rawA);
+        }
 
         progress = 0f;
         inB = false;
@@ -251,37 +392,119 @@ public class CutModule : MonoBehaviour
         currentState = ModuleState.Idle;
         IsMainFrameReady = true;
 
-        if (debugLog) Debug.Log($"🎬 [{name}] Cut 主视频第 0 帧准备完毕，进入 Idle 等待切割");
+        // 进入 Prepare 后再拉起入场打断弹窗（例如 Cut 1 居士微信 / Cut 2 老师微信）
+        CheckAndTriggerEnterInterrupt();
+
+        SetRegionsActive(!ShouldHideInteractiveUI());
+        ApplyRegionsAlpha(idleAlpha);
+
+        if (debugLog) Debug.Log($"🎬 [{name}] Cut 进入 Idle 等待切割 (Prep循环={HasValidPrepSource()}, 弹窗挂起={isInterrupted})");
     }
 
-    private IEnumerator RenderFirstFrame(VideoPlayer vp)
+    private IEnumerator RenderFirstFrame(VideoPlayer vp, bool forceSeekToZero = false)
     {
         if (vp == null) yield break;
         if (!vp.enabled) vp.enabled = true;
-        vp.time = 0;
+        if (vp.targetTexture != null && !vp.targetTexture.IsCreated())
+        {
+            vp.targetTexture.Create();
+        }
+        if (vp.canSetPlaybackSpeed) vp.playbackSpeed = 1f;
+        vp.isLooping = false;
+
+        bool needSeek = forceSeekToZero || vp.time > 0.05 || vp.frame > 0;
+        int renderedFrames = 0;
+        bool seekDone = !needSeek;
+        VideoPlayer.FrameReadyEventHandler onFrame = (player, idx) =>
+        {
+            if (seekDone) renderedFrames++;
+        };
+        VideoPlayer.EventHandler onSeek = (player) => { seekDone = true; };
+
+        bool prevSendEvents = vp.sendFrameReadyEvents;
+        vp.sendFrameReadyEvents = true;
+        vp.frameReady += onFrame;
+        if (needSeek) vp.seekCompleted += onSeek;
+
+        if (needSeek)
+        {
+            vp.time = 0;
+        }
         vp.Play();
-        yield return StartCoroutine(WaitForVideoFirstFrame(vp, 0.4f));
-        vp.Pause();
+
+        float timeout = 1.4f;
+        while (timeout > 0f && !(seekDone && renderedFrames >= 4))
+        {
+            if (!seekDone && timeout < 0.7f)
+            {
+                seekDone = true;
+            }
+            timeout -= Time.unscaledDeltaTime;
+            yield return null;
+        }
+        yield return new WaitForEndOfFrame();
+
+        if (vp != null)
+        {
+            vp.frameReady -= onFrame;
+            if (needSeek) vp.seekCompleted -= onSeek;
+            vp.sendFrameReadyEvents = prevSendEvents;
+            vp.Pause();
+            bool gotFrame = renderedFrames >= 1;
+            if (vp == videoA)
+            {
+                mainFirstFrameRendered = gotFrame;
+            }
+            if (debugLog)
+            {
+                Debug.Log($"🎞️ [{name}] {vp.name} 首帧渲染{(gotFrame ? "成功" : "超时")} (frames={renderedFrames}, frame={vp.frame}, time={vp.time:F2}s, RT={vp.targetTexture?.name}, created={vp.targetTexture?.IsCreated()})");
+            }
+        }
     }
 
-    private static IEnumerator WaitForVideoFirstFrame(VideoPlayer vp, float timeoutSeconds = 0.4f, long previousFrame = long.MinValue)
+    private static IEnumerator WaitForVideoFirstFrame(VideoPlayer vp, float timeoutSeconds = 0.6f, long previousFrame = long.MinValue)
     {
         if (vp == null) yield break;
+
+        bool gotFrame = false;
         float t = 0f;
-        while (t < timeoutSeconds)
+        long targetMinFrame = previousFrame;
+        VideoPlayer.FrameReadyEventHandler onFrame = (player, idx) =>
         {
-            if (vp.frame >= 0 && (previousFrame == long.MinValue || vp.frame != previousFrame || t > 0.05f))
-                break;
+            if (targetMinFrame == long.MinValue || idx != targetMinFrame || t > 0.1f)
+            {
+                gotFrame = true;
+            }
+        };
+
+        bool prevSendEvents = vp.sendFrameReadyEvents;
+        vp.sendFrameReadyEvents = true;
+        vp.frameReady += onFrame;
+
+        while (t < timeoutSeconds && !gotFrame)
+        {
             t += Time.unscaledDeltaTime;
             yield return null;
         }
         yield return new WaitForEndOfFrame();
+
+        if (vp != null)
+        {
+            vp.frameReady -= onFrame;
+            vp.sendFrameReadyEvents = prevSendEvents;
+        }
     }
 
 
     // ============================================================
     // UPDATE 状态机驱动
     // ============================================================
+
+    private bool ShouldHideInteractiveUI()
+    {
+        bool popupShowing = PopupManager.ExistingInstance != null && PopupManager.ExistingInstance.HasActivePopup;
+        return isInterrupted || popupShowing;
+    }
 
     private void Update()
     {
@@ -294,6 +517,13 @@ public class CutModule : MonoBehaviour
             return;
         }
 
+        if (Time.timeScale <= 0f)
+        {
+            return;
+        }
+
+        bool hideInteractive = ShouldHideInteractiveUI();
+
         if (mainCamera == null)
         {
             mainCamera = Camera.main;
@@ -305,10 +535,17 @@ public class CutModule : MonoBehaviour
         switch (currentState)
         {
             case ModuleState.Idle:
-                // 弹窗打断挂起中，锁定切割输入
-                if (isInterrupted)
+                // 任何弹窗显示或入场挂起期间：隐藏当前交互引导条并锁定切割输入
+                if (hideInteractive)
                 {
+                    if (regionsVisible) SetRegionsActive(false);
                     return;
+                }
+
+                if (!regionsVisible)
+                {
+                    SetRegionsActive(true);
+                    ApplyRegionsAlpha(idleAlpha);
                 }
 
                 if (Input.GetMouseButtonDown(0) && IsInside(mouseWorld, areaA))
@@ -324,6 +561,20 @@ public class CutModule : MonoBehaviour
                 break;
 
             case ModuleState.Cutting:
+                if (hideInteractive)
+                {
+                    if (regionsVisible) SetRegionsActive(false);
+                    if (activeTrail != null && activeTrail.gameObject.activeSelf)
+                        activeTrail.gameObject.SetActive(false);
+                    return;
+                }
+
+                if (!regionsVisible)
+                {
+                    SetRegionsActive(true);
+                    ApplyRegionsAlpha(mainAlpha);
+                }
+
                 HandleCuttingInput(mouseWorld);
                 break;
         }
@@ -340,6 +591,27 @@ public class CutModule : MonoBehaviour
         inB = false;
         hasReachedEnd = false;
         progress = 0f;
+
+        if (pendingShowMainRoutine != null)
+        {
+            StopCoroutine(pendingShowMainRoutine);
+            pendingShowMainRoutine = null;
+        }
+
+        EnsureVideoRenderTexture(videoA, rawA);
+
+        if (videoA != null)
+        {
+            pendingShowMainRoutine = StartCoroutine(EnsureMainVideoVisibleDuringCut());
+        }
+        else
+        {
+            if (prepVideo != null && prepVideo.isPlaying)
+            {
+                prepVideo.Pause();
+            }
+            EnableOnly(rawA);
+        }
 
         if (trailPrefab != null && activeTrail == null)
         {
@@ -358,6 +630,85 @@ public class CutModule : MonoBehaviour
         }
 
         if (debugLog) Debug.Log($"✂️ [{name}] Cut started in A");
+    }
+
+    private IEnumerator EnsureMainVideoVisibleDuringCut()
+    {
+        if (videoA != null)
+        {
+            if (!videoA.enabled) videoA.enabled = true;
+            EnsureVideoRenderTexture(videoA, rawA);
+
+            if (!videoA.isPrepared)
+            {
+                videoA.Prepare();
+                float prepTimeout = 1.5f;
+                while (!videoA.isPrepared && prepTimeout > 0f && currentState == ModuleState.Cutting)
+                {
+                    prepTimeout -= Time.unscaledDeltaTime;
+                    yield return null;
+                }
+            }
+
+            if (currentState != ModuleState.Cutting)
+            {
+                pendingShowMainRoutine = null;
+                yield break;
+            }
+
+            int targetFrames = mainFirstFrameRendered ? 1 : 4;
+            int renderedFrames = 0;
+            VideoPlayer.FrameReadyEventHandler onFrame = (player, idx) => { renderedFrames++; };
+            bool prevSendEvents = videoA.sendFrameReadyEvents;
+            videoA.sendFrameReadyEvents = true;
+            videoA.frameReady += onFrame;
+
+            bool startedPlaybackOurselves = false;
+            if (!videoA.isPlaying && progress <= 0.01f)
+            {
+                if (videoA.canSetPlaybackSpeed) videoA.playbackSpeed = 1f;
+                if (!mainFirstFrameRendered && videoA.time > 0.25)
+                {
+                    videoA.time = 0;
+                }
+                videoA.Play();
+                startedPlaybackOurselves = true;
+            }
+
+            float waitTimeout = 0.8f;
+            while (renderedFrames < targetFrames && waitTimeout > 0f && currentState == ModuleState.Cutting)
+            {
+                waitTimeout -= Time.unscaledDeltaTime;
+                yield return null;
+            }
+            yield return new WaitForEndOfFrame();
+
+            if (videoA != null)
+            {
+                videoA.frameReady -= onFrame;
+                videoA.sendFrameReadyEvents = prevSendEvents;
+                if (startedPlaybackOurselves && progress <= 0.04f)
+                {
+                    videoA.Pause();
+                }
+                if (renderedFrames >= 1) mainFirstFrameRendered = true;
+            }
+        }
+
+        if (currentState == ModuleState.Cutting)
+        {
+            if (prepVideo != null && prepVideo.isPlaying)
+            {
+                prepVideo.Pause();
+            }
+            EnableOnly(rawA);
+            if (rawA != null && rawA.enabled && enableAlphaControl)
+            {
+                ApplyRegionsAlpha(mainAlpha);
+            }
+        }
+
+        pendingShowMainRoutine = null;
     }
 
     private void HandleCuttingInput(Vector2 mouseWorld)
@@ -389,12 +740,16 @@ public class CutModule : MonoBehaviour
 
             if (reachedC)
             {
+                bool firstReach = !hasReachedEnd;
                 hasReachedEnd = true;
                 inB = true;
                 progress = 1f;
 
-                // 划到末尾显示切断帧
-                ScrubMainVideo(1f);
+                if (firstReach)
+                {
+                    // 划到末尾显示切断帧
+                    ScrubMainVideo(1f);
+                }
 
                 if (rawA != null && rawA.enabled && enableAlphaControl)
                 {
@@ -476,13 +831,7 @@ public class CutModule : MonoBehaviour
     {
         if (ctrlA != null)
         {
-            ctrlA.ScrubTo(p);
-        }
-        else if (videoA != null && videoA.isPrepared)
-        {
-            videoA.Pause();
-            videoA.time = videoA.length * Mathf.Clamp01(p);
-            videoA.StepForward();
+            ctrlA.ScrubTo(p, false);
         }
     }
 
@@ -493,6 +842,12 @@ public class CutModule : MonoBehaviour
 
     private void TriggerFail()
     {
+        if (pendingShowMainRoutine != null)
+        {
+            StopCoroutine(pendingShowMainRoutine);
+            pendingShowMainRoutine = null;
+        }
+        ctrlA?.CancelScrub();
         currentState = ModuleState.Failed;
         if (debugLog) Debug.Log($"💥 [{name}] 切割失败，开始播放失败视频");
         StartCoroutine(FailRoutine());
@@ -500,9 +855,12 @@ public class CutModule : MonoBehaviour
 
     private IEnumerator FailRoutine()
     {
+        ctrlA?.CancelScrub();
+
         if (videoB != null)
         {
             if (!videoB.enabled) videoB.enabled = true;
+            EnsureVideoRenderTexture(videoB, rawB);
 
             if (!videoB.isPrepared)
             {
@@ -524,7 +882,7 @@ public class CutModule : MonoBehaviour
             videoB.time = startTime;
             videoB.Play();
 
-            yield return StartCoroutine(WaitForVideoFirstFrame(videoB, 0.35f, prevFrame));
+            yield return StartCoroutine(WaitForVideoFirstFrame(videoB, 0.6f, prevFrame));
             EnableOnly(rawB);
 
             float maxFailDuration = Mathf.Max(0.5f, (float)(videoB.length - startTime) + 0.2f);
@@ -545,17 +903,32 @@ public class CutModule : MonoBehaviour
         // ⭐ 彻底重置并强制刷新 videoA 回到第 0 帧
         if (videoA != null)
         {
-            yield return StartCoroutine(RenderFirstFrame(videoA));
+            yield return StartCoroutine(RenderFirstFrame(videoA, true));
         }
 
-        // 返回 RawA
-        EnableOnly(rawA);
+        // 若配置了 Prep 循环视频，失败后切回持续动态的 Prep 待机循环；否则返回静止的 RawA
+        if (HasValidPrepSource())
+        {
+            if (!prepVideo.enabled) prepVideo.enabled = true;
+            EnsureVideoRenderTexture(prepVideo, rawPrep);
+            prepVideo.isLooping = true;
+            long prevPrepFrame = prepVideo.frame;
+            prepVideo.Play();
+            yield return StartCoroutine(WaitForVideoFirstFrame(prepVideo, 0.6f, prevPrepFrame));
+            EnableOnly(rawPrep);
+        }
+        else
+        {
+            EnsureVideoRenderTexture(videoA, rawA);
+            EnableOnly(rawA);
+        }
+
         if (videoB != null)
         {
             videoB.Stop();
             videoB.time = 0;
         }
-        SetRegionsActive(true);
+        SetRegionsActive(!ShouldHideInteractiveUI());
         ApplyRegionsAlpha(idleAlpha);
 
         if (activeTrail != null)
@@ -579,6 +952,12 @@ public class CutModule : MonoBehaviour
 
     private void TriggerSuccess()
     {
+        if (pendingShowMainRoutine != null)
+        {
+            StopCoroutine(pendingShowMainRoutine);
+            pendingShowMainRoutine = null;
+        }
+        ctrlA?.CancelScrub();
         currentState = ModuleState.Success;
         if (debugLog) Debug.Log($"🎉 [{name}] Cut 成功！");
         StartCoroutine(SuccessRoutine());
@@ -659,6 +1038,7 @@ public class CutModule : MonoBehaviour
     {
         if (vp == null) yield break;
 
+        EnsureVideoRenderTexture(vp, vp == transition ? rawTrans : null);
         vp.isLooping = false;
         vp.playOnAwake = false;
 
@@ -676,7 +1056,7 @@ public class CutModule : MonoBehaviour
         long prevFrame = vp.frame;
         vp.time = 0;
         vp.Play();
-        yield return StartCoroutine(WaitForVideoFirstFrame(vp, 0.35f, prevFrame));
+        yield return StartCoroutine(WaitForVideoFirstFrame(vp, 0.6f, prevFrame));
         onFirstFrameRendered?.Invoke();
 
         bool finished = false;
@@ -710,14 +1090,23 @@ public class CutModule : MonoBehaviour
     }
 
     /// <summary>
-    /// 仅释放主视频与失败视频的解码器资源（转场阶段交接时先释放前序视频，减轻 macOS 并发解码压力）
+    /// 仅释放主视频、失败视频与待机 Prep 循环视频的解码器资源（转场阶段交接时先释放前序视频，减轻 macOS 并发解码压力）
     /// </summary>
     public void ReleaseMainAndFailVideos()
     {
+        if (pendingShowMainRoutine != null)
+        {
+            StopCoroutine(pendingShowMainRoutine);
+            pendingShowMainRoutine = null;
+        }
+        mainFirstFrameRendered = false;
+        ctrlA?.CancelScrub();
         ctrlA?.Release();
         ctrlB?.Release();
+        ctrlPrep?.Release();
         if (videoA != null) { videoA.Stop(); videoA.enabled = false; }
         if (videoB != null) { videoB.Stop(); videoB.enabled = false; }
+        if (prepVideo != null) { prepVideo.Stop(); prepVideo.enabled = false; }
     }
 
     /// <summary>
@@ -725,15 +1114,56 @@ public class CutModule : MonoBehaviour
     /// </summary>
     public void ReleaseResources()
     {
+        if (pendingShowMainRoutine != null)
+        {
+            StopCoroutine(pendingShowMainRoutine);
+            pendingShowMainRoutine = null;
+        }
+        mainFirstFrameRendered = false;
+        ctrlA?.CancelScrub();
         ctrlA?.Release();
         ctrlB?.Release();
         ctrlTrans?.Release();
         ctrlComplete?.Release();
+        ctrlPrep?.Release();
 
         if (videoA != null) { videoA.Stop(); videoA.enabled = false; }
         if (videoB != null) { videoB.Stop(); videoB.enabled = false; }
         if (transition != null) { transition.Stop(); transition.enabled = false; }
         if (completeVideo != null) { completeVideo.Stop(); completeVideo.enabled = false; }
+
+        if (prepVideo != null)
+        {
+            prepVideo.Stop();
+            prepVideo.enabled = false;
+            if (createdRuntimePrepVP) prepVideo.targetTexture = null;
+        }
+
+        if (rawPrep != null)
+        {
+            rawPrep.texture = null;
+            rawPrep.enabled = false;
+            if (createdRuntimePrepRaw)
+            {
+                Destroy(rawPrep.gameObject);
+                rawPrep = null;
+                createdRuntimePrepRaw = false;
+            }
+        }
+
+        if (createdRuntimePrepVP && prepVideo != null)
+        {
+            Destroy(prepVideo.gameObject);
+            prepVideo = null;
+            createdRuntimePrepVP = false;
+        }
+
+        if (runtimePrepRT != null)
+        {
+            runtimePrepRT.Release();
+            Destroy(runtimePrepRT);
+            runtimePrepRT = null;
+        }
     }
 
     // ============================================================
@@ -776,14 +1206,14 @@ public class CutModule : MonoBehaviour
                 Debug.LogWarning($"⚠️ [{name}] enableEnterInterrupt 为 true，但弹窗拉起失败，自动解除打断！");
                 PopupManager.Instance.OnPopupClosed -= HandlePopupClosed;
                 isInterrupted = false;
-                SetRegionsActive(true);
+                SetRegionsActive(!ShouldHideInteractiveUI());
             }
         }
         else
         {
             Debug.LogWarning($"⚠️ [{name}] 未找到 PopupManager 实例，无法拉起打断弹窗！");
             isInterrupted = false;
-            SetRegionsActive(true);
+            SetRegionsActive(!ShouldHideInteractiveUI());
         }
     }
 
@@ -797,8 +1227,9 @@ public class CutModule : MonoBehaviour
         if (!isInterrupted) return;
 
         isInterrupted = false;
-        SetRegionsActive(true);
-        ApplyRegionsAlpha(idleAlpha);
+        bool hide = ShouldHideInteractiveUI();
+        SetRegionsActive(!hide);
+        if (!hide) ApplyRegionsAlpha(idleAlpha);
         if (debugLog) Debug.Log($"🔓 [{name}] 弹窗已处理关闭，解除切壶打断，玩家现在可以开始切割！");
     }
 
@@ -810,6 +1241,7 @@ public class CutModule : MonoBehaviour
     {
         if (vp == null) yield break;
 
+        EnsureVideoRenderTexture(vp, vp == transition ? rawTrans : null);
         isTransitionInterrupted = true;
         hasTriggeredTransitionInterrupt = true;
 
@@ -830,7 +1262,7 @@ public class CutModule : MonoBehaviour
         long prevFrame = vp.frame;
         vp.time = 0;
         vp.Play();
-        yield return StartCoroutine(WaitForVideoFirstFrame(vp, 0.35f, prevFrame));
+        yield return StartCoroutine(WaitForVideoFirstFrame(vp, 0.6f, prevFrame));
         onFirstFrameRendered?.Invoke();
 
         if (debugLog) Debug.Log($"🎬 [{name}] 播放准备/转场视频，并保持播放直至弹窗结束: {vp.name}");
@@ -840,7 +1272,7 @@ public class CutModule : MonoBehaviour
 
         TriggerTransitionInterruptPopup();
 
-        // 核心挂起：等待弹窗完全关闭！
+        // 核心挂起：等待弹窗完全关闭（不再误把点击弹窗本身当成跳过转场）
         float interruptTimer = 0f;
         while (isTransitionInterrupted)
         {
@@ -851,17 +1283,8 @@ public class CutModule : MonoBehaviour
                 break;
             }
 
-            // 防御保护 2：允许玩家在转场视频播放 4 秒后点击屏幕提前跳过/推进
-            if (interruptTimer > 4f && Input.GetMouseButtonDown(0))
-            {
-                if (debugLog) Debug.Log($"⏩ [{name}] 玩家点击提前跳过转场弹窗打断");
-                if (PopupManager.ExistingInstance != null) PopupManager.ExistingInstance.CloseAll();
-                isTransitionInterrupted = false;
-                break;
-            }
-
-            // 防御保护 3：安全超时（25 秒），避免死锁
-            interruptTimer += Time.unscaledDeltaTime;
+            // 防御保护 2：安全超时（25 秒，受 PauseMenu TimeScale 冻结控制），避免死锁
+            interruptTimer += Time.deltaTime;
             if (interruptTimer > 25f)
             {
                 Debug.LogWarning($"⚠️ [{name}] 转场打断超时 (25s)，自动收起并进入下一 Cut");
@@ -1000,6 +1423,7 @@ public class CutModule : MonoBehaviour
         if (rawA != null) rawA.enabled = (active == rawA);
         if (rawB != null) rawB.enabled = (active == rawB);
         if (rawTrans != null) rawTrans.enabled = (active == rawTrans);
+        if (rawPrep != null) rawPrep.enabled = (active == rawPrep);
 
         if (activeTrail != null)
         {
@@ -1048,6 +1472,8 @@ public class CutModule : MonoBehaviour
 
     private void SetRegionsActive(bool on)
     {
+        regionsVisible = on;
+
         if (regionsRoot != null)
         {
             regionsRoot.SetActive(on);
