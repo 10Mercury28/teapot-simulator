@@ -16,7 +16,7 @@
                 },
                 {
                     "name": "yarn-variables",
-                    "pattern": "/\\$[a-zA-Z_][a-zA-Z0-9_]*/g"
+                    "pattern": "/\\$[\\p{L}\\p{M}_][\\p{L}\\p{M}\\p{N}_]*/gu"
                 },
                 {
                     "name": "yarn-markup",
@@ -24,7 +24,7 @@
                 },
                 {
                     "name": "yarn-hashtags",
-                    "pattern": "/#[a-zA-Z_][a-zA-Z0-9_:-]*/g"
+                    "pattern": "/#[\\p{L}\\p{M}_][\\p{L}\\p{M}\\p{N}_:-]*/gu"
                 },
                 {
                     "name": "yarn-node-markers",
@@ -36,7 +36,7 @@
                 },
                 {
                     "name": "yarn-character-names",
-                    "pattern": "/^\\s*[A-Za-z_][A-Za-z0-9_]*(?=:)/gm"
+                    "pattern": "/^\\s*[\\p{L}\\p{M}_][\\p{L}\\p{M}\\p{N}_]*(?=:)/gmu"
                 },
                 {
                     "name": "yarn-comments",
@@ -55,5 +55,18 @@
                 "yarn-comments"
             ]
         }
+    ],
+    "cSpell.ignorePaths": [
+        "package-lock.json",
+        "node_modules",
+        "vscode-extension",
+        ".git/{info,lfs,logs,refs,objects}/**",
+        ".git/{index,*refs,*HEAD}",
+        ".vscode",
+        ".vscode-insiders",
+        "**/*.yarnproject",
+        "**/*.ysls",
+        "**/*.ysls.json",
+        "**/*.debuginfo.json"
     ]
 }
