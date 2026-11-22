@@ -82,3 +82,5 @@ crashlytics-build.properties
 /teapot simulator/Assets/pat module.meta
 /teapot simulator/Assets/patDemoV.meta
 /teapot simulator/Assets/tool selection.meta
+teapot simulator/Packages/packages-lock.json
+teapot simulator/ProjectSettings/ProjectVersion.txt
