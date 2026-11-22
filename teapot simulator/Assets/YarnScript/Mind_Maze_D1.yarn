@@ -19,6 +19,7 @@ position: 12,12
 title: MindMaze_OpenScene
 ---
 this is a placeholder needed to be replaced.
+<<jump MindMaze_Start>>
 ===
 
 title: MindMaze_Start
@@ -106,6 +107,7 @@ title: MindMaze_Continue
 
 title: MindMaze_1
 ---
+<<mindmaze_roll_anim 1>>
 <<set_speakers "宝钗, 吕蒙, 柯湘">>
 // 第一段： 宝钗、吕蒙、柯湘 讨论角色本身对于想法不同的人的接受程度，成交成功解锁
 宝钗: 漫揾英雄泪，相离处士家。谢慈悲，剃度在莲台下。
@@ -164,11 +166,13 @@ title: MindMaze_1
 我: 那你呢，你回答我全部的问题吗？  
 (柯湘不说话了)
 <<set $MindDone1 to true>>
+<<mindmaze_reset_hands>>
 <<jump MindMaze_Continue>>
 ===
 
 title: MindMaze_2
 ---
+<<mindmaze_roll_anim 2>>
 <<set_speakers "柯湘, 吕蒙, 赫尔墨斯, 宝钗">>
 // 第二段:柯湘、吕蒙、赫尔墨斯、宝钗；交心解锁
 我: 我其实非常期待和您聊聊。
@@ -251,11 +255,13 @@ title: MindMaze_2
 // 注意保留“空是什么”的两个玩家选项。
 // 两条选择最终汇合到共同的结尾。
 <<set $MindDone2 to true>>
+<<mindmaze_reset_hands>>
 <<jump MindMaze_Continue>>
 ===
 
 title: MindMaze_3
 ---
+<<mindmaze_roll_anim 3>>
 <<set_speakers "MBTI, 伍尔夫, 宝钗">>
 // 第三段:MBTI、伍尔夫、宝钗；无条件解锁
 MBTI: 你是不是累了，需要休息吗宝？
@@ -285,11 +291,13 @@ MBTI: 你的教育只是给你这么一个让话不要掉在地上的机会了�
 宝钗: 几曾随逝水？
 宝钗: 岂必委芳尘？ 
 <<set $MindDone3 to true>>
+<<mindmaze_reset_hands>>
 <<jump MindMaze_Continue>>
 ===
 
 title: MindMaze_4
 ---
+<<mindmaze_roll_anim 4>>
 <<set_speakers "名妓, 比尔博, 赫尔墨斯, 伍尔夫, 宝钗, 柯湘">>
 // 第四段: 名妓、比尔博、赫尔墨斯等；无条件解锁
 名妓: 昔张岱得木龙，起丁丑诗社，恳诸公赐之名，并赋小言咏之。
@@ -410,12 +418,14 @@ title: MindMaze_4
 柯湘: （看着你）有些老掉牙的话，你听得都起了茧，眼下也没了重新讨论的土壤。
 柯湘: 若没有生活里的新观察，何必又让我从头讲？ 
 <<set $MindDone4 to true>>
+<<mindmaze_reset_hands>>
 <<jump MindMaze_Continue>>
 ===
 
 
 title: MindMaze_5
 ---
+<<mindmaze_roll_anim 5>>
 <<set_speakers "all">>
 我: 啊啊啊啊啊啊啊啊啊啊啊啊啊啊！
 “赫尔墨斯”: 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊！
@@ -544,11 +554,14 @@ MBTI: 作为你的一部分，你一难受，我也跟你不舒服啊，宝。
 我: 你俩有让天放晴的人脉吗？
 “赫尔墨斯”: 一蓑烟雨任平生罢！
 <<set $MindDone5 to true>>
+<<mindmaze_reset_hands>>
 <<jump MindMaze_End>>
 ===
 
 title: MindMaze_End
 ---
+<<mindmaze_reset_hands>>
+<<mindmaze_close_scene>>
 <<if $MindDone5>>
     <<load_scene "StudioDesk" "" 1>>
 <<else>>
