@@ -104,7 +104,7 @@ title: MindMaze_Continue
 <<endif>>
 
 -> 继续聊。
-    "我":还有哪些人今天召唤过我？ 
+    “我”:还有哪些人今天召唤过我？ 
     <<jump MindMaze_Roll>>
 -> 嗯……
     <<jump MindMaze_End>>

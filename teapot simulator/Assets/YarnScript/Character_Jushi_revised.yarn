@@ -463,7 +463,6 @@ title: FailEnd
 （居士温和地笑，自己翻看了一会册子。）
 居士: 我下次再来，先走了。为了我来这一趟，也耽误你不少事。
 // 游戏端事件：老师后来询问居士为何另外约她在店的时候过来。
-(弹窗设计：老师事后问你怎么招待的，怎么居士另外约她在的时间来。)
 <<hide_character "jushi">>
 <<set $JushiFailed to true>>
 <<show_popup_wait "Day1_fail">>

@@ -1082,7 +1082,6 @@ title: JushiD2_Order
 position: 265,2712
 ---
 <<hide_character "teacher">>
-我:【订单：古南街404室 → 宜兴陶都半岛酒店（原凯宾斯基）1314室；17:30取件，18:00送达；贵重物品。】
 <<show_popup_wait "BoorBash">>
 <<if $D2Finished>>
     <<stop>>
