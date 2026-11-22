@@ -39,7 +39,7 @@ public class MindMazeAnimationController : MonoBehaviour
     [System.Serializable]
     public class CharacterEntry
     {
-        [Tooltip("角色唯一 ID（如 BC, VW, MBTI, courtesan, kong, LM, Mercury, KX, zodiac, XZ, mirror, bilbo, hand）")]
+        [Tooltip("角色唯一 ID（如 BC, VW, MBTI, courtesan, kong, LM, Mercury, KX, zodiac, XZ, mirror, bilbo）")]
         public string id;
 
         [Tooltip("对白中的别名匹配（逗号隔开，如 '宝钗,BC,薛宝钗'）")]
@@ -90,11 +90,11 @@ public class MindMazeAnimationController : MonoBehaviour
         // 自动解析依赖组件
         ResolveDependencies();
 
-        // 智能防呆：若从预制体继承的 startNode 仍是 Day 2 的 JushiD2_GiftMenu，自动切到脑内迷宫起点 MindMaze_Start
+        // 智能防呆：若从预制体继承的 startNode 仍是 Day 2 的 JushiD2_GiftMenu，自动切到脑内迷宫起点 MindMaze_OpenScene
         if (dialogueRunner != null && (string.IsNullOrEmpty(dialogueRunner.startNode) || dialogueRunner.startNode == "JushiD2_GiftMenu"))
         {
-            dialogueRunner.startNode = "MindMaze_Start";
-            Debug.Log("🎭 [MindMazeAnimationController] 自动将 DialogueRunner.startNode 设定为 MindMaze_Start。");
+            dialogueRunner.startNode = "MindMaze_OpenScene";
+            Debug.Log("🎭 [MindMazeAnimationController] 自动将 DialogueRunner.startNode 设定为 MindMaze_OpenScene。");
         }
 
         // 若列表为空，自动从场景/子物体扫描装配
@@ -532,8 +532,7 @@ public class MindMazeAnimationController : MonoBehaviour
             ("zodiac", "zodiac,生肖", "zodiac", "zodiac_idle", "zodiac_talk"),
             ("XZ", "XZ,星座", "星座", "XZ_idle", "XZ_talk"),
             ("mirror", "mirror,镜子,奥斯卡,镜子中的“奥斯卡”", "mirror", "Mirror_Idle", "Mirror_Talk"),
-            ("bilbo", "bilbo,比尔博,“比尔博”", "bilbo", "Bilbo_idle", "Bilbo_talk"),
-            ("hand", "hand,手", "hand", "hand_idle", "hand_choose")
+            ("bilbo", "bilbo,比尔博,“比尔博”", "bilbo", "Bilbo_idle", "Bilbo_talk")
         };
 
         foreach (var item in defaultCatalog)
