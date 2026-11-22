@@ -122,6 +122,9 @@ public class PatModule : MonoBehaviour
         if (BeforeStartController.IsAnyBeforeStartBlocking)
             return;
 
+        if (IdleOverlay.IsAnyIdleOverlayBlocking)
+            return;
+
         if (Time.timeScale <= 0f)
             return;
 

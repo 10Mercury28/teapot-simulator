@@ -1,6 +1,9 @@
+using System.Collections;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.Video;
 
 /// <summary>
 /// 主菜单总控制器：管理 Main, NewGame, Archive, Settings 四个面板的显示与切换，
@@ -45,7 +48,25 @@ public class MainMenuController : MonoBehaviour
     [Tooltip("点击 StartGame 跳转的目标场景 Build Index（默认 1）")]
     public int startSceneBuildIndex = 1;
     [Tooltip("点击 StartGame 跳转的目标场景名（若 loadByIndex 为 false 时使用）")]
-    public string startSceneName = "begin";
+    public string startSceneName = "chooseToolBasedOnCut";
+
+    [Header("=== 开场动画 (Intro Cutscene) ===")]
+    [Tooltip("点击开始游戏后是否播放开场 Intro 视频（测试时可取消勾选一键跳过）")]
+    public bool playIntroCutscene = true;
+    [Tooltip("中文版 Intro 视频 (Assets/IntroCutscene/ch.mp4)")]
+    public VideoClip introVideoChinese;
+    [Tooltip("英文版 Intro 视频 (Assets/IntroCutscene/eng.mp4)")]
+    public VideoClip introVideoEnglish;
+    [Tooltip("Intro 播完后黑屏转场显示的字幕文字")]
+    public string firstDayBlackText = "第一天";
+    [Tooltip("英文模式下的黑屏字幕文字（留空则沿用 firstDayBlackText）")]
+    public string firstDayBlackTextEnglish = "Day 1";
+    [Tooltip("黑屏文字转场预制体（留空则由 SceneBlinkTransition 自动加载；挂上后打包版也能稳定生效）")]
+    public GameObject blackTextTransitionPrefab;
+
+    private bool isStartingGame = false;
+    private GameObject runtimeIntroCanvasObj;
+    private RenderTexture runtimeIntroRT;
 
     private void Awake()
     {
@@ -243,22 +264,190 @@ public class MainMenuController : MonoBehaviour
 
     public void StartGame()
     {
-        if (loadByIndex)
-        {
-            Debug.Log($"🚀 [MainMenu] 开始游戏，加载 Build Index [{startSceneBuildIndex}] 场景");
-            SceneManager.LoadScene(startSceneBuildIndex);
-        }
-        else
-        {
-            Debug.Log($"🚀 [MainMenu] 开始游戏，加载场景: {startSceneName}");
-            SceneManager.LoadScene(startSceneName);
-        }
+        string targetScene = ResolveTargetSceneName(startSceneBuildIndex);
+        BeginStartGameFlow(targetScene);
     }
 
     public void StartGameByIndex(int sceneIndex)
     {
-        Debug.Log($"🚀 [MainMenu] 开始游戏，加载 Build Index [{sceneIndex}] 场景");
-        SceneManager.LoadScene(sceneIndex);
+        string targetScene = ResolveSceneNameByBuildIndex(sceneIndex);
+        BeginStartGameFlow(targetScene);
+    }
+
+    private string ResolveTargetSceneName(int buildIndex)
+    {
+        if (loadByIndex)
+        {
+            return ResolveSceneNameByBuildIndex(buildIndex);
+        }
+        return !string.IsNullOrEmpty(startSceneName) ? startSceneName : "chooseToolBasedOnCut";
+    }
+
+    private string ResolveSceneNameByBuildIndex(int buildIndex)
+    {
+        string scenePath = SceneUtility.GetScenePathByBuildIndex(buildIndex);
+        if (!string.IsNullOrEmpty(scenePath))
+        {
+            string sceneName = Path.GetFileNameWithoutExtension(scenePath);
+            if (!string.IsNullOrEmpty(sceneName)) return sceneName;
+        }
+        return !string.IsNullOrEmpty(startSceneName) ? startSceneName : "chooseToolBasedOnCut";
+    }
+
+    private void BeginStartGameFlow(string targetSceneName)
+    {
+        if (isStartingGame) return;
+        isStartingGame = true;
+        StartCoroutine(StartGameFlowRoutine(targetSceneName));
+    }
+
+    private IEnumerator StartGameFlowRoutine(string targetSceneName)
+    {
+        bool isEnglish = OrientPearlLanguage.Current == 1;
+        VideoClip clip = (isEnglish && introVideoEnglish != null)
+            ? introVideoEnglish
+            : (introVideoChinese != null ? introVideoChinese : introVideoEnglish);
+        string blackText = (isEnglish && !string.IsNullOrEmpty(firstDayBlackTextEnglish))
+            ? firstDayBlackTextEnglish
+            : firstDayBlackText;
+
+        if (playIntroCutscene && clip != null)
+        {
+            Debug.Log($"🎬 [MainMenu] 开始播放全屏 Intro Cutscene: {clip.name} (禁止点击跳过)");
+            yield return StartCoroutine(PlayFullscreenIntroCutsceneRoutine(clip));
+        }
+
+        GlobalProgressManager global = GlobalProgressManager.EnsureInstance();
+        GlobalProgressManager.CurrentDay = 1;
+        GlobalProgressManager.IsLikeU = false;
+        GlobalProgressManager.JushiSuccess = false;
+        GlobalProgressManager.TalkedCicada = false;
+        global.currentOrder = 0;
+
+        SceneBlinkTransition trans = SceneBlinkTransition.EnsureInstance();
+        if (blackTextTransitionPrefab != null && trans.blackTextTransitionPrefab == null)
+        {
+            trans.blackTextTransitionPrefab = blackTextTransitionPrefab;
+        }
+
+        Debug.Log($"🚀 [MainMenu] Intro 完成，通过黑屏字幕 '{blackText}' 进入第一关: {targetSceneName}");
+        global.TransitionToScene(targetSceneName, blackText, 1);
+    }
+
+    private IEnumerator PlayFullscreenIntroCutsceneRoutine(VideoClip clip)
+    {
+        runtimeIntroCanvasObj = new GameObject("Canvas_IntroCutscene");
+        Canvas canvas = runtimeIntroCanvasObj.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 1500;
+
+        CanvasScaler scaler = runtimeIntroCanvasObj.AddComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920f, 1080f);
+        scaler.matchWidthOrHeight = 0.5f;
+
+        runtimeIntroCanvasObj.AddComponent<GraphicRaycaster>();
+
+        // 黑色衬底并拦截所有鼠标点击，确保播片期间无任何交互或误点按钮
+        GameObject backdropGo = new GameObject("IntroBackdrop", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        backdropGo.transform.SetParent(runtimeIntroCanvasObj.transform, false);
+        RectTransform backdropRt = backdropGo.GetComponent<RectTransform>();
+        backdropRt.anchorMin = Vector2.zero;
+        backdropRt.anchorMax = Vector2.one;
+        backdropRt.offsetMin = Vector2.zero;
+        backdropRt.offsetMax = Vector2.zero;
+        Image backdropImg = backdropGo.GetComponent<Image>();
+        backdropImg.color = Color.black;
+        backdropImg.raycastTarget = true;
+
+        GameObject rawGo = new GameObject("IntroVideoRaw", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
+        rawGo.transform.SetParent(runtimeIntroCanvasObj.transform, false);
+        RectTransform rawRt = rawGo.GetComponent<RectTransform>();
+        rawRt.anchorMin = Vector2.zero;
+        rawRt.anchorMax = Vector2.one;
+        rawRt.offsetMin = Vector2.zero;
+        rawRt.offsetMax = Vector2.zero;
+        RawImage rawImg = rawGo.GetComponent<RawImage>();
+        rawImg.color = Color.white;
+        rawImg.raycastTarget = false;
+        rawImg.enabled = false;
+
+        runtimeIntroRT = new RenderTexture(1920, 1080, 0, RenderTextureFormat.ARGB32)
+        {
+            name = "RT_MainMenuIntro",
+            hideFlags = HideFlags.DontSave
+        };
+        runtimeIntroRT.Create();
+        rawImg.texture = runtimeIntroRT;
+
+        VideoPlayer vp = runtimeIntroCanvasObj.AddComponent<VideoPlayer>();
+        vp.playOnAwake = false;
+        vp.isLooping = false;
+        vp.renderMode = VideoRenderMode.RenderTexture;
+        vp.aspectRatio = VideoAspectRatio.FitInside;
+        vp.audioOutputMode = VideoAudioOutputMode.Direct;
+        vp.targetTexture = runtimeIntroRT;
+        vp.clip = clip;
+
+        vp.Prepare();
+        float prepTimeout = 3.0f;
+        while (!vp.isPrepared && prepTimeout > 0f)
+        {
+            prepTimeout -= Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        bool finished = false;
+        bool gotFirstFrame = false;
+        VideoPlayer.EventHandler endHandler = (player) => { finished = true; };
+        VideoPlayer.FrameReadyEventHandler frameHandler = (player, frameIdx) => { gotFirstFrame = true; };
+
+        vp.loopPointReached += endHandler;
+        vp.sendFrameReadyEvents = true;
+        vp.frameReady += frameHandler;
+
+        vp.time = 0;
+        vp.Play();
+
+        float firstFrameTimeout = 1.0f;
+        while (!gotFirstFrame && firstFrameTimeout > 0f)
+        {
+            firstFrameTimeout -= Time.unscaledDeltaTime;
+            yield return null;
+        }
+        yield return new WaitForEndOfFrame();
+
+        vp.frameReady -= frameHandler;
+        vp.sendFrameReadyEvents = false;
+        rawImg.enabled = true;
+
+        float clipLen = vp.length > 0.1 ? (float)vp.length : (float)clip.length;
+        float maxWait = clipLen > 0.1f ? clipLen + 2.5f : 12f;
+        float elapsed = 0f;
+        while (!finished && elapsed < maxWait)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        vp.loopPointReached -= endHandler;
+        vp.Pause();
+    }
+
+    private void OnDestroy()
+    {
+        if (runtimeIntroCanvasObj != null)
+        {
+            Destroy(runtimeIntroCanvasObj);
+            runtimeIntroCanvasObj = null;
+        }
+
+        if (runtimeIntroRT != null)
+        {
+            runtimeIntroRT.Release();
+            Destroy(runtimeIntroRT);
+            runtimeIntroRT = null;
+        }
     }
 
     public void QuitGame()

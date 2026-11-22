@@ -33,6 +33,17 @@ public class IdleOverlay : MonoBehaviour
     [Header("Debug")]
     public bool debugLog = true;
 
+    private static IdleOverlay _activeInstance;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        _activeInstance = null;
+    }
+
+    public static bool IsAnyIdleOverlayBlocking => _activeInstance != null && _activeInstance.IsBlocking;
+    public bool IsBlocking => idleActive || inTransition;
+
     private CanvasGroup cg;
     private Vector3 lastMousePosition;
     private float idleTimer;
@@ -40,6 +51,24 @@ public class IdleOverlay : MonoBehaviour
     private bool inTransition;
     private IdleVideoSlot currentIdle1;
     private Collider2D[] cachedColliders;
+    private PatSequenceController patSequence;
+
+    void OnEnable()
+    {
+        _activeInstance = this;
+    }
+
+    void OnDisable()
+    {
+        if (_activeInstance == this)
+            _activeInstance = null;
+    }
+
+    void OnDestroy()
+    {
+        if (_activeInstance == this)
+            _activeInstance = null;
+    }
 
     void Start()
     {
@@ -48,16 +77,45 @@ public class IdleOverlay : MonoBehaviour
         DisableAll();
 
         cachedColliders = FindObjectsOfType<Collider2D>();
+        patSequence = FindObjectOfType<PatSequenceController>();
         lastMousePosition = Input.mousePosition;
 
         Debug.Log("🎬 IdleOverlay 初始化完成。");
+    }
+
+    private bool ShouldSuppressIdle()
+    {
+        if (Time.timeScale <= 0f)
+            return true;
+
+        if (BeforeStartController.IsAnyBeforeStartBlocking)
+            return true;
+
+        if (PopupManager.ExistingInstance != null && PopupManager.ExistingInstance.HasActivePopup)
+            return true;
+
+        if (patSequence != null && patSequence.allComplete)
+            return true;
+
+        if (SceneBlinkTransition.Instance != null && SceneBlinkTransition.Instance.IsTransitioning)
+            return true;
+
+        return false;
     }
 
     void Update()
     {
         if (inTransition) return;
 
-        if (Input.mousePosition != lastMousePosition)
+        if (!idleActive && ShouldSuppressIdle())
+        {
+            idleTimer = 0f;
+            lastMousePosition = Input.mousePosition;
+            return;
+        }
+
+        bool hasUserActivity = Input.mousePosition != lastMousePosition || Input.GetMouseButtonDown(0);
+        if (hasUserActivity)
         {
             lastMousePosition = Input.mousePosition;
             idleTimer = 0f;
@@ -100,6 +158,9 @@ public class IdleOverlay : MonoBehaviour
 
     IEnumerator PlayNextIdle1()
     {
+        if (ShouldSuppressIdle() || idle1Slots == null || idle1Slots.Count == 0)
+            yield break;
+
         inTransition = true;
         idleActive = true;
 
@@ -150,9 +211,12 @@ public class IdleOverlay : MonoBehaviour
         }
 
         idleActive = false;
-        inTransition = false;
         SetOverlayVisible(false);
+        DisableAll();
         LockAllObjects(false);
+        idleTimer = 0f;
+        lastMousePosition = Input.mousePosition;
+        inTransition = false;
     }
 
     IEnumerator SafePlay(VideoPlayer vp, RawImage raw)
