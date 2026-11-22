@@ -29,6 +29,7 @@ title: MindMaze_OpenScene
 title: MindMaze_Start
 ---
 // 失败：强制进入第五段
+“我”: 看看哪些人今天召唤过我。
 <<if not $JushiSuccess>>
     <<if not $MindDone5>>
         <<jump MindMaze_5>>
@@ -103,6 +104,7 @@ title: MindMaze_Continue
 <<endif>>
 
 -> 继续聊。
+    "我":还有哪些人今天召唤过我？ 
     <<jump MindMaze_Roll>>
 -> 嗯……
     <<jump MindMaze_End>>
