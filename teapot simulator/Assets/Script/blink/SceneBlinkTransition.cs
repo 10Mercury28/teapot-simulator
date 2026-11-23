@@ -9,7 +9,7 @@ public class SceneBlinkTransition : MonoBehaviour
 {
     public static SceneBlinkTransition Instance;
 
-    public const string DefaultBlackTextPrefabPath = "Assets/prefab/BlackTextTransitionCanvas .prefab";
+    public const string DefaultBlackTextPrefabPath = "Assets/Resources/BlackTextTransitionCanvas.prefab";
 
     [Header("转场设置 (眨眼)")]
     [Tooltip("切换场景前闭眼的持续时间 (秒)")]
@@ -256,8 +256,8 @@ public class SceneBlinkTransition : MonoBehaviour
     {
         if (blackTextTransitionPrefab != null) return blackTextTransitionPrefab;
 
-        GameObject loaded = Resources.Load<GameObject>("BlackTextTransitionCanvas ") ??
-                            Resources.Load<GameObject>("BlackTextTransitionCanvas");
+        GameObject loaded = Resources.Load<GameObject>("BlackTextTransitionCanvas") ??
+                            Resources.Load<GameObject>("BlackTextTransitionCanvas ");
         if (loaded != null)
         {
             blackTextTransitionPrefab = loaded;

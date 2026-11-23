@@ -393,7 +393,7 @@ public class FacePerspectiveSwitcher : MonoBehaviour
 #if UNITY_EDITOR
         resourceManager = new LocalResourceManager();
 #else
-        resourceManager = new StreamingAssetsResourceManager();
+        resourceManager = new StreamingAssetsResourceManager("MediaPipe");
 #endif
         yield return resourceManager.PrepareAssetAsync("blaze_face_short_range.bytes");
 

@@ -1564,7 +1564,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4aebfe0cf32adbd4f8eba011a8c9ac48, type: 2}
   dontDestroyOnLoad: 0
   debugTestSO: {fileID: 11400000, guid: 37518e0c73df2408fb315b422d45dd08, type: 2}
-  debugKey: 116
+  debugKey: 0
 --- !u!82 &6739728856062134480
 AudioSource:
   m_ObjectHideFlags: 0

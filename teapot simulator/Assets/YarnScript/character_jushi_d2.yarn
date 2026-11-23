@@ -51,7 +51,6 @@ position: 3541,912
 <<set $D2Started to true>>
 我: 15:49，侯居士又要来了。
 <<if $LikeU>>
-    <<show_popup_wait "Day2_HA">>
 <<endif>>
 //这里暂停一下沟通页面，空格后重新pull up
 <<pause_dialogue>>
