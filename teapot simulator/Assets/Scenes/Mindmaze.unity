@@ -919,9 +919,9 @@ MonoBehaviour:
     selectSpots:
     - {fileID: 2010000141}
   - rollId: 5
-    note: "MindMaze_5 (\u5931\u8D25\u7EBF\u5360\u4F4D-\u6682\u752811)"
-    rightTransState: 11T
-    rightIdleState: 11I
+    note: "MindMaze_5 (4\u70B9)"
+    rightTransState: 4T
+    rightIdleState: 4I
     selectSpots:
     - {fileID: 2010000151}
 --- !u!1 &2010000100

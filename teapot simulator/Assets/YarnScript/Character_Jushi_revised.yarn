@@ -33,6 +33,9 @@ title: Character_Jushi
 （这个中长发的中年女人微微看着很亲和，微微低着头。
 <<pause_dialogue>>
 （你左右端详这个女人）
+<<pause_dialogue>>
+（你可以左右侧头去看到这位顾客的更多侧面）
+<<pause_dialogue>>
 //这里暂停一下沟通页面，空格后重新pull up
 <<pause_dialogue>>
 我: 您是侯居士吧。我都准备好了。您先看壶，晚点我们去吃野菜馆。

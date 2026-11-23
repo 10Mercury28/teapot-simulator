@@ -196,9 +196,9 @@ public class MindMazeStageDirector : MonoBehaviour
         rollConfigs.Add(new RollAnimConfig
         {
             rollId = 5,
-            note = "MindMaze_5 (失败线占位-暂用11)",
-            rightTransState = "11T",
-            rightIdleState = "11I"
+            note = "MindMaze_5 (4点)",
+            rightTransState = "4T",
+            rightIdleState = "4I"
         });
     }
 
