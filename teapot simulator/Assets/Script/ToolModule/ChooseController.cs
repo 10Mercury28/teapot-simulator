@@ -11,10 +11,27 @@ public class ChooseController : MonoBehaviour
     public VideoPlayer v1; // 开场视频
     public VideoPlayer v2; // 循环视频
 
+    [Header("🔇 音频")]
+    [Tooltip("静音本场景所有视频音轨（保留独立 BGM / 弹窗音效 AudioSource）")]
+    public bool muteAllSceneVideos = true;
+
     private GlobalProgressManager global;
+
+    void Awake()
+    {
+        if (muteAllSceneVideos)
+        {
+            MuteAllSceneVideos();
+        }
+    }
 
     void Start()
     {
+        if (muteAllSceneVideos)
+        {
+            MuteAllSceneVideos();
+        }
+
         global = GlobalProgressManager.EnsureInstance();
         InitializeModules();
         PlayIntroSequence();
@@ -54,12 +71,14 @@ public class ChooseController : MonoBehaviour
     {
         if (v1 != null)
         {
+            if (muteAllSceneVideos) PatSequenceController.MuteVideoPlayer(v1);
             v1.loopPointReached -= OnV1Finished;
             v1.loopPointReached += OnV1Finished;
             v1.Play();
         }
         else if (v2 != null)
         {
+            if (muteAllSceneVideos) PatSequenceController.MuteVideoPlayer(v2);
             v2.isLooping = true;
             v2.Play();
         }
@@ -76,6 +95,7 @@ public class ChooseController : MonoBehaviour
 
         if (v2 != null)
         {
+            if (muteAllSceneVideos) PatSequenceController.MuteVideoPlayer(v2);
             v2.isLooping = true;
             v2.Play();
         }
@@ -118,6 +138,15 @@ public class ChooseController : MonoBehaviour
         {
             if (m != null && m != active)
                 m.HideAllForExternal();
+        }
+    }
+
+    private void MuteAllSceneVideos()
+    {
+        VideoPlayer[] players = FindObjectsOfType<VideoPlayer>(true);
+        for (int i = 0; i < players.Length; i++)
+        {
+            PatSequenceController.MuteVideoPlayer(players[i]);
         }
     }
 }

@@ -18,12 +18,29 @@ public class PatSequenceController : MonoBehaviour
 
     public RawImage successRawImage;
 
+    [Header("🔇 音频")]
+    [Tooltip("静音本场景所有视频音轨（保留独立 BGM / 弹窗音效 AudioSource）")]
+    public bool muteAllSceneVideos = true;
+
     private bool successVideoPlayed = false;
+
+    void Awake()
+    {
+        if (muteAllSceneVideos)
+        {
+            MuteAllSceneVideos();
+        }
+    }
 
     IEnumerator Start()
     {
         // 等所有对象完成初始化
         yield return new WaitForEndOfFrame();
+
+        if (muteAllSceneVideos)
+        {
+            MuteAllSceneVideos();
+        }
 
         allComplete = false;
         successVideoPlayed = false;
@@ -250,6 +267,11 @@ public class PatSequenceController : MonoBehaviour
         successVideoPlayer.skipOnDrop = true;
         successVideoPlayer.waitForFirstFrame = true;
 
+        if (muteAllSceneVideos)
+        {
+            MuteVideoPlayer(successVideoPlayer);
+        }
+
         if (
             successVideoPlayer.clip != null &&
             !successVideoPlayer.isPrepared
@@ -429,5 +451,48 @@ public class PatSequenceController : MonoBehaviour
         Debug.Log(
             $"✅ [PatSequenceController] 收到 Module {idx} 完成通知。"
         );
+    }
+
+    private void MuteAllSceneVideos()
+    {
+        VideoPlayer[] players = FindObjectsOfType<VideoPlayer>(true);
+        for (int i = 0; i < players.Length; i++)
+        {
+            MuteVideoPlayer(players[i]);
+        }
+    }
+
+    public static void MuteVideoPlayer(VideoPlayer vp)
+    {
+        if (vp == null) return;
+
+        if (!vp.isPlaying && !vp.isPrepared)
+        {
+            vp.audioOutputMode = VideoAudioOutputMode.None;
+            return;
+        }
+
+        if (vp.audioOutputMode == VideoAudioOutputMode.Direct)
+        {
+            ushort count = vp.controlledAudioTrackCount;
+            for (ushort i = 0; i < count; i++)
+            {
+                vp.SetDirectAudioMute(i, true);
+                vp.SetDirectAudioVolume(i, 0f);
+            }
+        }
+        else if (vp.audioOutputMode == VideoAudioOutputMode.AudioSource)
+        {
+            ushort count = vp.controlledAudioTrackCount;
+            for (ushort i = 0; i < count; i++)
+            {
+                AudioSource src = vp.GetTargetAudioSource(i);
+                if (src != null)
+                {
+                    src.mute = true;
+                    src.volume = 0f;
+                }
+            }
+        }
     }
 }

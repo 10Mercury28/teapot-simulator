@@ -88,6 +88,13 @@ public class ChooseModule : MonoBehaviour
 
     private void BindControllers()
     {
+        if (controller == null || controller.muteAllSceneVideos)
+        {
+            PatSequenceController.MuteVideoPlayer(videoMain);
+            PatSequenceController.MuteVideoPlayer(videoFail);
+            PatSequenceController.MuteVideoPlayer(videoWrong);
+        }
+
         if (videoMain != null && ctrlMain == null) ctrlMain = VideoController.GetOrCreate(videoMain);
         if (videoFail != null && ctrlFail == null) ctrlFail = VideoController.GetOrCreate(videoFail);
         if (videoWrong != null && ctrlWrong == null) ctrlWrong = VideoController.GetOrCreate(videoWrong);

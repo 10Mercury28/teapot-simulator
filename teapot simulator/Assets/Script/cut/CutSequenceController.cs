@@ -22,17 +22,34 @@ public class CutSequenceController : MonoBehaviour
     [Header("状态")]
     public bool isAllComplete = false;
 
+    [Header("🔇 音频")]
+    [Tooltip("静音本场景所有视频音轨（保留独立 BGM / 弹窗音效 AudioSource）")]
+    public bool muteAllSceneVideos = true;
+
     private bool hasSentGlobalSignal = false;
     private RenderTexture runtimeCompleteRT;
     private GameObject runtimeCompleteCanvasObj;
 
 
 
+    private void Awake()
+    {
+        if (muteAllSceneVideos)
+        {
+            MuteAllSceneVideos();
+        }
+    }
+
     private IEnumerator Start()
 
     {
 
         yield return new WaitForEndOfFrame();
+
+        if (muteAllSceneVideos)
+        {
+            MuteAllSceneVideos();
+        }
 
         GlobalProgressManager.EnsureInstance();
         GlobalProgressManager.CurrentDay = 2;
@@ -273,7 +290,7 @@ public class CutSequenceController : MonoBehaviour
         vp.isLooping = false;
         vp.renderMode = VideoRenderMode.RenderTexture;
         vp.aspectRatio = VideoAspectRatio.FitInside;
-        vp.audioOutputMode = VideoAudioOutputMode.Direct;
+        vp.audioOutputMode = muteAllSceneVideos ? VideoAudioOutputMode.None : VideoAudioOutputMode.Direct;
         vp.targetTexture = runtimeCompleteRT;
         vp.clip = completeVideoClip;
 
@@ -450,6 +467,15 @@ public class CutSequenceController : MonoBehaviour
 
         );
 
+    }
+
+    private void MuteAllSceneVideos()
+    {
+        VideoPlayer[] players = FindObjectsOfType<VideoPlayer>(true);
+        for (int i = 0; i < players.Length; i++)
+        {
+            PatSequenceController.MuteVideoPlayer(players[i]);
+        }
     }
 
 }

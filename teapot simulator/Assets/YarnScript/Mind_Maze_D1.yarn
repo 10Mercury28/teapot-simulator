@@ -569,7 +569,7 @@ title: MindMaze_End
 <<mindmaze_reset_hands>>
 <<mindmaze_close_scene>>
 <<if $MindDone5>>
-    <<load_scene "StudioDesk" "" 1>>
+    <<load_scene "StudioDesk" "回到前一天" 1>>
 <<else>>
     <<load_scene "chooseToolBasedOnCut" "Day 2" 2>>
 <<endif>>

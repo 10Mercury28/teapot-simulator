@@ -398,6 +398,8 @@ public class GlobalProgressManager : MonoBehaviour
     {
         if (sceneName == "Mindmaze")
             return "入夜";
+        if (sceneName == "StudioDesk" && SceneManager.GetActiveScene().name == "Mindmaze")
+            return "回到前一天";
         if (sceneName == "chooseToolBasedOnCut" && (CurrentDay >= 2 || targetOrder >= 4))
             return "Day 2";
         return "";

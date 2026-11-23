@@ -211,6 +211,15 @@ public class CutModule : MonoBehaviour
         // 2. 自动装配运行时 Prep 视频播放器与显示层（若配置了 prepVideoClip）
         EnsurePrepVideoSetup();
 
+        if (controller == null || controller.muteAllSceneVideos)
+        {
+            PatSequenceController.MuteVideoPlayer(videoA);
+            PatSequenceController.MuteVideoPlayer(videoB);
+            PatSequenceController.MuteVideoPlayer(transition);
+            PatSequenceController.MuteVideoPlayer(completeVideo);
+            PatSequenceController.MuteVideoPlayer(prepVideo);
+        }
+
         // 3. 确保所有 VideoPlayer 的 RenderTexture 已创建并正确绑定到对应的 RawImage
         EnsureVideoRenderTexture(videoA, rawA);
         EnsureVideoRenderTexture(videoB, rawB);
@@ -275,7 +284,7 @@ public class CutModule : MonoBehaviour
             prepVideo.isLooping = true;
             prepVideo.renderMode = VideoRenderMode.RenderTexture;
             prepVideo.aspectRatio = VideoAspectRatio.FitInside;
-            prepVideo.audioOutputMode = VideoAudioOutputMode.Direct;
+            prepVideo.audioOutputMode = (controller == null || controller.muteAllSceneVideos) ? VideoAudioOutputMode.None : VideoAudioOutputMode.Direct;
             prepVideo.clip = prepVideoClip;
 
             if (runtimePrepRT == null)
