@@ -70,8 +70,14 @@ public class MindMazeAnimationController : MonoBehaviour
     [Tooltip("调试模拟前一天与居士交心 ($LikeU = true)")]
     public bool debugSimulateLikeU = false;
 
-    private CharacterEntry currentSpeaker = null;
+    [Header("=== 换句防抖设置 ===")]
+    [Tooltip("对白框换句淡出间隙的防抖时间（秒），防止同一角色连续多句说话时句间闪回 Idle")]
+    public float emptySpeakerResetDelay = 0.25f;
+
+    private readonly List<CharacterEntry> currentSpeakers = new List<CharacterEntry>();
+    private Canvas lineCanvas;
     private string lastDetectedSpeakerName = "";
+    private float emptySpeakerTimer = 0f;
 
     private void Awake()
     {
@@ -172,6 +178,12 @@ public class MindMazeAnimationController : MonoBehaviour
                 characterNameText = nameObj.GetComponent<TMP_Text>();
             }
         }
+
+        if (lineCanvas == null)
+        {
+            if (lineCanvasGroup != null) lineCanvas = lineCanvasGroup.GetComponentInParent<Canvas>();
+            else if (linePresenter != null) lineCanvas = linePresenter.GetComponentInParent<Canvas>();
+        }
     }
 
     // ============================================================
@@ -182,6 +194,23 @@ public class MindMazeAnimationController : MonoBehaviour
     {
         string detectedSpeaker = GetActiveSpeakerName();
 
+        if (string.IsNullOrEmpty(detectedSpeaker))
+        {
+            if (!string.IsNullOrEmpty(lastDetectedSpeakerName) || currentSpeakers.Count > 0)
+            {
+                emptySpeakerTimer += Time.unscaledDeltaTime;
+                if (emptySpeakerTimer >= emptySpeakerResetDelay)
+                {
+                    emptySpeakerTimer = 0f;
+                    lastDetectedSpeakerName = "";
+                    HandleSpeakerChanged("");
+                }
+            }
+            return;
+        }
+
+        emptySpeakerTimer = 0f;
+
         if (detectedSpeaker != lastDetectedSpeakerName)
         {
             lastDetectedSpeakerName = detectedSpeaker;
@@ -191,6 +220,11 @@ public class MindMazeAnimationController : MonoBehaviour
 
     private string GetActiveSpeakerName()
     {
+        if (lineCanvas != null && !lineCanvas.enabled)
+        {
+            return "";
+        }
+
         // 检查对白框是否正在显示
         bool isLineVisible = true;
         if (lineCanvasGroup != null)
@@ -229,6 +263,18 @@ public class MindMazeAnimationController : MonoBehaviour
         return "";
     }
 
+    private static bool IsPlayerSpeakerName(string name)
+    {
+        string normalized = NormalizeSpeakerToken(name);
+        return normalized == "我" || normalized == "玩家" || normalized == "店主";
+    }
+
+    private void RevertCharacterAfterSpeaking(CharacterEntry entry)
+    {
+        if (entry == null) return;
+        SetCharacterState(entry, entry.isInvolved ? CharacterAnimState.Idle : CharacterAnimState.Frozen);
+    }
+
     private void HandleSpeakerChanged(string speakerName)
     {
         if (string.IsNullOrEmpty(speakerName))
@@ -239,54 +285,70 @@ public class MindMazeAnimationController : MonoBehaviour
         }
 
         // 过滤玩家自己或不需要做动画的角色
-        if (speakerName == "我" || speakerName == "玩家" || speakerName == "店主")
+        if (IsPlayerSpeakerName(speakerName))
         {
             ResetCurrentSpeakerToIdle();
             return;
         }
 
-        CharacterEntry matched = FindCharacter(speakerName);
-        if (matched != null)
+        List<CharacterEntry> matchedSpeakers = new List<CharacterEntry>();
+        string[] tokens = speakerName.Split(new char[] { '、', ',', '，' }, StringSplitOptions.RemoveEmptyEntries);
+        foreach (string rawToken in tokens)
         {
-            if (currentSpeaker != null && currentSpeaker != matched)
+            string token = rawToken.Trim();
+            if (string.IsNullOrEmpty(token) || IsPlayerSpeakerName(token))
+                continue;
+
+            CharacterEntry matched = FindCharacter(token);
+            if (matched != null && !matchedSpeakers.Contains(matched))
             {
-                // 上一个发言人回落 Idle
-                SetCharacterState(currentSpeaker, CharacterAnimState.Idle);
+                matchedSpeakers.Add(matched);
             }
-
-            currentSpeaker = matched;
-
-            // 发言人必须切到 Talk 动画
-            matched.isInvolved = true;
-            SetCharacterState(matched, CharacterAnimState.Talk);
-            Debug.Log($"🗣️ [MindMaze] 角色发言: '{matched.id}' -> 播放 Talk ('{matched.talkStateName}')");
         }
-        else
+
+        if (matchedSpeakers.Count == 0)
         {
             // 未在角色映射表中（例如未知旁白），之前发言人回落 Idle
             ResetCurrentSpeakerToIdle();
+            return;
+        }
+
+        // 上一批中不再继续发言的角色回落 Idle（或 Frozen）
+        for (int i = 0; i < currentSpeakers.Count; i++)
+        {
+            CharacterEntry prev = currentSpeakers[i];
+            if (prev != null && !matchedSpeakers.Contains(prev))
+            {
+                RevertCharacterAfterSpeaking(prev);
+            }
+        }
+
+        currentSpeakers.Clear();
+        currentSpeakers.AddRange(matchedSpeakers);
+
+        // 发言人必须切到 Talk 动画
+        for (int i = 0; i < currentSpeakers.Count; i++)
+        {
+            CharacterEntry entry = currentSpeakers[i];
+            entry.isInvolved = true;
+            SetCharacterState(entry, CharacterAnimState.Talk);
+            Debug.Log($"🗣️ [MindMaze] 角色发言: '{entry.id}' -> 播放 Talk ('{entry.talkStateName}')");
         }
     }
 
     private void ResetCurrentSpeakerToIdle()
     {
-        if (currentSpeaker != null)
+        for (int i = 0; i < currentSpeakers.Count; i++)
         {
-            if (currentSpeaker.isInvolved)
-            {
-                SetCharacterState(currentSpeaker, CharacterAnimState.Idle);
-            }
-            else
-            {
-                SetCharacterState(currentSpeaker, CharacterAnimState.Frozen);
-            }
-            currentSpeaker = null;
+            RevertCharacterAfterSpeaking(currentSpeakers[i]);
         }
+        currentSpeakers.Clear();
     }
 
     private void OnNodeStart(string nodeName)
     {
         // 节点切换时，清除当前发言状态
+        emptySpeakerTimer = 0f;
         ResetCurrentSpeakerToIdle();
         lastDetectedSpeakerName = "";
     }
@@ -294,6 +356,7 @@ public class MindMazeAnimationController : MonoBehaviour
     private void OnDialogueComplete()
     {
         // 对话彻底结束
+        emptySpeakerTimer = 0f;
         ResetCurrentSpeakerToIdle();
         lastDetectedSpeakerName = "";
     }
@@ -340,6 +403,10 @@ public class MindMazeAnimationController : MonoBehaviour
     public void ApplyInvolvedSpeakers(string speakerListStr)
     {
         Debug.Log($"🎭 [MindMaze] 设置当前 Node 涉及角色: '{speakerListStr}'");
+
+        emptySpeakerTimer = 0f;
+        lastDetectedSpeakerName = "";
+        currentSpeakers.Clear();
 
         string raw = string.IsNullOrEmpty(speakerListStr) ? "" : speakerListStr.Trim().ToLowerInvariant();
         bool isAll = raw == "all" || raw == "全部" || raw == "所有人";
@@ -415,6 +482,17 @@ public class MindMazeAnimationController : MonoBehaviour
         Talk    // 正在发言说话（speed = 1，循环 Talk）
     }
 
+    private static void PlayStateIfNeeded(Animator anim, string stateName)
+    {
+        if (string.IsNullOrEmpty(stateName)) return;
+
+        AnimatorStateInfo info = anim.GetCurrentAnimatorStateInfo(0);
+        if (anim.IsInTransition(0) || !info.IsName(stateName))
+        {
+            anim.Play(stateName, 0);
+        }
+    }
+
     public void SetCharacterState(CharacterEntry entry, CharacterAnimState state)
     {
         if (entry == null || entry.animator == null) return;
@@ -434,29 +512,14 @@ public class MindMazeAnimationController : MonoBehaviour
             case CharacterAnimState.Idle:
                 entry.isSpeaking = false;
                 anim.speed = 1f;
-                if (!string.IsNullOrEmpty(entry.idleStateName))
-                {
-                    // 仅当不在待机动画时才过渡，防止反复打断
-                    AnimatorStateInfo info = anim.GetCurrentAnimatorStateInfo(0);
-                    if (!info.IsName(entry.idleStateName))
-                    {
-                        anim.CrossFade(entry.idleStateName, 0.15f);
-                    }
-                }
+                PlayStateIfNeeded(anim, entry.idleStateName);
                 break;
 
             case CharacterAnimState.Talk:
                 entry.isSpeaking = true;
                 anim.speed = 1f;
                 string talkState = !string.IsNullOrEmpty(entry.talkStateName) ? entry.talkStateName : entry.idleStateName;
-                if (!string.IsNullOrEmpty(talkState))
-                {
-                    AnimatorStateInfo info = anim.GetCurrentAnimatorStateInfo(0);
-                    if (!info.IsName(talkState))
-                    {
-                        anim.CrossFade(talkState, 0.1f);
-                    }
-                }
+                PlayStateIfNeeded(anim, talkState);
                 break;
         }
     }
@@ -473,6 +536,10 @@ public class MindMazeAnimationController : MonoBehaviour
 
     public void FreezeAllCharacters()
     {
+        emptySpeakerTimer = 0f;
+        lastDetectedSpeakerName = "";
+        currentSpeakers.Clear();
+
         foreach (var c in characters)
         {
             if (c != null)
@@ -487,22 +554,36 @@ public class MindMazeAnimationController : MonoBehaviour
     // 4. 便捷查找与一键自动装配
     // ============================================================
 
+    private static string NormalizeSpeakerToken(string value)
+    {
+        return string.IsNullOrEmpty(value)
+            ? ""
+            : value.Trim().Trim('“', '”', '"', '‘', '’', '\'').Trim().ToLowerInvariant();
+    }
+
     public CharacterEntry FindCharacter(string searchKey)
     {
         if (string.IsNullOrEmpty(searchKey)) return null;
         string clean = searchKey.Trim().ToLowerInvariant();
+        string stripped = NormalizeSpeakerToken(searchKey);
 
         foreach (var c in characters)
         {
             if (c == null) continue;
-            if (c.id.ToLowerInvariant() == clean) return c;
+            string idLower = (c.id ?? "").Trim().ToLowerInvariant();
+            string idStripped = NormalizeSpeakerToken(c.id);
+            if (idLower == clean || (!string.IsNullOrEmpty(stripped) && idStripped == stripped))
+                return c;
 
             if (!string.IsNullOrEmpty(c.aliases))
             {
                 string[] aliasList = c.aliases.Split(new char[] { ',', '，', '、', ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (string a in aliasList)
                 {
-                    if (a.Trim().ToLowerInvariant() == clean) return c;
+                    string aliasLower = a.Trim().ToLowerInvariant();
+                    string aliasStripped = NormalizeSpeakerToken(a);
+                    if (aliasLower == clean || (!string.IsNullOrEmpty(stripped) && aliasStripped == stripped))
+                        return c;
                 }
             }
         }
@@ -531,7 +612,7 @@ public class MindMazeAnimationController : MonoBehaviour
             ("KX", "KX,柯湘,康熙", "KX", "KX_idle", "KX_talk"),
             ("zodiac", "zodiac,生肖", "zodiac", "zodiac_idle", "zodiac_talk"),
             ("XZ", "XZ,星座", "星座", "XZ_idle", "XZ_talk"),
-            ("mirror", "mirror,镜子,奥斯卡,镜子中的“奥斯卡”", "mirror", "Mirror_Idle", "Mirror_Talk"),
+            ("mirror", "mirror,镜中人,“镜中人”,镜子,奥斯卡,镜子中的“奥斯卡”", "mirror", "Mirror_Idle", "Mirror_Talk"),
             ("bilbo", "bilbo,比尔博,“比尔博”", "bilbo", "Bilbo_idle", "Bilbo_talk")
         };
 
