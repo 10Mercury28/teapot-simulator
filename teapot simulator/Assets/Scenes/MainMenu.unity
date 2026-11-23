@@ -214,7 +214,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &262720673
 RectTransform:
   m_ObjectHideFlags: 0
@@ -960,6 +960,7 @@ MonoBehaviour:
   newGameBackground: {fileID: 1869268232}
   archiveBackground: {fileID: 634026022}
   settingBackground: {fileID: 262720672}
+  startWithSettings: 1
   newGameButton: {fileID: 779100389}
   archiveButton: {fileID: 275959139}
   settingsButton: {fileID: 1075913361}

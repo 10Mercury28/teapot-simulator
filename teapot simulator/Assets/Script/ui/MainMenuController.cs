@@ -22,6 +22,10 @@ public class MainMenuController : MonoBehaviour
     [Tooltip("系统设置面板")]
     public GameObject settingBackground;
 
+    [Header("=== 启动页面配置 ===")]
+    [Tooltip("进入主菜单时默认先展示系统设置页，点击 Confirm 后进入主界面")]
+    public bool startWithSettings = true;
+
     [Header("=== 主界面 5 个按钮 ===")]
     public Button newGameButton;
     public Button archiveButton;
@@ -76,11 +80,11 @@ public class MainMenuController : MonoBehaviour
 
     private void Start()
     {
-        // 初始状态：只激活主界面，隐藏三个弹窗
+        // 初始状态：主界面垫底，按配置默认先打开系统设置页（点击 Confirm 后关闭设置页进入主界面），隐藏其余弹窗
         if (mainBackground != null) mainBackground.SetActive(true);
         if (newGameBackground != null) newGameBackground.SetActive(false);
         if (archiveBackground != null) archiveBackground.SetActive(false);
-        if (settingBackground != null) settingBackground.SetActive(false);
+        if (settingBackground != null) settingBackground.SetActive(startWithSettings);
 
         // 读取已保存的语言偏好 (0 = 中文, 1 = 英文)
         int currentLang = PlayerPrefs.GetInt("OP.UI.Language", OrientPearlLanguage.Current);
@@ -224,6 +228,7 @@ public class MainMenuController : MonoBehaviour
 
     public void CloseSettings()
     {
+        if (mainBackground != null) mainBackground.SetActive(true);
         if (settingBackground != null) settingBackground.SetActive(false);
     }
 

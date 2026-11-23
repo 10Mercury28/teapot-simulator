@@ -49,6 +49,7 @@ public class PatModule : MonoBehaviour
     private bool isInterrupted = false;
     private bool hasTriggeredInterrupt = false;
     private Coroutine interruptIdleRoutine;
+    private bool interruptHoldingIdleOverlay = false;
 
     [Header("Transition Settings")]
     [Range(0.2f, 2f)]
@@ -227,6 +228,7 @@ public class PatModule : MonoBehaviour
         timer = 0f;
         isInterrupted = false;
         hasTriggeredInterrupt = false;
+        interruptHoldingIdleOverlay = false;
         HasFirstFrameReady = false;
 
         Collider2D col = GetComponent<Collider2D>();
@@ -434,6 +436,11 @@ public class PatModule : MonoBehaviour
     /// </summary>
     public void ForceHideAndRelease()
     {
+        if (interruptHoldingIdleOverlay)
+        {
+            interruptHoldingIdleOverlay = false;
+            IdleOverlay.ActiveInstance?.CancelExternalHoldImmediate();
+        }
         UnsubscribePopup();
         StopAllCoroutines();
         if (transitionVideo != null) transitionVideo.isLooping = false;
@@ -444,6 +451,38 @@ public class PatModule : MonoBehaviour
     }
 
     IEnumerator PlayFailThenTransition()
+    {
+        yield return StartCoroutine(PlayFailVideoOnly());
+        currentState = PatState.TransitionLoop;
+        StartCoroutine(PlayTransitionLoop());
+    }
+
+    IEnumerator PlayFailThenInterruptIdle()
+    {
+        yield return StartCoroutine(PlayFailVideoOnly());
+
+        if (isInterrupted)
+        {
+            IdleOverlay idle = IdleOverlay.ActiveInstance ?? FindObjectOfType<IdleOverlay>();
+            if (idle != null)
+            {
+                interruptHoldingIdleOverlay = true;
+                Debug.Log($"👁️ [{name}] Fail 播放完毕，弹窗仍在显示 -> 进入 IdleOverlay (Idle 1)");
+                idle.EnterExternalIdle1(useBlink: true);
+                interruptIdleRoutine = null;
+                yield break;
+            }
+            else
+            {
+                Debug.LogWarning($"⚠️ [{name}] 场景中未找到 IdleOverlay，回退为 TransitionLoop 待机。");
+            }
+        }
+
+        interruptIdleRoutine = null;
+        FinishInterruptRecovery();
+    }
+
+    private IEnumerator PlayFailVideoOnly()
     {
         currentState = PatState.FailSequence;
         timer = 0f;
@@ -494,6 +533,7 @@ public class PatModule : MonoBehaviour
             }
 
             UpdateFallbackBackground(failVideo);
+            if (failRaw != null) failRaw.enabled = false;
             failCtrl?.StopAndReset();
         }
         else
@@ -501,14 +541,15 @@ public class PatModule : MonoBehaviour
             if (mainRaw != null) mainRaw.enabled = false;
             if (transitionRaw != null) transitionRaw.enabled = false;
         }
-
-        // 注意：若 failRaw 仍开着，PlayTransitionLoop 会在 transition 首帧绘制完毕后统一关闭 failRaw
-        currentState = PatState.TransitionLoop;
-        StartCoroutine(PlayTransitionLoop());
     }
 
     public void Deactivate()
     {
+        if (interruptHoldingIdleOverlay)
+        {
+            interruptHoldingIdleOverlay = false;
+            IdleOverlay.ActiveInstance?.CancelExternalHoldImmediate();
+        }
         SnapshotCurrentFrameToFallback();
         currentState = PatState.Inactive;
         timer = 0f;
@@ -654,35 +695,43 @@ public class PatModule : MonoBehaviour
     {
         hasTriggeredInterrupt = true;
         isInterrupted = true;
-        Debug.Log($"🚨 [{name}] 拍击达到第 {interruptHitCount} 次，触发打断！播放 Fail 动画 -> 切入 Idle 待机，并呼出弹窗。");
+        Debug.Log($"🚨 [{name}] 拍击达到第 {interruptHitCount} 次，触发打断！播放 Fail 动画 -> 切入 IdleOverlay (Idle 1) 待机，并呼出弹窗。");
 
         timer = 0f; // 暂停计时器，避免打断期间超时判 Fail
 
-        // 1. 触发原生丝滑的 Fail -> Transition (Idle) 动画序列
-        StartCoroutine(PlayFailThenTransition());
-
-        // 2. 呼出 PopupManager 弹窗 (常驻 + 循环提示音骚扰)
-        if (PopupManager.Instance != null)
+        // 1. 先订阅并呼出 PopupManager 弹窗 (常驻 + 循环提示音骚扰)
+        if (PopupManager.Instance != null && (interruptPopupSO != null || !string.IsNullOrEmpty(interruptPopupId)))
         {
+            PopupManager.Instance.OnPopupClosed -= HandlePopupClosed;
             PopupManager.Instance.OnPopupClosed += HandlePopupClosed;
 
             if (interruptPopupSO != null)
             {
                 PopupManager.Instance.Show(interruptPopupSO);
             }
-            else if (!string.IsNullOrEmpty(interruptPopupId))
+            else
             {
                 PopupManager.Instance.ShowById(interruptPopupId);
             }
-            else
+
+            if (!PopupManager.Instance.HasActivePopup)
             {
-                Debug.LogWarning($"⚠️ [{name}] enableInterruptPopup 为 true，但未指定 interruptPopupSO 或 interruptPopupId！");
+                Debug.LogWarning($"⚠️ [{name}] 打断弹窗未能成功打开，解除打断锁定以防卡死。");
+                UnsubscribePopup();
+                isInterrupted = false;
             }
         }
         else
         {
-            Debug.LogWarning("⚠️ [PatModule] 场景中未找到 PopupManager 实例，打断弹窗无法拉起！");
+            if (PopupManager.Instance == null)
+                Debug.LogWarning("⚠️ [PatModule] 场景中未找到 PopupManager 实例，打断弹窗无法拉起！");
+            else
+                Debug.LogWarning($"⚠️ [{name}] enableInterruptPopup 为 true，但未指定 interruptPopupSO 或 interruptPopupId！");
+            isInterrupted = false;
         }
+
+        // 2. 触发 Fail 动画 -> 结束后转入 IdleOverlay (Idle 1) 持稳待机（若弹窗已解除或无 IdleOverlay 则回退）
+        interruptIdleRoutine = StartCoroutine(PlayFailThenInterruptIdle());
     }
 
     private void HandlePopupClosed(PopupWindowDataSO data)
@@ -691,22 +740,66 @@ public class PatModule : MonoBehaviour
 
         if (!isInterrupted) return;
 
-        Debug.Log($"✅ [{name}] 弹窗已处理完毕！解除打断锁定。当前泥巴停留在 Idle 待机界面，点击即可切回拍泥完成剩余次数！");
+        Debug.Log($"✅ [{name}] 弹窗已处理完毕！退出 Idle1 -> 播放 Idle2 并回到 Transition 待机。");
         isInterrupted = false;
+
+        if (interruptHoldingIdleOverlay)
+        {
+            interruptHoldingIdleOverlay = false;
+
+            if (!completeModuleOnPopupDismiss)
+            {
+                currentState = PatState.TransitionLoop;
+                StartCoroutine(PlayTransitionLoop());
+            }
+
+            IdleOverlay idle = IdleOverlay.ActiveInstance ?? FindObjectOfType<IdleOverlay>();
+            if (idle != null)
+            {
+                idle.ExitExternalIdleToIdle2(OnInterruptIdle2Finished);
+                return;
+            }
+        }
+
+        // 若 Fail 视频尚未播完，等 PlayFailThenInterruptIdle 播完后自动收尾
+        if (currentState == PatState.FailSequence)
+            return;
+
+        FinishInterruptRecovery();
+    }
+
+    private void OnInterruptIdle2Finished()
+    {
+        if (!active) return;
 
         if (completeModuleOnPopupDismiss)
         {
-            // 若勾选了跳过，则直接完成本模块
             Complete();
         }
-        else if (autoResumePatOnPopupDismiss)
+        else if (autoResumePatOnPopupDismiss && currentState == PatState.TransitionLoop)
         {
-            // 若勾选了自动切回，关闭弹窗瞬间自动调用切回拍泥
-            if (currentState == PatState.TransitionLoop)
-            {
-                currentState = PatState.SwitchingToMain;
-                StartCoroutine(SwitchToMain());
-            }
+            currentState = PatState.SwitchingToMain;
+            StartCoroutine(SwitchToMain());
+        }
+    }
+
+    private void FinishInterruptRecovery()
+    {
+        if (!active) return;
+
+        if (completeModuleOnPopupDismiss)
+        {
+            Complete();
+            return;
+        }
+
+        currentState = PatState.TransitionLoop;
+        StartCoroutine(PlayTransitionLoop());
+
+        if (autoResumePatOnPopupDismiss)
+        {
+            currentState = PatState.SwitchingToMain;
+            StartCoroutine(SwitchToMain());
         }
     }
 

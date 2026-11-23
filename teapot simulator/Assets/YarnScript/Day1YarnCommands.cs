@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using Yarn.Unity;
 
@@ -949,11 +950,46 @@ public class Day1YarnCommands : MonoBehaviour
     }
 
     // ============================================================
-    // 6. 对话暂停观察指令 (Pause Dialogue Until Space)
+    // 6. 对话暂停观察指令 (Pause Dialogue Until Space / Left Click)
     // ============================================================
 
+    private static readonly List<RaycastResult> pauseUiRaycastResults = new List<RaycastResult>(16);
+
     /// <summary>
-    /// 暂停并隐藏对白界面（保留人物立绘、视角转头与桌面互动），按空格键后重新拉起对白。
+    /// 判断当前鼠标位置是否悬停在可交互 UI 控件上（如暂停按钮、弹窗等），
+    /// 忽略普通背景图/立绘 Image，避免点击画面任意位置时无法用左键恢复对白。
+    /// </summary>
+    private static bool IsPointerOverInteractiveUI()
+    {
+        EventSystem es = EventSystem.current;
+        if (es == null) return false;
+
+        PointerEventData eventData = new PointerEventData(es)
+        {
+            position = Input.mousePosition
+        };
+
+        pauseUiRaycastResults.Clear();
+        es.RaycastAll(eventData, pauseUiRaycastResults);
+
+        for (int i = 0; i < pauseUiRaycastResults.Count; i++)
+        {
+            GameObject go = pauseUiRaycastResults[i].gameObject;
+            if (go == null) continue;
+
+            Selectable selectable = go.GetComponentInParent<Selectable>();
+            if (selectable != null && selectable.IsInteractable())
+                return true;
+
+            if (go.GetComponentInParent<IPointerClickHandler>() != null)
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 暂停并隐藏对白界面（保留人物立绘、视角转头与桌面互动），按空格键或鼠标左键后重新拉起对白。
     /// 用法：在剧本任意需要停顿的位置插入 <<pause_dialogue>>
     /// </summary>
     [YarnCommand("pause_dialogue")]
@@ -977,8 +1013,9 @@ public class Day1YarnCommands : MonoBehaviour
         bool prevCanvasEnabled = dialogueCanvas != null && dialogueCanvas.enabled;
         bool prevAdvancerEnabled = advancer != null && advancer.enabled;
         bool prevKeyCodesEnabled = keyCodes != null && keyCodes.enabled;
+        bool resumedByLeftClick = false;
 
-        Debug.Log("⏸️ [YarnCommand] pause_dialogue: 已隐藏对白框进入自由观察，按空格键 (Space) 重新拉起对白。");
+        Debug.Log("⏸️ [YarnCommand] pause_dialogue: 已隐藏对白框进入自由观察，按空格键 (Space) 或点击鼠标左键重新拉起对白。");
 
         try
         {
@@ -986,9 +1023,9 @@ public class Day1YarnCommands : MonoBehaviour
             if (advancer != null) advancer.enabled = false;
             if (keyCodes != null) keyCodes.enabled = false;
 
-            // 先让出至少 1 帧并等上一句推进用的空格键彻底松开
+            // 先让出至少 1 帧并等上一句推进用的空格键或左键彻底松开
             yield return null;
-            while (Input.GetKey(KeyCode.Space))
+            while (Input.GetKey(KeyCode.Space) || Input.GetMouseButton(0))
             {
                 yield return null;
             }
@@ -996,15 +1033,21 @@ public class Day1YarnCommands : MonoBehaviour
             while (true)
             {
                 bool modalBlocking = Time.timeScale <= 0f ||
-                                     (PopupManager.Instance != null && PopupManager.Instance.CurrentData != null);
-                if (!modalBlocking && Input.GetKeyDown(KeyCode.Space))
+                                     (PopupManager.ExistingInstance != null && PopupManager.ExistingInstance.HasActivePopup);
+                if (!modalBlocking)
                 {
-                    break;
+                    bool spacePressed = Input.GetKeyDown(KeyCode.Space);
+                    bool leftClickPressed = Input.GetMouseButtonDown(0) && !IsPointerOverInteractiveUI();
+                    if (spacePressed || leftClickPressed)
+                    {
+                        resumedByLeftClick = leftClickPressed && !spacePressed;
+                        break;
+                    }
                 }
                 yield return null;
             }
 
-            // 等当前按空格的帧过去，再恢复 LineAdvancer/KeyCodes，避免同一帧把下一句也跳过
+            // 等当前恢复键/左键的帧过去，再恢复 LineAdvancer/KeyCodes，避免同一帧把下一句也跳过
             yield return null;
         }
         finally
@@ -1012,7 +1055,9 @@ public class Day1YarnCommands : MonoBehaviour
             if (dialogueCanvas != null) dialogueCanvas.enabled = prevCanvasEnabled;
             if (advancer != null) advancer.enabled = prevAdvancerEnabled;
             if (keyCodes != null) keyCodes.enabled = prevKeyCodesEnabled;
-            Debug.Log("▶️ [YarnCommand] pause_dialogue: 已按空格恢复并重新拉起对白。");
+            Debug.Log(resumedByLeftClick
+                ? "▶️ [YarnCommand] pause_dialogue: 已通过鼠标左键恢复并重新拉起对白。"
+                : "▶️ [YarnCommand] pause_dialogue: 已通过空格键恢复并重新拉起对白。");
         }
     }
 }

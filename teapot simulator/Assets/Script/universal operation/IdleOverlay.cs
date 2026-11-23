@@ -41,14 +41,19 @@ public class IdleOverlay : MonoBehaviour
         _activeInstance = null;
     }
 
+    public static IdleOverlay ActiveInstance => _activeInstance;
     public static bool IsAnyIdleOverlayBlocking => _activeInstance != null && _activeInstance.IsBlocking;
-    public bool IsBlocking => idleActive || inTransition;
+    public bool IsBlocking => idleActive || inTransition || externalHoldActive;
 
     private CanvasGroup cg;
     private Vector3 lastMousePosition;
     private float idleTimer;
     private bool idleActive;
     private bool inTransition;
+    private bool externalHoldActive;
+    private bool externalExitRequested;
+    private bool isExitingToIdle2;
+    private System.Action onExternalExitCompleted;
     private IdleVideoSlot currentIdle1;
     private Collider2D[] cachedColliders;
     private PatSequenceController patSequence;
@@ -106,6 +111,8 @@ public class IdleOverlay : MonoBehaviour
     void Update()
     {
         if (inTransition) return;
+
+        if (externalHoldActive) return;
 
         if (!idleActive && ShouldSuppressIdle())
         {
@@ -166,12 +173,14 @@ public class IdleOverlay : MonoBehaviour
 
         yield return SpawnBlink("Idle1 Start");
 
+        DisableAll();
         SetOverlayVisible(true);
         LockAllObjects(true);
 
         currentIdle1 = idle1Slots[Random.Range(0, idle1Slots.Count)];
-        if (currentIdle1.videoPlayer && currentIdle1.rawImage)
+        if (currentIdle1 != null && currentIdle1.videoPlayer && currentIdle1.rawImage)
         {
+            currentIdle1.videoPlayer.isLooping = true;
             yield return SafePlay(currentIdle1.videoPlayer, currentIdle1.rawImage);
             currentIdle1.videoPlayer.isLooping = true;
         }
@@ -179,9 +188,96 @@ public class IdleOverlay : MonoBehaviour
         inTransition = false;
     }
 
+    public void EnterExternalIdle1(bool useBlink = true)
+    {
+        externalHoldActive = true;
+        externalExitRequested = false;
+
+        if (idleActive && !isExitingToIdle2)
+            return;
+
+        if (idle1Slots == null || idle1Slots.Count == 0)
+        {
+            Debug.LogWarning("⚠️ IdleOverlay: idle1Slots 为空，无法进入外部 Idle 1。");
+            externalHoldActive = false;
+            return;
+        }
+
+        StartCoroutine(EnterExternalIdle1Routine(useBlink));
+    }
+
+    private IEnumerator EnterExternalIdle1Routine(bool useBlink)
+    {
+        while (inTransition)
+            yield return null;
+
+        if (!externalHoldActive)
+            yield break;
+
+        inTransition = true;
+        idleActive = true;
+        isExitingToIdle2 = false;
+
+        if (useBlink)
+            yield return SpawnBlink("PatInterrupt → Idle1");
+
+        DisableAll();
+        SetOverlayVisible(true);
+        LockAllObjects(true);
+
+        currentIdle1 = idle1Slots[Random.Range(0, idle1Slots.Count)];
+        if (currentIdle1 != null && currentIdle1.videoPlayer && currentIdle1.rawImage)
+        {
+            currentIdle1.videoPlayer.isLooping = true;
+            yield return SafePlay(currentIdle1.videoPlayer, currentIdle1.rawImage);
+            currentIdle1.videoPlayer.isLooping = true;
+        }
+
+        inTransition = false;
+
+        if (externalExitRequested)
+        {
+            externalExitRequested = false;
+            StartCoroutine(PlayIdle2Crossfade());
+        }
+    }
+
+    public void ExitExternalIdleToIdle2(System.Action onCompleted = null)
+    {
+        if (!externalHoldActive && !idleActive && !inTransition)
+        {
+            onCompleted?.Invoke();
+            return;
+        }
+
+        if (onCompleted != null)
+            onExternalExitCompleted += onCompleted;
+
+        if (isExitingToIdle2)
+            return;
+
+        if (inTransition)
+        {
+            externalExitRequested = true;
+            return;
+        }
+
+        externalExitRequested = false;
+        StartCoroutine(PlayIdle2Crossfade());
+    }
+
+    public void CancelExternalHoldImmediate()
+    {
+        externalHoldActive = false;
+        externalExitRequested = false;
+        isExitingToIdle2 = false;
+        onExternalExitCompleted = null;
+    }
+
     IEnumerator PlayIdle2Crossfade()
     {
         inTransition = true;
+        isExitingToIdle2 = true;
 
         yield return SpawnBlink("Idle1 → Idle2");
 
@@ -192,6 +288,7 @@ public class IdleOverlay : MonoBehaviour
             cg2.alpha = 0;
             idle2Raw.enabled = true;
 
+            idle2Video.isLooping = false;
             yield return SafePlay(idle2Video, idle2Raw);
 
             float t = 0;
@@ -202,7 +299,14 @@ public class IdleOverlay : MonoBehaviour
                 yield return null;
             }
 
-            yield return new WaitWhile(() => idle2Video.isPlaying);
+            float clipLen = idle2Video.clip != null ? (float)idle2Video.clip.length : (float)idle2Video.length;
+            float maxWait = clipLen > 0.1f ? clipLen + 2f : 5f;
+            float waitElapsed = 0f;
+            while (idle2Video.isPlaying && waitElapsed < maxWait)
+            {
+                waitElapsed += Time.deltaTime;
+                yield return null;
+            }
 
             yield return SpawnBlink("Idle2 End");
             yield return FadeCanvas(1f, 0f, fadeDuration);
@@ -211,12 +315,19 @@ public class IdleOverlay : MonoBehaviour
         }
 
         idleActive = false;
+        externalHoldActive = false;
+        externalExitRequested = false;
+        isExitingToIdle2 = false;
         SetOverlayVisible(false);
         DisableAll();
         LockAllObjects(false);
         idleTimer = 0f;
         lastMousePosition = Input.mousePosition;
         inTransition = false;
+
+        System.Action cb = onExternalExitCompleted;
+        onExternalExitCompleted = null;
+        cb?.Invoke();
     }
 
     IEnumerator SafePlay(VideoPlayer vp, RawImage raw)
@@ -231,13 +342,27 @@ public class IdleOverlay : MonoBehaviour
         if (!vp.isPrepared)
         {
             vp.Prepare();
-            yield return new WaitUntil(() => vp.isPrepared);
+            float prepTimeout = 3f;
+            while (!vp.isPrepared && prepTimeout > 0f)
+            {
+                prepTimeout -= Time.unscaledDeltaTime;
+                yield return null;
+            }
+        }
+
+        vp.time = 0.0;
+        vp.Play();
+
+        float frameWait = 0.25f;
+        while (vp.frame < 0 && frameWait > 0f)
+        {
+            frameWait -= Time.unscaledDeltaTime;
+            yield return null;
         }
 
         raw.texture = vp.targetTexture;
-        raw.enabled = true;
         raw.color = Color.white;
-        vp.Play();
+        raw.enabled = true;
     }
 
     IEnumerator FadeCanvas(float from, float to, float dur)
