@@ -23,7 +23,7 @@ MonoBehaviour:
   drawerContentImage: {fileID: 21300000, guid: 08beae52161834736894aea1f3397d8e, type: 3}
   drawerDetailText: 
   incomingLoopSfx: {fileID: 8300000, guid: a04ecf2458305b14f9dc60b540e65872, type: 3}
-  voiceClip: {fileID: 0}
+  voiceClip: {fileID: 8300000, guid: a22b1041e6b1c4f2bb7e5aee76769c25, type: 3}
   isDeliveryOrder: 0
   confirmButtonText: "\u786E\u8BA4\u53D6\u4EF6"
   targetSceneOnConfirm: 
