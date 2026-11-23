@@ -520,7 +520,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4368502024732009333, guid: 34b5fc89c14922d458d20635ffcadc6b, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -710
+      value: -709.9998
       objectReference: {fileID: 0}
     - target: {fileID: 5837940533610859689, guid: 34b5fc89c14922d458d20635ffcadc6b, type: 3}
       propertyPath: m_Name
@@ -819,6 +819,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2817667056579584550, guid: afecb5a77ba7c7c449ec8b7cf12b5a9e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2009965726}
+    - targetCorrespondingSourceObject: {fileID: 2817667056579584550, guid: afecb5a77ba7c7c449ec8b7cf12b5a9e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2009965727}
   m_SourcePrefab: {fileID: 100100000, guid: afecb5a77ba7c7c449ec8b7cf12b5a9e, type: 3}
 --- !u!114 &1999597474 stripped
 MonoBehaviour:
@@ -925,6 +928,28 @@ MonoBehaviour:
     rightIdleState: 4I
     selectSpots:
     - {fileID: 2010000151}
+--- !u!114 &2009965727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2009965720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c4e1a7f32b849e5a6d20f84c17e5b3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  introClip: {fileID: 8300000, guid: 3e39fe7a39b28134b9548b328df68635, type: 3}
+  volume: 1
+  fadeOutDuration: 3
+  fadeAtClipEnd: 0
+  holdBeforeFadeSeconds: 15
+  fadeInDuration: 0
+  playDelay: 0
+  waitForSceneBlinkFadeIn: 1
+  audioSource: {fileID: 0}
+  debugLog: 1
 --- !u!1 &2010000100
 GameObject:
   m_ObjectHideFlags: 0

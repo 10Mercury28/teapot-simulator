@@ -329,6 +329,19 @@ public class GlobalProgressManager : MonoBehaviour
         EnsureValidSceneSequence();
         sceneTransitioning = true;
 
+        GlobalBgmManager bgm = GlobalBgmManager.Instance;
+        if (bgm != null && bgm.ShouldFadeOutBeforeLoading(sceneName))
+        {
+            if (bgm.waitForFadeOutBeforeTransition)
+            {
+                yield return bgm.FadeOutAndStopRoutine();
+            }
+            else
+            {
+                bgm.FadeOutAndStop();
+            }
+        }
+
         ApplySceneTargetState(sceneName, nextDay);
         string effectiveText = !string.IsNullOrEmpty(blackScreenText)
             ? blackScreenText
@@ -406,6 +419,31 @@ public class GlobalProgressManager : MonoBehaviour
     }
 
     private void StartSceneLoad(string nextScene, string blackText)
+    {
+        GlobalBgmManager bgm = GlobalBgmManager.Instance;
+        if (bgm != null && bgm.ShouldFadeOutBeforeLoading(nextScene))
+        {
+            if (bgm.waitForFadeOutBeforeTransition)
+            {
+                StartCoroutine(FadeOutBgmThenStartSceneLoad(bgm, nextScene, blackText));
+                return;
+            }
+            bgm.FadeOutAndStop();
+        }
+
+        ExecuteSceneLoadImmediate(nextScene, blackText);
+    }
+
+    private IEnumerator FadeOutBgmThenStartSceneLoad(GlobalBgmManager bgm, string nextScene, string blackText)
+    {
+        if (bgm != null)
+        {
+            yield return bgm.FadeOutAndStopRoutine();
+        }
+        ExecuteSceneLoadImmediate(nextScene, blackText);
+    }
+
+    private void ExecuteSceneLoadImmediate(string nextScene, string blackText)
     {
         SceneBlinkTransition trans = SceneBlinkTransition.EnsureInstance();
         if (!string.IsNullOrEmpty(blackText))
