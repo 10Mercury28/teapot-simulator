@@ -14,10 +14,6 @@ position: 12,12
 <<declare $MindW3 = 0>>
 <<declare $MindW4 = 0>>
 <<declare $MindW5 = 0>>
-
-// 临时占位声明（等 Character_Jushi_revised 英文版加入 MyProject_Eng 后，删除这两行避免重复声明）
-<<declare $JushiSuccess = false>>
-<<declare $LikeU = false>>
 ===
 
 title: MindMaze_OpenScene
