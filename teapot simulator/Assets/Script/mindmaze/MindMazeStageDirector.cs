@@ -282,6 +282,7 @@ public class MindMazeStageDirector : MonoBehaviour
         // 3. 启动 Yarn 开场白
         if (dialogueRunner != null && !dialogueRunner.IsDialogueRunning)
         {
+            YarnLanguageBridge.ApplyToRunner(dialogueRunner);
             GlobalProgressManager.EnsureInstance();
             if (animationController != null)
             {

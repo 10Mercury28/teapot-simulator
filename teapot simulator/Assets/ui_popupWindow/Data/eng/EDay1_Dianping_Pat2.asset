@@ -25,6 +25,6 @@ MonoBehaviour:
   incomingLoopSfx: {fileID: 8300000, guid: a04ecf2458305b14f9dc60b540e65872, type: 3}
   voiceClip: {fileID: 0}
   isDeliveryOrder: 0
-  confirmButtonText: "\u786E\u8BA4\u53D6\u4EF6"
+  confirmButtonText: Confirm
   targetSceneOnConfirm: 
   interruptWorkAndFail: 0

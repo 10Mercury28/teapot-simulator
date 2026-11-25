@@ -108,6 +108,7 @@ public class MindMazeAnimationController : MonoBehaviour
         {
             AutoSetupCharacters();
         }
+        EnsureBuiltInAliases();
 
         // 初始让所有角色全部静止（等待首个 Node 指令唤醒参与者）
         FreezeAllCharacters();
@@ -577,7 +578,7 @@ public class MindMazeAnimationController : MonoBehaviour
 
             if (!string.IsNullOrEmpty(c.aliases))
             {
-                string[] aliasList = c.aliases.Split(new char[] { ',', '，', '、', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] aliasList = c.aliases.Split(new char[] { ',', '，', '、' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (string a in aliasList)
                 {
                     string aliasLower = a.Trim().ToLowerInvariant();
@@ -590,6 +591,62 @@ public class MindMazeAnimationController : MonoBehaviour
         return null;
     }
 
+    private static readonly (string id, string aliases, string childName, string idle, string talk)[] BuiltInCharacterCatalog =
+    {
+        ("BC", "BC,宝钗,薛宝钗,BaoChai,Baochai,Xue Baochai", "BC", "BC_idle", "BC_talk"),
+        ("VW", "VW,伍尔夫,弗吉尼亚,Virginia,Virginia Woolf,Woolf", "VW", "VW_idle", "VW_talk"),
+        ("courtesan", "courtesan,名妓,C,Courtesan,Oiran", "courtesan", "C_idle", "C_talk"),
+        ("MBTI", "MBTI,mbti,enfp,ENFP", "MBTIPanel", "enfp_idle", "enfp_talk"),
+        ("kong", "kong,孔子,金猴,Confucius,Golden Monkey,Monkey", "kong", "kong idle", "kong idle"),
+        ("LM", "LM,吕蒙,Lu Meng,Lü Meng,Lumeng", "LM", "LM_idle", "LM_talk"),
+        ("Mercury", "Mercury,MercuryPanel,水星,赫尔墨斯,“赫尔墨斯”,Hermes", "MercuryPanel", "Mercury_Idle", "Mercury_Talk"),
+        ("KX", "KX,柯湘,康熙,Ke Xiang,Kangxi,Kexiang", "KX", "KX_idle", "KX_talk"),
+        ("zodiac", "zodiac,生肖,Zodiac,Chinese Zodiac", "zodiac", "zodiac_idle", "zodiac_talk"),
+        ("XZ", "XZ,星座,Constellation,Horoscope,Star Sign,Astrology", "星座", "XZ_idle", "XZ_talk"),
+        ("mirror", "mirror,镜中人,“镜中人”,镜子,奥斯卡,镜子中的“奥斯卡”,Person in the Mirror,The Person in the Mirror,Mirror Person,Man in the Mirror,Woman in the Mirror,Oscar,Oscar in the Mirror", "mirror", "Mirror_Idle", "Mirror_Talk"),
+        ("bilbo", "bilbo,比尔博,“比尔博”,Bilbo,Bilbo Baggins", "bilbo", "Bilbo_idle", "Bilbo_talk")
+    };
+
+    private void EnsureBuiltInAliases()
+    {
+        if (characters == null || characters.Count == 0) return;
+
+        foreach (var entry in characters)
+        {
+            if (entry == null || string.IsNullOrEmpty(entry.id)) continue;
+            string entryId = entry.id.Trim();
+
+            for (int i = 0; i < BuiltInCharacterCatalog.Length; i++)
+            {
+                if (!string.Equals(BuiltInCharacterCatalog[i].id, entryId, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var existing = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                if (!string.IsNullOrEmpty(entry.aliases))
+                {
+                    foreach (var token in entry.aliases.Split(new char[] { ',', '，', '、' }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        string trimmed = token.Trim();
+                        if (!string.IsNullOrEmpty(trimmed)) existing.Add(trimmed);
+                    }
+                }
+
+                var merged = new List<string>(existing);
+                foreach (var builtInToken in BuiltInCharacterCatalog[i].aliases.Split(','))
+                {
+                    string trimmed = builtInToken.Trim();
+                    if (!string.IsNullOrEmpty(trimmed) && existing.Add(trimmed))
+                    {
+                        merged.Add(trimmed);
+                    }
+                }
+
+                entry.aliases = string.Join(",", merged);
+                break;
+            }
+        }
+    }
+
     /// <summary>
     /// 一键扫描并自动填充场景内角色的 Animator 和对应状态名
     /// 可在 Inspector 组件右上角齿轮点击 "Auto Setup Characters From Hierarchy" 触发
@@ -599,22 +656,8 @@ public class MindMazeAnimationController : MonoBehaviour
     {
         characters.Clear();
 
-        // 预定义工程中已有的知名角色映射表
-        var defaultCatalog = new (string id, string aliases, string childName, string idle, string talk)[]
-        {
-            ("BC", "BC,宝钗,薛宝钗,BaoChai", "BC", "BC_idle", "BC_talk"),
-            ("VW", "VW,伍尔夫,弗吉尼亚,Virginia", "VW", "VW_idle", "VW_talk"),
-            ("courtesan", "courtesan,名妓,C", "courtesan", "C_idle", "C_talk"),
-            ("MBTI", "MBTI,mbti,enfp", "MBTIPanel", "enfp_idle", "enfp_talk"),
-            ("kong", "kong,孔子,金猴", "kong", "kong idle", "kong idle"),
-            ("LM", "LM,吕蒙", "LM", "LM_idle", "LM_talk"),
-            ("Mercury", "Mercury,MercuryPanel,水星,赫尔墨斯,“赫尔墨斯”", "MercuryPanel", "Mercury_Idle", "Mercury_Talk"),
-            ("KX", "KX,柯湘,康熙", "KX", "KX_idle", "KX_talk"),
-            ("zodiac", "zodiac,生肖", "zodiac", "zodiac_idle", "zodiac_talk"),
-            ("XZ", "XZ,星座", "星座", "XZ_idle", "XZ_talk"),
-            ("mirror", "mirror,镜中人,“镜中人”,镜子,奥斯卡,镜子中的“奥斯卡”", "mirror", "Mirror_Idle", "Mirror_Talk"),
-            ("bilbo", "bilbo,比尔博,“比尔博”", "bilbo", "Bilbo_idle", "Bilbo_talk")
-        };
+        // 预定义工程中已有的知名角色映射表（同时覆盖中/英文别名）
+        var defaultCatalog = BuiltInCharacterCatalog;
 
         foreach (var item in defaultCatalog)
         {

@@ -216,6 +216,7 @@ public class PopupManager : MonoBehaviour
             return false;
         }
 
+        data = ResolveLocalizedPopup(data);
         CurrentData = data;
         Debug.Log($"🔔 [PopupManager] 弹出窗口: {data.popupId} | 标题: {data.bannerTitle}");
 
@@ -247,25 +248,87 @@ public class PopupManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 根据预注册的 popupId 或资产名查找弹窗数据
+    /// 按当前语言将弹窗数据自动切换到中/英文对应资产（英文版命名约定为 E + 中文 ID，如 EDay1_ShaoA）。
+    /// </summary>
+    public PopupWindowDataSO ResolveLocalizedPopup(PopupWindowDataSO data)
+    {
+        if (data == null) return null;
+
+        if (OrientPearlLanguage.IsEnglish)
+        {
+            if (!string.IsNullOrEmpty(data.popupId) && !data.popupId.StartsWith("E", StringComparison.OrdinalIgnoreCase))
+            {
+                PopupWindowDataSO eng = FindExactPopupData("E" + data.popupId);
+                if (eng != null) return eng;
+            }
+            if (!string.IsNullOrEmpty(data.name) && !data.name.StartsWith("E", StringComparison.OrdinalIgnoreCase))
+            {
+                PopupWindowDataSO eng = FindExactPopupData("E" + data.name);
+                if (eng != null) return eng;
+            }
+        }
+        else
+        {
+            if (!string.IsNullOrEmpty(data.popupId) && data.popupId.StartsWith("E", StringComparison.OrdinalIgnoreCase) && data.popupId.Length > 1)
+            {
+                PopupWindowDataSO zh = FindExactPopupData(data.popupId.Substring(1));
+                if (zh != null) return zh;
+            }
+            if (!string.IsNullOrEmpty(data.name) && data.name.StartsWith("E", StringComparison.OrdinalIgnoreCase) && data.name.Length > 1)
+            {
+                PopupWindowDataSO zh = FindExactPopupData(data.name.Substring(1));
+                if (zh != null) return zh;
+            }
+        }
+
+        return data;
+    }
+
+    private PopupWindowDataSO FindExactPopupData(string exactId)
+    {
+        if (string.IsNullOrEmpty(exactId)) return null;
+
+        PopupWindowDataSO found = registeredPopups.Find(p => p != null && string.Equals(p.popupId, exactId, StringComparison.OrdinalIgnoreCase));
+        if (found != null) return found;
+
+        found = registeredPopups.Find(p => p != null && string.Equals(p.name, exactId, StringComparison.OrdinalIgnoreCase));
+        if (found != null) return found;
+
+        PopupWindowDataSO[] allLoaded = Resources.FindObjectsOfTypeAll<PopupWindowDataSO>();
+        foreach (var p in allLoaded)
+        {
+            if (p == null) continue;
+            if (string.Equals(p.popupId, exactId, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(p.name, exactId, StringComparison.OrdinalIgnoreCase))
+            {
+                return p;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 根据预注册的 popupId 或资产名查找弹窗数据（自动跟随当前中/英文设置）
     /// </summary>
     public PopupWindowDataSO FindPopupData(string id)
     {
         if (string.IsNullOrEmpty(id)) return null;
 
-        // 1. 精确匹配 popupId
-        PopupWindowDataSO found = registeredPopups.Find(p => p != null && string.Equals(p.popupId, id, StringComparison.OrdinalIgnoreCase));
-        if (found != null) return found;
+        if (OrientPearlLanguage.IsEnglish && !id.StartsWith("E", StringComparison.OrdinalIgnoreCase))
+        {
+            PopupWindowDataSO engExact = FindExactPopupData("E" + id);
+            if (engExact != null) return engExact;
+        }
 
-        // 2. 精确匹配 asset 资产名
-        found = registeredPopups.Find(p => p != null && string.Equals(p.name, id, StringComparison.OrdinalIgnoreCase));
-        if (found != null) return found;
+        PopupWindowDataSO exact = FindExactPopupData(id);
+        if (exact != null) return ResolveLocalizedPopup(exact);
 
         // 3. 包含模糊匹配 (例如 "Dianping" 匹配 "Day1_Dianping_Pat2")
-        found = registeredPopups.Find(p => p != null && 
+        PopupWindowDataSO found = registeredPopups.Find(p => p != null && 
             ((p.popupId != null && p.popupId.IndexOf(id, StringComparison.OrdinalIgnoreCase) >= 0) ||
              (p.name != null && p.name.IndexOf(id, StringComparison.OrdinalIgnoreCase) >= 0)));
-        if (found != null) return found;
+        if (found != null) return ResolveLocalizedPopup(found);
 
         // 4. 从内存/已加载资产中查找 (防止策划未手动拖入 registeredPopups)
         PopupWindowDataSO[] allLoaded = Resources.FindObjectsOfTypeAll<PopupWindowDataSO>();
@@ -277,7 +340,7 @@ public class PopupManager : MonoBehaviour
                 (p.popupId != null && p.popupId.IndexOf(id, StringComparison.OrdinalIgnoreCase) >= 0) ||
                 (p.name != null && p.name.IndexOf(id, StringComparison.OrdinalIgnoreCase) >= 0))
             {
-                return p;
+                return ResolveLocalizedPopup(p);
             }
         }
 

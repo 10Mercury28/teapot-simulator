@@ -1504,10 +1504,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -1562,6 +1562,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 208fc2bf3dd2423ab08b5757bf39b448, type: 2}
   - {fileID: 11400000, guid: ba2edc4fce626b645bfcd62e908dc760, type: 2}
   - {fileID: 11400000, guid: 4aebfe0cf32adbd4f8eba011a8c9ac48, type: 2}
+  - {fileID: 11400000, guid: 9aaecc608170d4b5c9ce5e9d02378dba, type: 2}
+  - {fileID: 11400000, guid: d8c106ab428bd441bb847ca5eebf5bec, type: 2}
+  - {fileID: 11400000, guid: 239f889a0cb9e42069e86c50f5c7a022, type: 2}
+  - {fileID: 11400000, guid: 940e3291614214b729f51a6311790cc2, type: 2}
+  - {fileID: 11400000, guid: 144d85d6c66a64ad18743924753ac14d, type: 2}
+  - {fileID: 11400000, guid: 152acdae68cc84dabb43df323238116c, type: 2}
+  - {fileID: 11400000, guid: e0d96373185d9408ca441a21fae547e6, type: 2}
   dontDestroyOnLoad: 0
   debugTestSO: {fileID: 11400000, guid: 37518e0c73df2408fb315b422d45dd08, type: 2}
   debugKey: 0

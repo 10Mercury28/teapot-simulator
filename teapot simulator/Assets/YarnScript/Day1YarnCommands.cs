@@ -164,6 +164,7 @@ public class Day1YarnCommands : MonoBehaviour
 
     private void Start()
     {
+        YarnLanguageBridge.ApplyToRunner(dialogueRunner);
         SyncStateToYarn();
     }
 

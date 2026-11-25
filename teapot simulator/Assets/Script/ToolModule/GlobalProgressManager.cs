@@ -287,7 +287,7 @@ public class GlobalProgressManager : MonoBehaviour
         }
 
         string nextScene = sceneSequence[currentOrder];
-        string blackText = GetDefaultBlackTextForTransition(nextScene, currentOrder);
+        string blackText = LocalizeBlackScreenText(GetDefaultBlackTextForTransition(nextScene, currentOrder));
         Debug.Log($"🚀 [Global] 跳转到场景：{nextScene} (Day={currentDay}, Index={currentOrder}, BlackText='{blackText}')");
 
         StartSceneLoad(nextScene, blackText);
@@ -310,9 +310,9 @@ public class GlobalProgressManager : MonoBehaviour
         sceneTransitioning = true;
 
         ApplySceneTargetState(sceneName, nextDay);
-        string effectiveText = !string.IsNullOrEmpty(blackScreenText)
+        string effectiveText = LocalizeBlackScreenText(!string.IsNullOrEmpty(blackScreenText)
             ? blackScreenText
-            : GetDefaultBlackTextForTransition(sceneName, currentOrder);
+            : GetDefaultBlackTextForTransition(sceneName, currentOrder));
 
         Debug.Log($"🚀 [Global] 指定切场 → '{sceneName}' (Day={currentDay}, Index={currentOrder}, BlackText='{effectiveText}')");
         StartSceneLoad(sceneName, effectiveText);
@@ -343,9 +343,9 @@ public class GlobalProgressManager : MonoBehaviour
         }
 
         ApplySceneTargetState(sceneName, nextDay);
-        string effectiveText = !string.IsNullOrEmpty(blackScreenText)
+        string effectiveText = LocalizeBlackScreenText(!string.IsNullOrEmpty(blackScreenText)
             ? blackScreenText
-            : GetDefaultBlackTextForTransition(sceneName, currentOrder);
+            : GetDefaultBlackTextForTransition(sceneName, currentOrder));
 
         Debug.Log($"🚀 [Global] 协同切场 → '{sceneName}' (Day={currentDay}, Index={currentOrder}, BlackText='{effectiveText}')");
 
@@ -404,6 +404,26 @@ public class GlobalProgressManager : MonoBehaviour
             case "Ending":
                 currentOrder = 7;
                 break;
+        }
+    }
+
+    public static string LocalizeBlackScreenText(string text)
+    {
+        if (!OrientPearlLanguage.IsEnglish || string.IsNullOrEmpty(text))
+            return text;
+
+        switch (text.Trim())
+        {
+            case "第一天":
+                return "Day 1";
+            case "第二天":
+                return "Day 2";
+            case "入夜":
+                return "Nightfall";
+            case "回到前一天":
+                return "The Previous Day";
+            default:
+                return text;
         }
     }
 
