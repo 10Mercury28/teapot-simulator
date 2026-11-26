@@ -772,12 +772,15 @@ position: 923,1137
 [b]【请根据此次销售扫描册子上的二维码或输入对应货源代码】[/b]
 <<d2_scan "09-H2zhuangjj">>
 <<if $D2ScanMatched>>
+    [b]【出库成功】[/b]
     [b]【未来发生了变化】[/b]
     <<set $D2GiftCode to "09-H2zhuangjj">>
     <<set $D2GiftName to "梅桩壶">>
     <<jump JushiD2_AfterGift>>
 <<else>>
     居士: 不对吧（啧），这不是我要的，重新来。
+    [b]【商品与订单不符】[/b]
+    （快出库正确的商品！）
     <<jump JushiD2_ScanMeiZhuang>>
 <<endif>>
 ===
@@ -788,12 +791,15 @@ position: 1503,1137
 [b]【请根据此次销售扫描册子上的二维码或输入对应货源代码】[/b]
 <<d2_scan "09-H1FoShouJ">>
 <<if $D2ScanMatched>>
+    [b]【出库成功】[/b]
     [b]【未来发生了变化】[/b]
     <<set $D2GiftCode to "09-H1FoShouJ">>
     <<set $D2GiftName to "佛手提梁壶">>
     <<jump JushiD2_AfterGift>>
 <<else>>
     居士: 不对吧（啧），这不是我要的，重新来。
+    [b]【商品与订单不符】[/b]
+    （快出库正确的商品！）
     <<jump JushiD2_ScanFoShou>>
 <<endif>>
 ===
@@ -804,12 +810,15 @@ position: 633,1137
 [b]【请根据此次销售扫描册子上的二维码或输入对应货源代码】[/b]
 <<d2_scan "05-HeHuanHu">>
 <<if $D2ScanMatched>>
+    [b]【出库成功】[/b]
     [b]【未来发生了变化】[/b]
     <<set $D2GiftCode to "05-HeHuanHu">>
     <<set $D2GiftName to "合欢壶">>
     <<jump JushiD2_AfterGift>>
 <<else>>
     居士: 不对吧（啧），这不是我要的，重新来。
+    [b]【商品与订单不符】[/b]
+    （快出库正确的商品！）
     <<jump JushiD2_ScanHeHuan>>
 <<endif>>
 ===
@@ -820,12 +829,15 @@ position: 1213,1137
 [b]【请根据此次销售扫描册子上的二维码或输入对应货源代码】[/b]
 <<d2_scan "04-FangXingHj">>
 <<if $D2ScanMatched>>
+    [b]【出库成功】[/b]
     [b]【未来发生了变化】[/b]
     <<set $D2GiftCode to "04-FangXingHj">>
     <<set $D2GiftName to "方片壶">>
     <<jump JushiD2_AfterGift>>
 <<else>>
     居士: 不对吧（啧），这不是我要的，重新来。
+    [b]【商品与订单不符】[/b]
+    （快出库正确的商品！）
     <<jump JushiD2_ScanFangPian>>
 <<endif>>
 ===

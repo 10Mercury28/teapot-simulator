@@ -839,6 +839,7 @@ position: 923,1137
 ---
 <<d2_scan "09-H2zhuangjj">>
 <<if $D2ScanMatched>>
+    [b]【Item successfully checked out.】[/b]
     [b]The future has changed.[/b]
     <<set $D2GiftCode to "09-H2zhuangjj">>
     <<set $D2GiftName to "Plum-Stump Teapot">>
@@ -846,6 +847,8 @@ position: 923,1137
 <<else>>
     Jushi: That's not right. (She clicks her tongue) 
     Jushi: That's not the one I asked for. Try again.
+    [b]【Item does not match the order.】[/b]
+    (Hurry! Check out the correct item!)
     <<jump JushiD2_ScanMeiZhuang>>
 <<endif>>
 ===
@@ -855,6 +858,7 @@ position: 1503,1137
 ---
 <<d2_scan "09-H1FoShouJ">>
 <<if $D2ScanMatched>>
+    [b]【Item successfully checked out.】[/b]
     [b]The future has changed.[/b]
     <<set $D2GiftCode to "09-H1FoShouJ">>
     <<set $D2GiftName to "Buddha's Hand Overhead-Handle Teapot">>
@@ -862,6 +866,8 @@ position: 1503,1137
 <<else>>
     Jushi: That's not right. (She clicks her tongue) 
     Jushi: That's not the one I asked for. Try again.
+    [b]【Item does not match the order.】[/b]
+    (Hurry! Check out the correct item!)
     <<jump JushiD2_ScanFoShou>>
 <<endif>>
 ===
@@ -871,6 +877,7 @@ position: 633,1137
 ---
 <<d2_scan "05-HeHuanHu">>
 <<if $D2ScanMatched>>
+    [b]【Item successfully checked out.】[/b]
     [b]The future has changed.[/b]
     <<set $D2GiftCode to "05-HeHuanHu">>
     <<set $D2GiftName to "Mansheng Sharing-Joy Teapot">>
@@ -878,6 +885,8 @@ position: 633,1137
 <<else>>
     Jushi: That's not right. (She clicks her tongue) 
     Jushi: That's not the one I asked for. Try again.
+    [b]【Item does not match the order.】[/b]
+    (Hurry! Check out the correct item!)
     <<jump JushiD2_ScanHeHuan>>
 <<endif>>
 ===
@@ -887,6 +896,7 @@ position: 1213,1137
 ---
 <<d2_scan "04-FangXingHj">>
 <<if $D2ScanMatched>>
+    [b]【Item successfully checked out.】[/b]
     [b]The future has changed.[/b]
     <<set $D2GiftCode to "04-FangXingHj">>
     <<set $D2GiftName to "Square-Panel Teapot">>
@@ -894,6 +904,8 @@ position: 1213,1137
 <<else>>
     Jushi: That's not right. (She clicks her tongue) 
     Jushi: That's not the one I asked for. Try again.
+    [b]【Item does not match the order.】[/b]
+    (Hurry! Check out the correct item!)
     <<jump JushiD2_ScanFangPian>>
 <<endif>>
 ===
