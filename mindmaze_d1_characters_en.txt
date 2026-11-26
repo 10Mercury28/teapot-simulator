@@ -1,0 +1,1363 @@
+================================================================================
+Mind_Maze_D1_Eng.yarn — 脑内迷宫 12 位角色英文翻译对照稿
+================================================================================
+源文件: Assets/YarnScript/Mind_Maze_D1_Eng.yarn
+覆盖范围: 全部 328 句脑内角色对白（含 2 句多人合唱行），按 Node 与原始行号 [L###] 排列。
+未包含: 单独的「我: / “我”:」对白、玩家选项及独立旁白行（留给 partner 自行翻译并手动核对粘贴）。
+
+【⚠️ 说话人英文名已与 MindMazeAnimationController.cs 内置别名 100% 对齐】
+直接按以下英文名字粘贴进 Mind_Maze_D1_Eng.yarn，角色张嘴/待机动画会自动生效：
+- 宝钗       -> Baochai              (从容典雅、含蓄通透、偶带俏皮机锋的古典才女)
+- 吕蒙       -> Lu Meng              (厚道务实、谦逊温和、带点兵家烟火气的自学老大哥)
+- 柯湘       -> Ke Xiang             (沉稳清醒、历史唯物主义导师感、温厚而不失锐度)
+- “赫尔墨斯” -> "Hermes"             (学术脑、人文研究生式热情与理论狂飙、慌起来会戏剧化抓狂)
+- 伍尔夫     -> Virginia Woolf       (诗意敏锐、细腻犀利的现代主义女性主义语调)
+- 名妓       -> Courtesan            (开场古雅清冷，转入尖锐炽烈、带刺又痛彻的清醒)
+- “比尔博”   -> "Bilbo"              (慈爱唠叨、老派温情、护短又容易不好意思的霍比特长辈)
+- 镜中人     -> Person in the Mirror (冷峻毒舌、手术刀般克制精准的心理剖析者)
+- MBTI       -> MBTI                 (贴心软萌的当代互联网闺蜜语气)
+- 星座       -> Constellation        (干脆利落、带点吐槽感的当代损友)
+- 生肖       -> Zodiac               (暴躁直球、一秒破防的当代损友)
+- 金猴       -> Golden Monkey        (冷静补刀、简短淡定)
+
+【术语统一（与 Day 1 / Day 2 保持一致）】
+- 侯居士 -> Madame Hou | 紫砂壶 -> purple clay teapot | 供春壶 -> Gongchun teapot
+- 冷香丸 -> Cold Fragrance Pill | 氿边 -> by the lake (Jiu Lake / lakeside)
+================================================================================
+
+
+================================================================================
+NODE: MindMaze_1 (43 lines)
+================================================================================
+
+[L119]
+原文: 宝钗: 漫揾英雄泪，相离处士家。谢慈悲，剃度在莲台下。
+译文: Baochai: Wipe not the hero's tears, leave the scholar's house behind; thank mercy, take the tonsure beneath the lotus throne.
+
+[L120]
+原文: 宝钗: 没缘法，转眼分离乍。赤条条，来去无牵挂。
+译文: Baochai: When fate runs dry, we part in the blink of an eye; naked and unbound we come, naked and unbound we go.
+
+[L121]
+原文: 宝钗: 那里讨，烟蓑雨笠卷单行？一任俺，芒鞋破钵随缘化！
+译文: Baochai: Where to seek a straw cloak and bamboo hat for a solitary road? Leave me to straw sandals and a cracked alms bowl, wandering as fate decrees!
+
+[L123]
+原文: 宝钗: 她既然对你和善，你又何妨投桃报李呢？
+译文: Baochai: Since she treated you kindly, what harm is there in returning the courtesy?
+
+[L125]
+原文: 宝钗: 既然她愿意同你交流，那你就不卑不亢地回答。只不过，倒也不用妄自菲薄。
+译文: Baochai: If she is willing to converse with you, answer her with quiet poise—neither servile nor haughty. Still, there is no need to belittle yourself.
+
+[L126]
+原文: 宝钗: 我看，她或许是没有完全了悟的，才会和你说这么多话。
+译文: Baochai: To my eye, she may not have fully seen through things herself—that is why she had so much to say to you.
+
+[L127]
+原文: 宝钗: 案头是蒙了灰，还是摆着鲜花清供，难道就能妨碍她修心了？
+译文: Baochai: Whether a desk gathers dust or holds fresh flowers and refined offerings—could that truly hinder her from cultivating the mind?
+
+[L128]
+原文: 宝钗: 她既说不执着于物，那些陈设和礼数又如何能够牵动她的分别心呢？
+译文: Baochai: If she claims non-attachment to material things, how could mere furnishings and etiquette stir her discriminating mind?
+
+[L129]
+原文: 宝钗: 若是真要斩断尘缘，送朋友一件称心的小礼物也就是了。
+译文: Baochai: If one truly meant to sever worldly ties, picking out a modest gift to please a friend would have been enough.
+
+[L130]
+原文: 宝钗: 何必还托着市教育局、什么公司的旧关系，先通传你一声，叫人安排得像是商务接待？
+译文: Baochai: Why pull old strings through the municipal education bureau or some company, sending word ahead so you'd set it up like an official reception?
+
+[L131]
+原文: 宝钗: 她分明可以只和你缔结消费者与销售的关系，
+译文: Baochai: She could plainly have kept things between you as simple as customer and clerk—
+
+[L132]
+原文: 宝钗: 怎么还结一层老板家里的亲眷与下属的服务关系呢？
+译文: Baochai: why layer on the extra tie of boss's honored acquaintance and employee obliged to attend her?
+
+[L133]
+原文: 宝钗: 末了，她又告诉你儿子在哪里念书、念什么学位。
+译文: Baochai: And at the very end, she still made sure to tell you where her son studies and what degree he's pursuing.
+
+[L134]
+原文: 宝钗: 她儿子自然是她的心头肉，可这些世俗的功名，与你有什么相干呢？
+译文: Baochai: Her son is naturally the apple of her eye, yet what concern are those worldly credentials of his to you?
+
+[L135]
+原文: 宝钗: 可见这尘缘，也不是说放下，就放下了的。
+译文: Baochai: So you see, worldly attachments are not so easily set down merely by saying one has let them go.
+
+[L143]
+原文: 吕蒙: 我只觉得，人读书、学本事，终究还是希望把日子过好些，让身边的人也过好些。
+译文: Lu Meng: The way I see it, people read books and learn skills because, at the end of the day, they want a better life for themselves and for the folks around them.
+
+[L144]
+原文: 吕蒙: 至于最后会是什么样……
+译文: Lu Meng: As for what the final destination looks like...
+
+[L145]
+原文: 吕蒙: 共产主义、极乐世界、大同世界，还是现在好多人说的那个，社民的福利国家？
+译文: Lu Meng: Communism, the Pure Land of Ultimate Bliss, the Great Unity, or that social-democratic welfare state everyone talks about nowadays?
+
+[L146]
+原文: 吕蒙: 我不知道。
+译文: Lu Meng: I honestly don't know.
+
+[L147]
+原文: 吕蒙: 能不能和而不同呢？我也不知道。
+译文: Lu Meng: Can people really live in harmony while keeping their differences? I don't know that either.
+
+[L148]
+原文: 吕蒙: 有人想着穷苦的人，有人想让乡里自己管自己的事。
+译文: Lu Meng: Some look out for the poor; some want local communities to govern their own affairs.
+
+[L149]
+原文: 吕蒙: 还有人替女人、替那些没什么人听他们说话的人，争一争。
+译文: Lu Meng: And others fight for women, and for all the people nobody ever bothers to listen to.
+
+[L150]
+原文: 吕蒙: 他们的主张不一定一样，心思也不一定一样。
+译文: Lu Meng: Their platforms aren't always the same, and neither are their motives.
+
+[L151]
+原文: 吕蒙: 有人想救世，有人是菩萨心肠，
+译文: Lu Meng: Some want to save the world, some genuinely have a bodhisattva's heart,
+
+[L152]
+原文: 吕蒙: 也有人只是想要自己出风头。
+译文: Lu Meng: and some just want to show off and hear themselves talk.
+
+[L153]
+原文: 吕蒙: 但做了实在的好事，总归是值得珍惜的。也不能说谁就把道理全占了。
+译文: Lu Meng: Still, any real, tangible good done is worth cherishing. Nobody gets to claim a monopoly on being right.
+
+[L154]
+原文: 吕蒙: 你可以认识他们，和他们说话，理解或者不理解。
+译文: Lu Meng: You can meet them, talk with them, understand them—or not understand them.
+
+[L155]
+原文: 吕蒙: 至于人家愿不愿意听你说，那也得相处了才知道。
+译文: Lu Meng: As for whether they're willing to listen to you in return, you only find out by spending time with them.
+
+[L156]
+原文: 吕蒙: 不必事事都赞同，也不用事事争个高下。
+译文: Lu Meng: You don't have to agree on everything, and you don't have to turn every conversation into a contest.
+
+[L157]
+原文: 吕蒙: 了解别人的思考过程和处境，然后边看边决定你要怎么趟水过河。
+译文: Lu Meng: Understand how others think and where they're standing—then feel out the stones and decide how you'll cross the river yourself.
+
+[L158]
+原文: 宝钗: 可欲之谓善，有诸己之谓信，充实之谓美。
+译文: Baochai: What is worthy of desire is called good; to hold it within oneself is called true; to be filled with it is called beauty.
+
+[L159]
+原文: 柯湘: (为我顺手整理衣领) 教员说吕蒙传红军不可不读，
+译文: Ke Xiang: (Straightening your collar casually.) Chairman Mao said the Biography of Lu Meng is required reading for the Red Army,
+
+[L160]
+原文: 柯湘: 宝钗又是古典小说魁首中并列第一的伟大人物。
+译文: Ke Xiang: and Baochai stands at the very summit of China's greatest classical novel.
+
+[L162]
+原文: 柯湘: 可是，有时代局限性在，再大的学问见识，也不能包罗万象。
+译文: Ke Xiang: Yet every era has its historical limits—no matter how vast one's learning or insight, it can never encompass everything.
+
+[L163]
+原文: 柯湘: 人总无法打破自己被所在社会关系塑造的模样，
+译文: Ke Xiang: No one can wholly break free from the shape forged by their own social relations,
+
+[L164]
+原文: 柯湘: 以及或多或少被动形成的主张。
+译文: Ke Xiang: or the convictions formed, more or less passively, within them.
+
+[L165]
+原文: 柯湘: 你读了这么多书，走了这么多地方，哪能只靠别人替你寻找方向？
+译文: Ke Xiang: You've read so many books and traveled so far—how could you rely solely on others to point out your path?
+
+[L166]
+原文: 柯湘: 你详细看，仔细想，这些道理从哪里来，为什么这样讲？
+译文: Ke Xiang: Look closely and think carefully: where do these arguments come from, and why are they framed this way?
+
+[L167]
+原文: 柯湘: 哪些是好东西，值得你终身不忘；
+译文: Ke Xiang: Which parts are genuine gold, worth carrying for a lifetime;
+
+[L168]
+原文: 柯湘: 哪些背负着叙述者意识形态的负担，还要重新掂量？
+译文: Ke Xiang: and which carry the ideological baggage of their speaker, and need to be weighed anew?
+
+[L169]
+原文: 柯湘: 哪些道理本来有益，却被说话的方式遮住了光？
+译文: Ke Xiang: Which truths are sound at heart, yet dimmed by the manner in which they're spoken;
+
+[L170]
+原文: 柯湘: 哪些看似自然的表达，又无法超出语言结构划定的立场？
+译文: Ke Xiang: and which seemingly "natural" phrases can never step outside the stance built into the language itself?
+
+[L171]
+原文: 柯湘: 超越这些为你提供建议的人，你才能走到他们不曾到过的地方。
+译文: Ke Xiang: Only by moving beyond those who offer you counsel can you reach places they have never been.
+
+
+================================================================================
+NODE: MindMaze_2 (63 lines)
+================================================================================
+
+[L188]
+原文: 柯湘: 孩子，你已经想到了经济、政治、文化和社会关系.
+译文: Ke Xiang: Child, you're already thinking in terms of economics, politics, culture, and social relations.
+
+[L189]
+原文: 柯湘: 知道从这些地方发问，是个好方向。
+译文: Ke Xiang: Knowing to start your questions there is a strong direction.
+
+[L190]
+原文: 柯湘: 可你要研究佛教，就不能只看它在中国的模样。
+译文: Ke Xiang: But if you want to study Buddhism, you can't look only at the form it took in China.
+
+[L191]
+原文: 柯湘: 它最初在古印度怎样兴起？
+译文: Ke Xiang: How did it first emerge in ancient India?
+
+[L192]
+原文: 柯湘: 那时的人怎样生活，沙门为什么强调辩论与体悟，又在为什么事情苦苦思量？
+译文: Ke Xiang: How did people live back then—why did the Sramanas prize debate and direct realization, and what questions tormented them?
+
+[L193]
+原文: 柯湘: 僧团怎样形成又靠什么维持？
+译文: Ke Xiang: How did the monastic Sangha form, and what material base sustained it?
+
+[L194]
+原文: 柯湘: 为什么偏在孔雀王朝获得了政权的拉拢和国王的供养？
+译文: Ke Xiang: Why did it win state patronage and royal support specifically under the Maurya Empire?
+
+[L195]
+原文: 柯湘: 佛教和婆罗门传统怎样辩论、竞争、相互影响？
+译文: Ke Xiang: How did Buddhism debate, compete with, and reshape—and be reshaped by—the Brahmanical tradition?
+
+[L196]
+原文: 柯湘: 寺院、佛塔和佛像又怎么普及全国，变成瞻仰的对象？
+译文: Ke Xiang: How did monasteries, stupas, and statues spread across the land to become objects of veneration?
+
+[L197]
+原文: 柯湘: 希腊和西亚的造像怎么投射对悉达多肉身的幻想，
+译文: Ke Xiang: How did Greek and West Asian sculptural traditions project their vision onto Siddhartha's physical body,
+
+[L198]
+原文: 柯湘: 怎么来到中国，变成垂耳且敦厚的模样？
+译文: Ke Xiang: and how did that image travel to China and soften into the long-eared, serene figure we recognize today?
+
+[L199]
+原文: 柯湘: 又怎样，随着战乱、贸易、民族交往和王朝更替改变教义和方向？
+译文: Ke Xiang: And how did doctrine and direction shift again through warfare, trade, cross-cultural exchange, and the rise and fall of dynasties?
+
+[L200]
+原文: 柯湘: 我没法直接告诉你他和中国近代的北伐战争、城市化、反法西斯、解放战争、新中国的关系，
+译文: Ke Xiang: I can't simply hand you a summary of its ties to the Northern Expedition, urbanization, the anti-fascist war, the Liberation War, and New China—
+
+[L201]
+原文: 柯湘: 帮你断章取义、盲人摸象。
+译文: Ke Xiang: that would only leave you quoting out of context, like blind men groping an elephant.
+
+[L202]
+原文: 柯湘: 你要先阅读，向外探索，我们才有讨论的土壤。
+译文: Ke Xiang: Read first and explore outward; only then will we have real ground to discuss it on.
+
+[L203]
+原文: 柯湘: 看到不同的说法，不急着选一个相信，须知从来没有所谓中立。
+译文: Ke Xiang: When you encounter competing accounts, don't rush to pick one to believe—remember, there is no such thing as neutrality.
+
+[L204]
+原文: 柯湘: 先问问它们依据什么，又各自站在什么立场。
+译文: Ke Xiang: Ask first what evidence they rest on, and what standpoint each one speaks from.
+
+[L205]
+原文: 柯湘: 以后你再回来，我们一道讨论。
+译文: Ke Xiang: Come back later, and we'll talk it through together.
+
+[L206]
+原文: 柯湘: 到那时候，你或许能把这些问题同现代中国的身体文化、民族形式和国际交往联系起来，
+译文: Ke Xiang: By then, you might even link these questions to modern China's body culture, "national forms," and international exchange—
+
+[L207]
+原文: 柯湘: 和我再聊和我更切身相关的Emily Wilcox，Laurence Coderre，戏曲现代化相关的感想。
+译文: Ke Xiang: and share your thoughts on things closer to my own heart: Emily Wilcox, Laurence Coderre, and the modernization of Chinese opera.
+
+[L211]
+原文: 吕蒙: 这……孩子，
+译文: Lu Meng: Well... child,
+
+[L212]
+原文: 吕蒙: 我倒可以陪你聊聊江东的巫觋、方士，
+译文: Lu Meng: I can certainly chat with you about the shamans and alchemists of Jiangdong,
+
+[L213]
+原文: 吕蒙: 还有康僧会到建业传法、至尊为他建寺的故事。
+译文: Lu Meng: or how Kang Senghui came to Jianye to preach the Dharma and Lord Sun Quan built a temple for him.
+
+[L214]
+原文: 吕蒙: 我还能和你讲讲孙孝廉15岁随国太在潮音寺以佛教化民的神异八卦。
+译文: Lu Meng: I could even tell you the wondrous local gossip about fifteen-year-old Sun Xiaolian accompanying the Lady Dowager to Chaoyin Temple to edify the people with Buddhism.
+
+[L215]
+原文: 吕蒙: 可你若问，这件事是不是关系到江东对地方百姓的统治、有没有对抗或者吸纳地方士族的意味，
+译文: Lu Meng: But if you ask whether that tied into Eastern Wu's governance of commoners, or whether it was meant to counter or co-opt local aristocratic clans,
+
+[L216]
+原文: 吕蒙: 甚至江东地区和中原文化之间的往来……
+译文: Lu Meng: or even the cultural exchange between Jiangdong and the Central Plains...
+
+[L217]
+原文: 吕蒙: 毕竟，我只是因为和你读过《三国志》，读过《吴简与吴志》，还有《波峰与波谷》才获得栖身之所。
+译文: Lu Meng: After all, I only have a place in your head because we read Records of the Three Kingdoms, Wu Slips and Wu History, and Peaks and Troughs together.
+
+[L218]
+原文: 吕蒙: 如果它超出了你的认知，那么不管孱陵侯知不知道，我都无法回答。
+译文: Lu Meng: If it lies beyond what you yourself know, then whether the real Marquis of Chanling knew it or not, I can't answer you.
+
+[L219]
+原文: “赫尔墨斯”: 我们可以陪你阅读新的。你也不要焦虑会不会贪多嚼不烂。
+译文: "Hermes": We can read new books with you! And don't panic about biting off more than you can chew.
+
+[L220]
+原文: “赫尔墨斯”: 凭着我们一起去过北方的白马寺、龙门石窟，
+译文: "Hermes": Think of everywhere we've already been together—White Horse Temple and Longmen Grottoes up north,
+
+[L221]
+原文: “赫尔墨斯”: 南方的潮音寺、大觉寺、灵山、栖霞山，
+译文: "Hermes": Chaoyin Temple, Dajue Temple, Lingshan, and Qixia Mountain down south—
+
+[L222]
+原文: “赫尔墨斯”: 读过的尊佛、灭佛运动以及背后真正产生影响的经济基础、民众动员、社会组织形式和政治背景，
+译文: "Hermes": plus everything we've read on the waves of imperial patronage and suppression of Buddhism, and the real economic bases, popular mobilizations, social structures, and politics behind them—
+
+[L223]
+原文: “赫尔墨斯”: 有什么不能了解和吸纳的?
+译文: "Hermes": what is there you couldn't grasp and absorb?
+
+[L224]
+原文: “赫尔墨斯”: 难道你离开大学了，自己就不能了解新知识了？
+译文: "Hermes": Just because you left university, does that mean you can't learn anything new on your own?
+
+[L225]
+原文: 吕蒙: 是啊，也不用每件事都像你做东亚文化研究那样，一开始就查得那么细。
+译文: Lu Meng: Exactly—and you don't have to dig into every topic right away like you're writing an East Asian Studies thesis.
+
+[L226]
+原文: 吕蒙: 即使是看视频和纪录片也好。慢慢来，但当涉猎，把更大的亚洲放进你的眼睛里。
+译文: Lu Meng: Even watching videos and documentaries is fine. Take your time—read broadly, dip your toes in, and let a bigger Asia come into view.
+
+[L228]
+原文: 宝钗: 我先问你，空是什么？
+译文: Baochai: Let me ask you first—what is emptiness?
+
+[L230]
+原文: 宝钗: 是。一个你早知道的概念。
+译文: Baochai: Yes. A concept you already knew.
+
+[L231]
+原文: 宝钗: 空的意义不是一个变化无常可以穷尽的。
+译文: Baochai: Yet the meaning of emptiness cannot be exhausted by "impermanence" alone.
+
+[L232]
+原文: 宝钗: 它还追问事物是否具有独立不变的自性。
+译文: Baochai: It also asks whether anything possesses an independent, unchanging essence of its own.
+
+[L233]
+原文: 宝钗: 你原先也知道一些缘起、关系与变化的道理。
+译文: Baochai: You already knew a bit about dependent origination, relationality, and flux.
+
+[L234]
+原文: 宝钗: 怎么今天听人说了一番话，接触了一些陌生的概念，
+译文: Baochai: So why is it that after hearing someone speak today and brushing against a few unfamiliar terms,
+
+[L235]
+原文: 宝钗: 就急着要把它们与你自身的关系翻出来弄明白呢？
+译文: Baochai: you're suddenly in such a rush to dig up and settle how they relate to you personally?
+
+[L238]
+原文: 宝钗: 你瞧，空不是说一切都不存在。
+译文: Baochai: You see, emptiness does not mean nothing exists.
+
+[L239]
+原文: 宝钗: 事物因缘和合，没有独立不变的自性，却也并不是虚无。
+译文: Baochai: Things arise from the coming together of causes and conditions—lacking a fixed, independent essence, yet hardly mere nothingness.
+
+[L240]
+原文: 宝钗: 你今日听了许多陌生的说法，便急着确认自己与这些概念的关系。
+译文: Baochai: Today you heard a string of unfamiliar claims and hurried to pin down where you stand in relation to them.
+
+[L241]
+原文: 宝钗: 可是，连它们各自是什么意思，你还没来得及仔细分辨呢。
+译文: Baochai: Yet you haven't even had the time to distinguish carefully what each one actually means.
+
+[L243]
+原文: 宝钗: 你从前读哲学，也想过知识如何与自己的经验发生关系。
+译文: Baochai: Back when you read philosophy, you also wondered how knowledge connects to lived experience.
+
+[L244]
+原文: 宝钗: 知道一件事情，与真正理解它为什么对自己重要，总归还有区别。
+译文: Baochai: There is always a difference between merely knowing a thing and truly understanding why it matters to you.
+
+[L245]
+原文: “赫尔墨斯”: 我们不是读过梅洛-庞蒂和胡塞尔吗？
+译文: "Hermes": Didn't we read Merleau-Ponty and Husserl?
+
+[L246]
+原文: “赫尔墨斯”: 还记得 The Primacy of Perception 里说的
+译文: "Hermes": Remember in The Primacy of Perception, where he talks about
+
+[L247]
+原文: “赫尔墨斯”: The Paradox of Immanence and Transcendence 吗？
+译文: "Hermes": the Paradox of Immanence and Transcendence?
+
+[L248]
+原文: “赫尔墨斯”: 就像你面前放着一把紫砂壶，只看得见正面，却知道它还有背面、侧面，
+译文: "Hermes": It's like a purple clay teapot sitting in front of you—you only see the front, yet you know it also has a back and sides,
+
+[L249]
+原文: “赫尔墨斯”: 还有那些现在看不到的茶叶和被使用的场景被触摸把玩和交易的时刻。
+译文: "Hermes": plus the unseen tea leaves inside, the scenes where it's used, every moment it's held, admired, and bought and sold.
+
+[L250]
+原文: “赫尔墨斯”: 你所感知到的只是它的一面，但你经验到的从来不只是这一面。
+译文: "Hermes": What you directly perceive is only one aspect, yet what you experience is never just that single face.
+
+[L251]
+原文: “赫尔墨斯”: 梅洛-庞蒂说，感知是内在的，因为被感知的东西总是向感知它的人显现；
+译文: "Hermes": Merleau-Ponty says perception is immanent, because the perceived always reveals itself to the perceiver;
+
+[L252]
+原文: “赫尔墨斯”: 又是超越的，因为它总包含着超过当下所给予的部分。
+译文: "Hermes": and transcendent, because it always holds more than what is given in the immediate moment.
+
+[L253]
+原文: “赫尔墨斯”: 你很久以前就走马观花地看过佛教的一角。
+译文: "Hermes": Long ago you already glanced over a corner of Buddhism in passing.
+
+[L254]
+原文: “赫尔墨斯”: 你也知道，那些你尚未了解的历史、思想和社会关系，并不会因为你没看见就不存在。
+译文: "Hermes": And you know perfectly well that all the history, thought, and social relations you haven't studied yet don't cease to exist just because you haven't seen them.
+
+[L255]
+原文: “赫尔墨斯”: 可是奇怪啊，这个知识原本就在那儿。
+译文: "Hermes": Funny thing, though—that knowledge was sitting there all along.
+
+[L256]
+原文: “赫尔墨斯”: 怎么偏偏今天，听侯居士说了那么一番话，你突然就想把这把壶拎起来瞧瞧了？
+译文: "Hermes": Why is it today of all days, right after listening to Madame Hou hold forth, that you suddenly want to pick up this teapot and inspect every side of it?
+
+[L257]
+原文: 宝钗: 你现在这样急着弄明白佛学和佛教，究竟是因为真想研究它们，
+译文: Baochai: This sudden urgency to understand Buddhist thought and religion—is it because you truly wish to study them,
+
+[L258]
+原文: 宝钗: 还是因为今天这场谈话，让你觉得有些东西非得立刻弄懂不可？
+译文: Baochai: or because today's conversation left you feeling that there is something you simply must master right this instant?
+
+
+================================================================================
+NODE: MindMaze_3 (26 lines)
+================================================================================
+
+[L273]
+原文: MBTI: 你是不是累了，需要休息吗宝？
+译文: MBTI: Are you wiped out, babe? Do you need a break?
+
+[L274]
+原文: MBTI: 付出情绪劳动，一直 嗯嗯嗯 很累吧。
+译文: MBTI: Doing all that emotional labor—just going "mm-hm, mm-hm, right" nonstop—it's exhausting, isn't it?
+
+[L275]
+原文: MBTI: 你当然可以结束这些闲聊，
+译文: MBTI: Sure, in theory you could cut off the small talk—
+
+[L276]
+原文: MBTI: 但是老板和客户，还有你的工作性质，给你这个机会了吗？
+译文: MBTI: but did your boss, the customer, or the nature of your job ever really give you that choice?
+
+[L277]
+原文: MBTI: 有人这么接你的话吗？
+译文: MBTI: Does anyone ever catch the ball for you like that?
+
+[L278]
+原文: MBTI: 你的教育只是给你这么一个让话不要掉在地上的机会了吗
+译文: MBTI: Was your whole education just to qualify you for keeping awkward conversations from hitting the floor?
+
+[L279]
+原文: 伍尔夫: 亲爱的，在这么琐碎的占用你两个多小时的情绪劳动里，你自我还存在吗？
+译文: Virginia Woolf: My dear, through two whole hours of such trivial, consuming emotional labor, does your self even survive?
+
+[L280]
+原文: 伍尔夫: 你说的这些话你真的喜欢吗？你真的这么想吗? 你稳定的人格是否被淹没了？
+译文: Virginia Woolf: Did you even like the words coming out of your mouth? Did you truly mean them? Has your steady core of self been drowned beneath them?
+
+[L281]
+原文: 伍尔夫: 你还记得拉姆齐夫人吗？
+译文: Virginia Woolf: Do you remember Mrs. Ramsay?
+
+[L282]
+原文: 伍尔夫: 那样敏锐的女人，那样会察言观色、长袖善舞。
+译文: Virginia Woolf: A woman so acutely perceptive, so deft at reading every face and smoothing every room.
+
+[L283]
+原文: 伍尔夫: 她读莎翁、她记忆力超群，
+译文: Virginia Woolf: She read Shakespeare; she had an extraordinary memory—
+
+[L284]
+原文: 伍尔夫: 但这些天赋浪费在一遍遍让拉姆齐先生重拾哲学家信心的对话里，
+译文: Virginia Woolf: yet all those gifts were poured away in conversation after conversation restoring Mr. Ramsay's faith in himself as a philosopher,
+
+[L285]
+原文: 伍尔夫: 一次次全家乃至客人都舒服的对话里。
+译文: Virginia Woolf: in evening after evening spent making her family and every guest feel effortlessly at ease.
+
+[L286]
+原文: 伍尔夫: 可这些不像油画可以保留下来，大不了重新刷一层亮油。
+译文: Virginia Woolf: And unlike an oil painting, none of it can be preserved—not even by brushing on a fresh coat of varnish.
+
+[L287]
+原文: 伍尔夫: 拉姆齐夫人的满足和主动性，她的劳动，
+译文: Virginia Woolf: Mrs. Ramsay's quiet pride, her initiative, her labor—
+
+[L288]
+原文: 伍尔夫: 那些令人舒适的交流和家庭活动，那是一阵风，交流结束就被时间冲散了。
+译文: Virginia Woolf: all that gracious talk and domestic harmony was merely a breath of wind, scattered by time the moment the gathering broke up.
+
+[L289]
+原文: 伍尔夫: 你，我的朋友，嫁给了你的琐碎的职业吗？一遍遍绞尽脑汁回应这些话。
+译文: Virginia Woolf: And you, my friend—have you wedded yourself to your own trivial trade, racking your brain again and again to furnish the right reply?
+
+[L290]
+原文: 伍尔夫: 你的唾液变成的金钱只有一点点流入你的口袋，
+译文: Virginia Woolf: Only the tiniest trickle of the money spun from your breath ever reaches your own pocket,
+
+[L291]
+原文: 伍尔夫: 你的思想保留的不如一只你卖出去的壶久。
+译文: Virginia Woolf: and your thoughts will not endure half as long as a single teapot you hand across the counter.
+
+[L292]
+原文: 宝钗: 可是，难道你没有亲身活过这些光阴吗？
+译文: Baochai: Yet did you not live through those very hours yourself?
+
+[L293]
+原文: 宝钗: 从一场变化走向另一场变化，谁又能以什么形态被永远留住呢？
+译文: Baochai: Passing from one shift to the next, who among us—and in what form—can ever be kept forever?
+
+[L294]
+原文: 宝钗: 你感受着每一刻活着的时间，每一次交流，
+译文: Baochai: You felt every living moment, every exchange—
+
+[L295]
+原文: 宝钗: 讨厌、逃避、奉承、随和、快乐、幡然醒悟、观察，这都是生命本身。
+译文: Baochai: distaste, evasion, flattery, ease, joy, sudden clarity, quiet observation—all of it is life itself.
+
+[L296]
+原文: 宝钗: 既不全是别人从你这里拿走，也不全是时间从你手里流逝。
+译文: Baochai: It is neither wholly stolen from you by others, nor wholly slipped away through time's fingers.
+
+[L297]
+原文: 宝钗: 几曾随逝水？
+译文: Baochai: When have they ever drifted off with passing waters?
+
+[L298]
+原文: 宝钗: 岂必委芳尘？
+译文: Baochai: Why must they fall to lie in fragrant dust?
+
+
+================================================================================
+NODE: MindMaze_4 (113 lines)
+================================================================================
+
+[L309]
+原文: 名妓: 昔张岱得木龙，起丁丑诗社，恳诸公赐之名，并赋小言咏之。
+译文: Courtesan: Of old, Zhang Dai obtained a piece of driftwood shaped like a dragon, founded the Dingchou Poetry Society, and entreated the assembled gentlemen to bestow upon it a name and compose short verses in its praise.
+
+[L310]
+原文: 名妓: 张子不吝笔墨，记满座高朋之题咏，诸名盈帙；
+译文: Courtesan: Sparing neither brush nor ink, Master Zhang recorded every inscription from his distinguished guests until the volume overflowed with famed names;
+
+[L311]
+原文: 名妓: 亦不惜百金输运，方得磨其尺木，勒铭曰：秋涛夏云。
+译文: Courtesan: nor did he begrudge a hundred taels of gold to haul it home, polish that foot of gnarled wood, and engrave upon it the title: "Autumn Surge, Summer Cloud."
+
+[L312]
+原文: “赫尔墨斯”: 这是明末遗民张岱的《木犹龙》。你以前读明清士绅的赏玩文化时见过。
+译文: "Hermes": That's "Wood Like a Dragon" by Zhang Dai, the late-Ming loyalist. You came across it back when you were reading up on Ming-Qing gentry connoisseurship.
+
+[L314]
+原文: “比尔博”: 我的孩子，你这样皱眉，莫不是太久不读文言文，看不懂这段文字了？
+译文: "Bilbo": My dear child, what's with that frown? Don't tell me you've gone so long without reading classical Chinese that you've lost the thread of it!
+
+[L315]
+原文: “比尔博”: 可怜的孩子，你不像我们这些意识，可以跳过语言理解意义。
+译文: "Bilbo": Poor thing—unlike us figments of mind, you can't just skip straight past language to the meaning underneath.
+
+[L316]
+原文: “比尔博”: 其实张岱讲的是一块奇形怪状的木质遗物。
+译文: "Bilbo": Really, Zhang Dai is just talking about a curiously shaped relic of wood.
+
+[L317]
+原文: “比尔博”: 它先后经历了明初功臣的收藏、火灾、古玩市场的交换、
+译文: "Bilbo": It passed from an early-Ming noble's collection, through a fire, through trades in the antique market,
+
+[L318]
+原文: “比尔博”: 贵族家庭的交际、家族内部的传承，还有改朝换代的动荡。
+译文: "Bilbo": through aristocratic social circles, inheritance within a family, and the upheaval of dynasties changing hands.
+
+[L319]
+原文: “比尔博”: 不光是这个物件本身值钱，他的流通渠道、赏玩者之间的网络、
+译文: "Bilbo": It isn't merely that the object itself was costly—it's the channels it traveled through, the network of connoisseurs passing it round,
+
+[L320]
+原文: “比尔博”: 该网络中被认可的文化符号和想象才是他被鉴赏的意义，
+译文: "Bilbo": and the shared cultural symbols and imaginings recognized inside that circle that gave it meaning—
+
+[L321]
+原文: “比尔博”: 才是他值得用17块犀角杯交换的原因。
+译文: "Bilbo": that's why it was worth trading seventeen rhinoceros-horn cups for!
+
+[L322]
+原文: “比尔博”: 就像我送侄子的秘银甲，
+译文: "Bilbo": Just like the mithril coat I gave my nephew.
+
+[L323]
+原文: “比尔博”: 不仅代表我家族内部的财富和冒险的传承、
+译文: "Bilbo": Not only did it stand for our family's wealth and legacy of adventure,
+
+[L324]
+原文: “比尔博”: 还能暗示他的祖辈，嘿嘿也就是我，与矮人皇室的交际，
+译文: "Bilbo": it also hinted at his elder—hehe, meaning me—having kept company with Dwarven royalty,
+
+[L325]
+原文: “比尔博”: 甚至让人联想到都林王室的衰微和复国远征的历史。
+译文: "Bilbo": and even called to mind the decline of Durin's line and the whole quest to reclaim their kingdom.
+
+[L326]
+原文: “比尔博”: 正是要它被贴身穿着、被把玩被使用，最重要的，
+译文: "Bilbo": Precisely by being worn close to the skin, handled, put to use—and most importantly,
+
+[L327]
+原文: “比尔博”: 被其他冒险中的有识之士和高朋看见，盔甲的文化意义才能被体现。
+译文: "Bilbo": seen by discerning companions and worthy folk along the road—could that armor's cultural meaning truly shine through.
+
+[L328]
+原文: “比尔博”: 同样，我的故人索林将它送给我，
+译文: "Bilbo": By the same token, when my old friend Thorin gifted it to me,
+
+[L329]
+原文: “比尔博”: 不仅是希望保存自己的记忆和对我的感情，
+译文: "Bilbo": it wasn't only to preserve his memory and his affection for me—
+
+[L330]
+原文: “比尔博”: 也是希望将情谊本身和守护的愿望寄托于物品。
+译文: "Bilbo": it was also to entrust friendship itself, and the wish to keep me safe, into the object.
+
+[L331]
+原文: 宝钗: 正是在这些辗转流传中，这块顽木才获得了意义。
+译文: Baochai: It is precisely through all that passing from hand to hand that a stubborn lump of wood acquired its meaning.
+
+[L332]
+原文: 宝钗: 张岱说，他父亲原想把木龙献给鲁王，偏偏误写了“木龙”二字，犯了讳，没能如愿。
+译文: Baochai: Zhang Dai writes that his father originally meant to present it to Prince Lu, only to miswrite the characters "Wood Dragon," breaking a taboo and spoiling the gift.
+
+[L333]
+原文: 宝钗: 我倒想起我哥哥给东府送去的那副棺木。
+译文: Baochai: It puts me in mind of that cedar coffin my brother sent over to the Eastern Mansion.
+
+[L334]
+原文: 宝钗: 那原是义忠亲王老千岁要用的，后来没有用成，才辗转到了珍大哥哥手里。
+译文: Baochai: It had been reserved for the old Prince Yizhong, never came to be used, and so drifted into Cousin Zhen's hands.
+
+[L335]
+原文: 宝钗: 既有进献的资质，又有未能如愿的境遇。
+译文: Baochai: Possessing the pedigree fit for royalty, yet marked by a fate thwarted—
+
+[L336]
+原文: 宝钗: 这些来历一经说起，物件倒像是自己会说话了。
+译文: Baochai: once such a provenance is spoken aloud, the object almost seems to find a voice of its own.
+
+[L337]
+原文: “赫尔墨斯”: 其实，赏玩本来就是一种有规则、有边界、有程式的活动。
+译文: "Hermes": Actually, connoisseurship has always been an activity governed by rules, boundaries, and rituals.
+
+[L338]
+原文: “赫尔墨斯”: 尤其是在那些半公开的雅集里，
+译文: "Hermes": Especially in those semi-public literati gatherings—
+
+[L339]
+原文: “赫尔墨斯”: 被邀请者必然是在情感联结、社会地位等方面被认同才加入，
+译文: "Hermes": anyone invited had already been vetted for emotional affinity and social standing,
+
+[L340]
+原文: “赫尔墨斯”: 所以加入本身就是在践行游戏规则
+译文: "Hermes": so simply taking your seat meant enacting the rules of the game.
+
+[L341]
+原文: “赫尔墨斯”: Connoisseurship 不只是干瞪眼，
+译文: "Hermes": Connoisseurship isn't just staring blankly at a thing—
+
+[L342]
+原文: “赫尔墨斯”: 而是连接着身体与物品交互的感官体验和社会实践。
+译文: "Hermes": it's a sensory experience and social practice linking the body in interaction with the object.
+
+[L343]
+原文: “赫尔墨斯”: 物品仿佛在要求人以某种方式回应它。
+译文: "Hermes": It's as if the object itself demands that you respond to it in a prescribed way.
+
+[L344]
+原文: “赫尔墨斯”: 棺木是在典礼上停灵用的、秘银甲是贴身穿的、
+译文: "Hermes": A coffin is for lying in state at a funeral rite, a mithril shirt is worn next to the skin,
+
+[L345]
+原文: “赫尔墨斯”: 木犹龙是陈列赏玩的、供春壶是在书房里喝茶用的。
+译文: "Hermes": Wood Like a Dragon is displayed for admiration, and a Gongchun teapot is for brewing tea in a scholar's study.
+
+[L346]
+原文: “赫尔墨斯”: 但这些用途并不中立。
+译文: "Hermes": Yet none of those uses are neutral.
+
+[L347]
+原文: “赫尔墨斯”: 物品本身在明示着一个社会要求下合适的使用规范和使用者，
+译文: "Hermes": The object itself spells out a socially mandated protocol and an ideal user—
+
+[L348]
+原文: “赫尔墨斯”: 暗示使用对象按照社会对他们的要求扮演这个使用者。
+译文: "Hermes": nudging whoever picks it up to perform the exact role society expects of them.
+
+[L349]
+原文: 宝钗: 人以物显身份，物也借人添身价。这样一来，人与人之间，又生出多少关系呢？
+译文: Baochai: People display their station through objects, and objects gain their worth through people. How many entanglements between one soul and another spring up from that alone?
+
+[L350]
+原文: “赫尔墨斯”: 对，宝姐姐。
+译文: "Hermes": Exactly, Sister Baochai!
+
+[L351]
+原文: “赫尔墨斯”: 你说的倒让我想起 Jonathan Hay 的 Sensuous Surfaces:
+译文: "Hermes": What you just said reminds me of Jonathan Hay's Sensuous Surfaces:
+
+[L352]
+原文: “赫尔墨斯”: The Decorative Object in Early Modern China。
+译文: "Hermes": The Decorative Object in Early Modern China.
+
+[L353]
+原文: “赫尔墨斯”: 就说东府的葬礼吧。
+译文: "Hermes": Take the Eastern Mansion's funeral, for instance.
+
+[L354]
+原文: “赫尔墨斯”: 对你们东府的葬礼来说，棺材早就告诉我们他的使用说明：
+译文: "Hermes": For that funeral, the coffin practically came with its own user's manual:
+
+[L355]
+原文: “赫尔墨斯”: 在葬礼上陈列尸体，令逝者社会关系中的各种人物交互，使得逝者可以被社会性的安葬。
+译文: "Hermes": display the body in ceremony, draw every actor in the deceased's social web into interaction, and ensure the dead is socially laid to rest.
+
+[L356]
+原文: “赫尔墨斯”: 可我觉得更重要的是，同一件物品，对不同的人提出了不同的要求。
+译文: "Hermes": More importantly, though, one single object issues completely different demands to different people.
+
+[L357]
+原文: “赫尔墨斯”: 你们皇商通过掏出宝贝来体现自己和实权人物曾经的亲密与物质的丰富，
+译文: "Hermes": Your imperial-merchant family produces the rare timber to signal past intimacy with power and sheer material abundance;
+
+[L358]
+原文: “赫尔墨斯”: 东府的贾珍通过征用和哭泣表达对逝者的心碎。
+译文: "Hermes": Jia Zhen of the Eastern Mansion commandeers it and weeps to perform his heartbreak;
+
+[L359]
+原文: “赫尔墨斯”: 仆人呢？他们把棺木抬起来，送到该去的地方。
+译文: "Hermes": and the servants? They hoist the coffin onto their shoulders and haul it where it has to go.
+
+[L360]
+原文: “赫尔墨斯”: 而物品的召唤本身就是一个系统。
+译文: "Hermes": The call of the object is itself a whole system.
+
+[L361]
+原文: “赫尔墨斯”: 通过物品，人被罗织到社会里面去。
+译文: "Hermes": Through objects, people are woven right into the social net.
+
+[L362]
+原文: “赫尔墨斯”: 对着这么一块木犹龙，主家设宴待客从而扮演好了世代簪缨、交游广阔的清贵角色。
+译文: "Hermes": Before a piece like Wood Like a Dragon, the host throws a banquet and plays the cultured scion of an illustrious line with far-flung connections.
+
+[L363]
+原文: “赫尔墨斯”: 文人墨客引经据典、题名作诗，扮演的是博学高雅的鸿儒。
+译文: "Hermes": The literati cite the classics, bestow names, and compose poems—playing the erudite, refined men of letters.
+
+[L364]
+原文: 名妓: 你们若只能想到这里，便足见这番品评还是事不关己。
+译文: Courtesan: If that is as far as your thoughts reach, it only proves how comfortably detached this little critique of yours is.
+
+[L365]
+原文: 名妓: 那我呢？
+译文: Courtesan: What about me?
+
+[L366]
+原文: 名妓: 若是受邀入席，便要唱得好、说得巧，知道什么时候该笑该说话该不说话。
+译文: Courtesan: Invited to the banquet, I must sing flawlessly, speak cleverly, know the exact instant to smile, to chime in, and to hold my tongue.
+
+[L367]
+原文: 名妓: 我的职业也要求我懂得鉴赏文人的字画、清供和文章，能够品评，能够奉和，
+译文: Courtesan: My trade demands that I know how to appraise the scholars' calligraphy, paintings, desk curios, and essays—comment gracefully, compose verses in reply,
+
+[L368]
+原文: 名妓: 还要让他们觉得我是知音。
+译文: Courtesan: and make every last one of them believe I am his kindred spirit.
+
+[L369]
+原文: 名妓: 可当他们赏玩那些东西的时候，也有人在赏玩我。
+译文: Courtesan: Yet even as they appraise those objects, they are appraising me.
+
+[L370]
+原文: 名妓: 我与这块木头相同，也不同。
+译文: Courtesan: I am like that lump of wood—and not like it at all.
+
+[L371]
+原文: 名妓: 一旦我退出了这场身份的扮演，不再唱、不再应酬，不再做他们眼中那位知情识趣的人，
+译文: Courtesan: The moment I step out of that performance—stop singing, stop entertaining, stop playing the witty, understanding companion in their eyes—
+
+[L372]
+原文: 名妓: 我又能到哪里立足呢？
+译文: Courtesan: where on earth am I left to stand?
+
+[L373]
+原文: 名妓: 没有了这件物品，还有下一件；
+译文: Courtesan: Lose one curio, and there is always the next;
+
+[L374]
+原文: 名妓: 没有了这场雅集，还有下一场。
+译文: Courtesan: end one elegant gathering, and another takes its place—
+
+[L375]
+原文: 名妓: 一样能罗织出一张容纳诸位的网。
+译文: Courtesan: weaving the same comfortable net to hold all of you just as neatly.
+
+[L376]
+原文: 名妓: 可我若不能在其中继续扮演那个角色，这张网还会容纳我吗？
+译文: Courtesan: But if I can no longer play my allotted role inside it, will that net still have room for me?
+
+[L377]
+原文: 伍尔夫: 我可以想象你的男客人们怎样把玩那些古玩和清供。
+译文: Virginia Woolf: I can picture your male patrons turning those antiques and curios over in their palms.
+
+[L378]
+原文: 伍尔夫: 紫砂壶的泥料、形制、署名、来历；
+译文: Virginia Woolf: The purple clay teapot's clay, its form, its seal, its provenance;
+
+[L379]
+原文: 伍尔夫: 你的才艺、家世、容貌、情史。
+译文: Virginia Woolf: your accomplishments, your background, your looks, your past affairs.
+
+[L380]
+原文: 伍尔夫: 你和那些同时赏玩你的雅士有什么不同？
+译文: Virginia Woolf: How are you any different from the refined gentlemen appraising you at that very table?
+
+[L381]
+原文: 伍尔夫: Same person, just a different sex.
+译文: Virginia Woolf: Same person, just a different sex.
+
+[L382]
+原文: 伍尔夫: 可是你们得到的待遇，却如此不同。
+译文: Virginia Woolf: Yet the treatment each of you receives is worlds apart.
+
+[L383]
+原文: 名妓: 还有不同。
+译文: Courtesan: There is more difference still.
+
+[L384]
+原文: 名妓: 出身不同，受教育的机会不同，学到的东西也不同。
+译文: Courtesan: Different origins, different access to education, different things we were ever permitted to learn.
+
+[L385]
+原文: 名妓: 可最后，我们却又殊途同归，坐到一处，鉴赏同一件玩意，以此交换文化资本。
+译文: Courtesan: Yet in the end, by separate roads, we arrive at the same table, appraising the same trinket to trade in cultural capital.
+
+[L386]
+原文: 名妓: 说真的！供春壶！我倒想问问你！
+译文: Courtesan: Tell me truly—Gongchun teapot! I'd like to ask you!
+
+[L387]
+原文: 名妓: 你的名声，有多少来自制作者的劳动，
+译文: Courtesan: How much of your fame comes from the maker's actual labor,
+
+[L388]
+原文: 名妓: 来自那些底层人有限生存空间中世世代代的经验与口口相传？
+译文: Courtesan: from generations of craft passed word of mouth in the narrow margins left to the lowly?
+
+[L389]
+原文: 名妓: 又有多少来自后来那些替你命名、赋予渊源、考据、题字、作保的乡绅名士？
+译文: Courtesan: And how much comes from the gentry and celebrities who came later to name you, invent your pedigree, verify you, inscribe you, and vouch for you—
+
+[L390]
+原文: 名妓: 从唐伯虎的同窗，到宜兴近代的贤达，再到新中国的工艺美术家，
+译文: Courtesan: from Tang Bohu's schoolmates, to Yixing's modern notables, to the master artisans of New China,
+
+[L391]
+原文: 名妓: 一代接着一代。
+译文: Courtesan: generation after generation?
+
+[L392]
+原文: 名妓: 就算你是真的，凭什么？
+译文: Courtesan: Even if you were genuine—by what right?
+
+[L393]
+原文: 名妓: 凭什么一件工匠制作的器物，至少还能以传说的形式流传几百年，
+译文: Courtesan: By what right does a vessel shaped by an artisan endure at least as legend for hundreds of years,
+
+[L394]
+原文: 名妓: 而我的一场投入了青春、技能和情感的劳动，
+译文: Courtesan: while a performance into which I poured my youth, my craft, and my whole heart
+
+[L395]
+原文: 名妓: 却随着宴席散去，只剩下不知是谁写下的只言片语？
+译文: Courtesan: vanishes the moment the banquet clears, leaving behind nothing but a few stray lines jotted down by some nameless hand?
+
+[L396]
+原文: 名妓: 文人塞给我几句不合曲调、韵脚不通的歌词，
+译文: Courtesan: A scholar shoves a scrap of clumsy lyrics at me—off-meter, flat-rhymed—
+
+[L397]
+原文: 名妓: 我依着曲子唱，费心改了字句，调好了声韵。
+译文: Courtesan: and I sing it to the melody, painstakingly reworking the phrasing, tuning every tone and cadence.
+
+[L398]
+原文: 名妓: 到了后来，却只见这些东西被收进他们的歌集，连我的名字都不留下。
+译文: Courtesan: Later on, I see those very lines printed in their collected songs—without even my name left beside them.
+
+[L399]
+原文: 名妓: 我好妒忌！
+译文: Courtesan: How I envy it!
+
+[L400]
+原文: 名妓: 即使是血色罗裙翻酒污的时候，我也嗟叹怀才不遇！
+译文: Courtesan: Even when spilled wine stains my crimson silk skirt, I still mourn talent gone unrecognized!
+
+[L401]
+原文: “比尔博”: 可是……我的孩子，没有这些乡绅士大夫，紫砂壶文化和……那种文化，
+译文: "Bilbo": But... my child, without those gentry and scholars, purple clay teapot culture—and, well, that sort of culture—
+
+[L402]
+原文: “比尔博”: 不就少了很重要的消费者吗？
+译文: "Bilbo": wouldn't it have lost its most important patrons?
+
+[L403]
+原文: “比尔博”: 你知道，这样的文化物品，价值往往不只是泥料和工钱。
+译文: "Bilbo": You know, with cultural things like these, their worth is rarely just the clay and the wages.
+
+[L404]
+原文: “比尔博”: 它们要靠人来欣赏、购买、，也靠人与人之间的往来，才能获得那些额外的意义。
+译文: "Bilbo": They rely on people appreciating them, buying them, and passing them back and forth in fellowship to gather all that extra meaning.
+
+[L405]
+原文: “比尔博”: 有人买下一把壶，送给朋友，传给儿孙。
+译文: "Bilbo": Someone buys a teapot, gifts it to a friend, hands it down to children and grandchildren.
+
+[L406]
+原文: “比尔博”: 多少情谊、多少故事，就这样随着它一代代走下去。
+译文: "Bilbo": Think of all the affection, all the stories that travel down the generations with it.
+
+[L407]
+原文: “比尔博”: 维系这些人情网络，还有其背后慢慢生成的乡村伦理道德，
+译文: "Bilbo": Sustaining those webs of human warmth, the quiet local ethics that grow up behind them,
+
+[L408]
+原文: “比尔博”: 以及网络中的每一个人对彼此对自己的想象。。。。。。
+译文: "Bilbo": and how everyone in that circle pictures one another and themselves...
+
+[L409]
+原文: “比尔博”: 这些东西与礼物背后的文化意义，原本也是相辅相成的呀。
+译文: "Bilbo": Those bonds and the cultural meaning behind a gift were always meant to nourish each other, weren't they?
+
+[L410]
+原文: “比尔博”: 就像索林送我的秘银甲。要没有他，这一件又怎么会成为我如此珍爱的宝物？
+译文: "Bilbo": Like Thorin's mithril coat. Without him, how could it ever have become a treasure so dear to me?
+
+[L411]
+原文: “比尔博”: 可你说的……那种文化……
+译文: "Bilbo": Though as for... the kind of "culture" you spoke of...
+
+[L412]
+原文: “比尔博”: 我从来没有消费过……
+译文: "Bilbo": I've never been a patron of that myself...
+
+[L413]
+原文: “比尔博”: 我的意思是，我相信那些人里面，也有真正温柔善良、懂得珍惜别人的……
+译文: "Bilbo": What I mean is, I'd like to believe that among those people, there must have been some who were genuinely gentle and kind, who knew how to cherish others...
+
+[L416]
+原文: 柯湘: 血脉亲情，阡陌邻里，这些感情未必虚妄。
+译文: Ke Xiang: Kinship by blood, warmth between neighbors along country lanes—those feelings aren't necessarily false.
+
+[L417]
+原文: 柯湘: 反思和观察，也不是要把人间厚意一概埋葬。
+译文: Ke Xiang: Critical reflection doesn't mean burying every genuine kindness in the human world.
+
+[L418]
+原文: “赫尔墨斯”: 可这是一种结构性的压迫，
+译文: "Hermes": Still, it's a structural oppression—
+
+[L419]
+原文: “赫尔墨斯”: 不是一两个坏乡绅造成的，也不是几个温厚的老好人就能改变的。
+译文: "Hermes": not caused by one or two wicked squires, and not undone by a handful of kindhearted nice guys either.
+
+[L420]
+原文: “赫尔墨斯”: 在这样的关系里，受到压抑的人也可能转而伤害别人。
+译文: "Hermes": Inside a structure like that, even the oppressed can turn around and wound someone else.
+
+[L421]
+原文: “赫尔墨斯”: 真正需要反思的，是社会关系本身，
+译文: "Hermes": What really demands examination is the social relation itself—
+
+[L422]
+原文: “赫尔墨斯”: 以及器物如何通过它所暗示的使用方式、身份与交往规范，使这些关系不断展开、延续。
+译文: "Hermes": and how objects, through the scripts of use, identity, and etiquette they imply, keep reproducing and extending those relations.
+
+[L424]
+原文: 柯湘: （看着你）有些老掉牙的话，你听得都起了茧，眼下也没了重新讨论的土壤。
+译文: Ke Xiang: (Looking at you.) Some well-worn lessons you've heard so often they've grown calluses on your ears, and right now there's no fresh soil to rehash them in.
+
+[L425]
+原文: 柯湘: 若没有生活里的新观察，何必又让我从头讲？
+译文: Ke Xiang: Without new observations drawn from real life, why make me lecture you from scratch?
+
+
+================================================================================
+NODE: MindMaze_5 (83 lines)
+================================================================================
+
+[L437]
+原文: “赫尔墨斯”: 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊！
+译文: "Hermes": AAAAAAAAAAAAAAAAAAAH!
+
+[L439]
+原文: “赫尔墨斯”: 啊啊啊啊啊啊啊！
+译文: "Hermes": AAAAAAAH!
+
+[L441]
+原文: 生肖: 啊啊啊啊啊啊啊啊你给我冷静了！
+译文: Zodiac: AAAAAAAAH—CALM DOWN ALREADY!
+
+[L442]
+原文: MBTI: 作为你的一部分，你一难受，我也跟你不舒服啊，宝。
+译文: MBTI: I'm a part of you, hon—when you're hurting, I feel awful right along with you.
+
+[L443]
+原文: 星座: 烦死了！谁不是！
+译文: Constellation: Ugh, so annoying! Aren't we all?!
+
+[L444]
+原文: 我、“赫尔墨斯”、星座、MBTI、生肖: 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊！
+译文: Me, "Hermes", Constellation, MBTI, Zodiac: AAAAAAAAAAAAAAAAAAAH!
+
+[L452]
+原文: “比尔博”: 什么破班！够了，明天请假。
+译文: "Bilbo": What a rotten job! Enough of this—call in sick tomorrow!
+
+[L453]
+原文: “比尔博”: 为了这几块钱哭成这样。我的儿！
+译文: "Bilbo": Crying your eyes out over a few measly bucks! Oh, my poor child!
+
+[L456]
+原文: “赫尔墨斯”: 怎么能说的出这么庸俗的话。
+译文: "Hermes": How could something so crass come out of my mouth?!
+
+[L458]
+原文: “赫尔墨斯”: 太失败了！
+译文: "Hermes": Total disaster!
+
+[L460]
+原文: “赫尔墨斯”:  救命！
+译文: "Hermes": Help me!
+
+[L462]
+原文: 镜中人: 停。
+译文: Person in the Mirror: Stop.
+
+[L463]
+原文: “赫尔墨斯”: 啊啊啊哦哦哦！
+译文: "Hermes": Aaaah—ooooh!
+
+[L464]
+原文: 镜中人: 闭嘴，你很吵。
+译文: Person in the Mirror: Shut up. You're noisy.
+
+[L465]
+原文: 我 & “赫尔墨斯”: 呜呜
+译文: Me & "Hermes": (Sniffles...)
+
+[L466]
+原文: 镜中人: 你知道你难过在哪里吗?
+译文: Person in the Mirror: Do you even know what you're actually upset about?
+
+[L468]
+原文: 镜中人: 收（做出手势）倒带。
+译文: Person in the Mirror: Cut. (Makes a hand gesture.) Rewind.
+
+[L469]
+原文: “赫尔墨斯”: 了砸搞我为因。呜呜！啊啊啊哦哦哦！前——面——她——在
+译文: "Hermes": ...up it messed I because. Sniffle! Ooooh-aaaah! HER—OF—FRONT—IN—
+
+[L470]
+原文: 镜中人: 就是这里。
+译文: Person in the Mirror: Right there.
+
+[L471]
+原文: 镜中人: 不当着她的面，你还没这么伤心了。我问你，她是谁？
+译文: Person in the Mirror: If it hadn't happened right in front of her, you wouldn't be half this devastated. Tell me—who is she?
+
+[L473]
+原文: 镜中人: 倘若是个从未见过、以后也不会再见的普通客人，
+译文: Person in the Mirror: If she were just an ordinary customer you'd never met and would never see again,
+
+[L474]
+原文: 镜中人: 你还会哭得这样伤心吗？
+译文: Person in the Mirror: would you still be crying this hard?
+
+[L475]
+原文: 吕蒙: 对我们你还不诚实吗？
+译文: Lu Meng: Come on—aren't you going to be honest with us?
+
+[L478]
+原文: “赫尔墨斯”: 儿子又是哥伦比亚大学的。
+译文: "Hermes": And her son goes to Columbia...
+
+[L479]
+原文: 宝钗: 恐怕是不止于此。
+译文: Baochai: I suspect it goes deeper than that.
+
+[L483]
+原文: 镜中人: 什么关系？
+译文: Person in the Mirror: What kind of bearing?
+
+[L485]
+原文: 镜中人: 她答应给你写推荐信了？
+译文: Person in the Mirror: Did she promise to write you a letter of recommendation?
+
+[L487]
+原文: 镜中人: 她答应给你介绍工作了？
+译文: Person in the Mirror: Did she offer to refer you for a job?
+
+[L489]
+原文: 镜中人: 她甚至知道你曾经或者以后想做什么吗？
+译文: Person in the Mirror: Does she even know what you used to do—or what you want to do next?
+
+[L490]
+原文: “赫尔墨斯”: ……我没跟她说过。
+译文: "Hermes": ...I never told her.
+
+[L491]
+原文: 镜中人: 那她究竟掌握着你的什么前途？
+译文: Person in the Mirror: Then what part of your future is she supposedly holding in her hands?
+
+[L493]
+原文: 镜中人: 哼。双重的失败。
+译文: Person in the Mirror: Hmph. A double failure.
+
+[L494]
+原文: 镜中人: 第一，你没能在一个似乎掌握着地方人情与道德网络的中年妇女面前，
+译文: Person in the Mirror: First, in front of a middle-aged woman who seems plugged into the local web of favors and moral authority,
+
+[L495]
+原文: 镜中人: 好好扮演她所期待的年轻后辈。
+译文: Person in the Mirror: you failed to play the dutiful young junior she expected.
+
+[L496]
+原文: 镜中人: 第二，你也没能在一个似乎有些学识的成熟女性面前，
+译文: Person in the Mirror: Second, in front of a mature woman who seems to have some learning,
+
+[L497]
+原文: 镜中人: 证明你们是能够平等谈论思想的同类。
+译文: Person in the Mirror: you failed to prove you're an intellectual equal—one of her own kind.
+
+[L498]
+原文: 镜中人: 既希望她把你当作一个有前途的孩子，又想得到她的尊重。
+译文: Person in the Mirror: You wanted her to see you as a promising young kid, and you wanted her respect as a peer at the exact same time.
+
+[L499]
+原文: 镜中人: 你在她面前涛涛不绝，好像，好像你在期待她给你打分，给你考评。
+译文: Person in the Mirror: You rattled on and on in front of her as if—as if you were waiting for her to grade you, to pass judgment on you.
+
+[L501]
+原文: 镜中人: 我不禁要问了，谁赋予她考官的身份？
+译文: Person in the Mirror: I have to ask: who appointed her your examiner?
+
+[L502]
+原文: 镜中人: 你甚至还不知道，她是否真的在考察你。
+译文: Person in the Mirror: You don't even know whether she was testing you at all.
+
+[L503]
+原文: 镜中人: 是你把母亲、教授、老板，
+译文: Person in the Mirror: You're the one who stacked your mother, your professors, your boss,
+
+[L504]
+原文: 镜中人: 还有你想象中的那些有地位的人，都放到了她身后。
+译文: Person in the Mirror: and every high-status figure in your imagination right behind her shoulders—
+
+[L505]
+原文: 镜中人: 仿佛回答她的问题才能解锁人生成就。。。（被打断）
+译文: Person in the Mirror: as if answering her questions were the only way to unlock a life achievement... (Cut off.)
+
+[L506]
+原文: “赫尔墨斯”: 可是……她说话的方式，她的来历，她的关系，成体系的思想……
+译文: "Hermes": But... the way she talks, her background, her connections, that whole coherent system of thought...
+
+[L507]
+原文: 镜中人: （并不打算停下）却不知道，(盯着“赫尔墨斯”直到她不敢往下说)
+译文: Person in the Mirror: (Not stopping for a second.) Never realizing— (Stares down "Hermes" until she shrinks back into silence.)
+
+[L508]
+原文: 镜中人: （恢复正常说话的语气）这些都是你替她获得的价值
+译文: Person in the Mirror: (Returning to an even tone.) All of that value is something you handed her yourself.
+
+[L509]
+原文: 镜中人: 你对她的投射
+译文: Person in the Mirror: Your own projection onto her.
+
+[L510]
+原文: “赫尔墨斯”: ……
+译文: "Hermes": ...
+
+[L511]
+原文: 镜中人: （手指赫尔墨斯）书真是白读了。亏你天天满口跑理论。
+译文: Person in the Mirror: (Pointing at "Hermes".) All those books read for nothing. And you spout theory all day long.
+
+[L512]
+原文: “赫尔墨斯”: 嘤。
+译文: "Hermes": Whimper...
+
+[L514]
+原文: 镜中人: 我只是叫你看清你在向谁的幻影摇尾乞求认可。
+译文: Person in the Mirror: I'm only making you see whose phantom you were wagging your tail at, begging for approval.
+
+[L515]
+原文: 伍尔夫: 你知道，你有资格难受，即使看透了这个道理。
+译文: Virginia Woolf: You know, you still have every right to hurt—even after seeing straight through it.
+
+[L516]
+原文: 伍尔夫: 即使是一首半个世纪以前的诗给人自我认同造成的负面影响也足以被重视，
+译文: Virginia Woolf: Even the wound a half-century-old poem leaves on one's sense of self deserves to be taken seriously—
+
+[L517]
+原文: 伍尔夫: 何况一个活生生的小他者可能对你的评价。
+译文: Virginia Woolf: how much more so the unspoken judgment of a living, breathing "little other" standing right before you.
+
+[L519]
+原文: 宝钗: （一手端着一个汤碗，一手拍拍你气鼓鼓的脸）张嘴。
+译文: Baochai: (Holding a small bowl in one hand, patting your puffed-up cheek with the other.) Open wide.
+
+[L521]
+原文: 宝钗: 我不信，吃了我这一丸，你还能吵吵嚷嚷地发这热疯了
+译文: Baochai: I refuse to believe you can still carry on with this feverish tantrum after swallowing one of my pills.
+
+[L522]
+原文: 吕蒙: 欸，乱吃中药不好。
+译文: Lu Meng: Hey now, taking random herbal medicine isn't good for you.
+
+[L523]
+原文: 宝钗: 是，你不乱吃药。
+译文: Baochai: Oh yes, of course—you never take medicine carelessly.
+
+[L524]
+原文: 宝钗: 赶明儿我去问问，满武庙里，
+译文: Baochai: Tomorrow I'll go ask around the entire Temple of War—
+
+[L525]
+原文: 宝钗: 是不是数你看病最省事、最不费病房，最崇尚科学，身体也最棒。
+译文: Baochai: see if you're really the easiest patient in the hall, the least trouble to the sickbed, the grand champion of science, and the picture of perfect health!
+
+[L526]
+原文: “比尔博”: 啧！这种玩笑不要乱开。
+译文: "Bilbo": Tsk! Don't joke lightly about things like that.
+
+[L529]
+原文: 宝钗: 你以为真有一丸药，吃下去就百病全消、万事不想了？
+译文: Baochai: Did you truly think there's a magic pill that cures every ill and wipes every worry clean?
+
+[L530]
+原文: 宝钗: 它未必对你有用。对你而言，姑且就算是一点平静、一点放下吧。
+译文: Baochai: It may not work wonders for you. Think of it simply as a small measure of calm—a small letting go.
+
+[L532]
+原文: 宝钗: 今晚这场没完没了的官司。
+译文: Baochai: This endless courtroom trial you've been running all night.
+
+[L533]
+原文: 宝钗: 人家早走了，你倒还在这里替她传唤证人、拍惊堂木、打杀威棒，
+译文: Baochai: The woman went home hours ago, yet here you are still summoning witnesses on her behalf, banging the gavel, handing out lashes—
+
+[L534]
+原文: 宝钗: 连陪审的都哭成一片。
+译文: Baochai: even the whole jury is sobbing in a heap.
+
+[L535]
+原文: “赫尔墨斯”: 没有哭成一片！（两只手在空中倒腾）
+译文: "Hermes": We were NOT sobbing in a heap! (Flails both hands in the air.)
+
+[L536]
+原文: 吕蒙: (手点“赫尔墨斯”，笑) 瞧，这仵作还在呼威武呢
+译文: Lu Meng: (Pointing at "Hermes", laughing.) Look—even the coroner's still yelling "Order in the court!"
+
+[L538]
+原文: 宝钗: 那便蠢了一回。明日想起哪里说得不好，往后留心就是。
+译文: Baochai: Then you were foolish once. Tomorrow, if you recall a line that fell flat, simply keep it in mind for next time.
+
+[L539]
+原文: 宝钗: 今晚既不能再向她解释，也不能凭空把说出口的话收回来。
+译文: Baochai: Tonight you can neither explain yourself to her nor pluck spoken words back out of thin air.
+
+[L540]
+原文: 宝钗: 你偏要让已经过去的事，再陪你过一整夜么？
+译文: Baochai: Must you really force what is already past to sit up with you all night long?
+
+[L542]
+原文: 宝钗: 没有冷香丸吃，也要慢慢静下来。
+译文: Baochai: Even without a Cold Fragrance Pill, let yourself quiet down, bit by bit.
+
+[L543]
+原文: 宝钗: 明早定个闹铃，早起来一刻钟，去晒五分钟太阳。
+译文: Baochai: Set an alarm for tomorrow morning, get up a quarter-hour early, and stand in the sun for five minutes.
+
+[L544]
+原文: 宝钗: 上班路上，看看氿边开了几朵花。
+译文: Baochai: On your way to work, check how many flowers have opened by the lake.
+
+[L545]
+原文: 宝钗: 到了店里，该做什么便做什么。
+译文: Baochai: Once you reach the shop, simply do what needs doing.
+
+[L546]
+原文: 宝钗: 哪句话说错了，记得便是，也不必拿来日日责罚自己。
+译文: Baochai: If a line came out wrong, remember it—there's no need to turn it into a whip to beat yourself with every day.
+
+[L548]
+原文: 宝钗: 想起来便想起来。
+译文: Baochai: If it comes to mind, then let it come to mind.
+
+[L549]
+原文: 吕蒙: 说不定人家已经忘了你，
+译文: Lu Meng: Chances are she's already forgotten all about it—
+
+[L550]
+原文: 吕蒙: 或者也想起来哪里对你说过一句你早忘记的错话呢。
+译文: Lu Meng: or she's lying awake remembering some clumsy thing she said to you that you've long since forgotten.
+
+[L552]
+原文: “比尔博”: 睡吧。
+译文: "Bilbo": Go to sleep now.
+
+[L557]
+原文: 星座: 没太阳。
+译文: Constellation: No sun.
+
+[L559]
+原文: 金猴: 花可能也被打掉了。
+译文: Golden Monkey: The flowers were probably beaten off by the rain too.
+
+[L561]
+原文: “赫尔墨斯”: 一蓑烟雨任平生罢！
+译文: "Hermes": Then let a single straw cloak carry us through a lifetime of mist and rain!

@@ -1,0 +1,484 @@
+================================================================================
+Character_Jushi_revised_Eng.yarn — Day 1 居士 (Madame Hou) 英文翻译对照稿
+================================================================================
+源文件: Assets/YarnScript/Character_Jushi_revised_Eng.yarn
+覆盖范围: 全部 94 句「居士:」对白（含句内括号动作提示），按 Node 与原始行号 [L###] 排列。
+未包含: 「我:」、玩家选项及独立旁白行（留给 partner 自行翻译并手动核对粘贴）。
+
+【术语与专名统一表（与 Day 2 对齐）】
+- 居士 / 侯居士      -> Madame Hou
+- 紫砂壶             -> purple clay teapot
+- 供春壶             -> Gongchun teapot
+- 僧帽壶             -> Monk's Cap teapot
+- 拈花               -> Holding a Flower (Buddhist-themed series, from "Holding Up a Flower and Smiling")
+- 大觉寺             -> Dajue Temple
+- 星云大师           -> Master Hsing Yun
+- 时大彬             -> Shi Dabin
+- 毗卢冠             -> Vairocana Crown (Pilu Crown)
+- 观音兜             -> Guanyin Hood
+- 五佛冠 / 五方佛    -> Five-Buddha Crown / Five Dhyani Buddhas
+- 邵苇               -> Shao Wei
+- 宜兴               -> Yixing
+- 哥伦比亚           -> Columbia
+- 《护垫侠》         -> Pad Man
+
+【人设语气说明（与 Day 2 形成鲜明反差）】
+- Day 1 的 Madame Hou 是克制自持（self-contained）、优雅从容、温和亲和的。
+- 说话不疾不徐、留有分寸，哪怕反驳金钱观、批评密宗与宗教等级制，或婉转指出邵苇选品失误，也始终保持清雅淡定的语调与温和的笑意；尾声聊起儿子时带着克制的长辈慈爱与含蓄的骄傲。
+================================================================================
+
+
+================================================================================
+NODE: Character_Jushi (8 lines)
+================================================================================
+
+[L32]
+原文: 居士: 你好，我和邵苇店长有预约。
+译文: Madame Hou: Hello. I have an appointment with your shop owner, Shao Wei.
+
+[L42]
+原文: 居士: 你们邵老板是很好心，我要来，她这么忙还接待。
+译文: Madame Hou: Your boss Shao is so thoughtful—busy as she is, she still made arrangements for my visit.
+
+[L43]
+原文: 居士: 她一句话，你们就辛苦得不得了了。我是觉得不好意思的。
+译文: Madame Hou: One word from her and you're run off your feet. I really do feel quite apologetic.
+
+[L45]
+原文: 居士: 我挑个壶。下个月大觉寺有活动，我送给一起做义工的朋友。
+译文: Madame Hou: I'd like to pick out a teapot. Dajue Temple is holding an event next month, and I want to gift it to a fellow volunteer.
+
+[L62]
+原文: 居士: 你们邵苇不错啊，把供春壶放在第一个。
+译文: Madame Hou: Shao Wei has good sense, putting the Gongchun teapot right at the front.
+
+[L63]
+原文: 居士: 这可是你们紫砂壶的鼻祖了。
+译文: Madame Hou: After all, it is the founding ancestor of your purple clay teapots.
+
+[L67]
+原文: 居士: 没有他，哪里有这个工艺美术行业呢？
+译文: Madame Hou: Without him, where would this entire craft tradition be?
+
+[L71]
+原文: 居士: 你说了那么多，那你们为什么还把它放在册子的第一页呢？
+译文: Madame Hou: After everything you've just said, why did your shop still place it on the very first page of the catalog?
+
+
+================================================================================
+NODE: LikeStory (4 lines)
+================================================================================
+
+[L113]
+原文: 居士: 是的，有多少孕育的工作没有被看见呢？
+译文: Madame Hou: Quite so. How much quiet labor of nurturing goes unseen?
+
+[L114]
+原文: 居士: 好比我们看见竹子，只能看见竹子春天破土而出、见风长的时候，
+译文: Madame Hou: Just like bamboo—we only notice it when it breaks through the earth in spring and shoots upward in the breeze,
+
+[L115]
+原文: 居士: 想不到它先前几年在土里默默扎根。
+译文: Madame Hou: never thinking of the years it spent silently taking root beneath the soil.
+
+[L116]
+原文: 居士: 听见鸣蝉，也不知道它在土地里蛰伏和爬树的辛苦。
+译文: Madame Hou: And when we hear a cicada sing, we scarcely think of the long years it waited underground, or the toil of climbing the tree.
+
+
+================================================================================
+NODE: OfficeMan (21 lines)
+================================================================================
+
+[L133]
+原文: 居士: 小丫头。（抿嘴）
+译文: Madame Hou: My dear girl. (She presses her lips together gently.)
+
+[L134]
+原文: 居士: 这就是人类自私的欲望啊。
+译文: Madame Hou: That is simply human selfishness and desire.
+
+[L135]
+原文: 居士: 即使一切顺利的男人，也会抱怨有人比自己更如愿。
+译文: Madame Hou: Even a man for whom everything goes smoothly will still complain that someone else has it better.
+
+[L136]
+原文: 居士: 他们看不到自己以下，还有多少人的机会更少。
+译文: Madame Hou: They never look downward to see how many have far fewer chances than they do.
+
+[L137]
+原文: 居士: 只是这些抱怨，到底多少是感叹不公平，多少是感叹自己没有特权呢？
+译文: Madame Hou: Yet in all those complaints, how much is truly lamenting injustice, and how much is merely resenting a lack of privilege?
+
+[L138]
+原文: 居士: 幸好我们生在中国。你看印度一些女人的处境。你看过《护垫侠》吗？
+译文: Madame Hou: We are fortunate to have been born in China. Look at what some women face in India—have you seen Pad Man?
+
+[L139]
+原文: 居士: 有些地方的女性面临月经禁忌、婚姻和寡居歧视，太苦了。
+译文: Madame Hou: In some places, women endure menstrual taboos and discrimination in marriage and widowhood. It is terribly hard.
+
+[L147]
+原文: 居士: 实际来说所谓的惩罚不是佛陀思想，只有自作自受是佛陀思想。
+译文: Madame Hou: Strictly speaking, "punishment" is not the Buddha's teaching. Only reaping what one sows belongs to the Buddha's teaching.
+
+[L148]
+原文: 居士: 纵有百千劫，所作业不亡，因果际会时，果报还自受。
+译文: Madame Hou: Though a hundred thousand kalpas pass, the karma one creates does not perish; when causes and conditions converge, one bears the fruit oneself.
+
+[L149]
+原文: 居士: 实际我们现在看到很多的社会事件，会认为很多都不公平。
+译文: Madame Hou: When we look at so many events in society today, it is natural to think them deeply unfair.
+
+[L150]
+原文: 居士: 但从因，缘，果的相续来看，一切都是如如是。
+译文: Madame Hou: Yet seen through the continuity of cause, condition, and effect, all things are simply thus as they are.
+
+[L151]
+原文: 居士: 没有不公平，都是业果的相续流动。
+译文: Madame Hou: There is no unfairness—only the unbroken flow of karmic fruition.
+
+[L152]
+原文: 居士: 很多人常说的因果，实际是因，缘，果，中间的缘是不可缺少的。
+译文: Madame Hou: People always speak of cause and effect, when in truth it is cause, condition, and effect—the condition in between is indispensable.
+
+[L153]
+原文: 居士: 我们很多时候看问题都是一边，如果能站在中道来看，一切都是因缘果的流动。
+译文: Madame Hou: We so often view things from only one side. If we stand on the Middle Way, everything is simply the unfolding of causes, conditions, and fruits.
+
+[L154]
+原文: 居士: 没有所谓的好，也没有所谓的坏，都是因缘，好坏都是主观的。
+译文: Madame Hou: There is no intrinsic good or bad; there are only conditions. Good and bad are merely subjective labels.
+
+[L155]
+原文: 居士: 作为缘起来说，是没有任何属性的。
+译文: Madame Hou: As dependent origination, phenomena carry no fixed qualities of their own.
+
+[L156]
+原文: 居士: 我们喜欢的认为是好的，我们不喜欢的认为是不好的。
+译文: Madame Hou: What pleases us, we call good; what displeases us, we call bad.
+
+[L157]
+原文: 居士: 顺境，逆境，这些都是主观添加的。
+译文: Madame Hou: Favorable circumstances, adversity—all of these are meanings we project onto things ourselves.
+
+[L158]
+原文: 居士: 对于人事物来说，它只是一个缘起法。
+译文: Madame Hou: Whether people, events, or objects, each is simply a phenomenon arising through dependent origination.
+
+[L160]
+原文: 居士: 你是有想法的人，小丫头。（抿嘴）
+译文: Madame Hou: You are a thoughtful young woman, my dear. (She presses her lips together softly.)
+
+[L163]
+原文: 居士: 我给你发一个我老师讲的课，你愿意听就看看。
+译文: Madame Hou: I'll send you a lecture by my teacher—have a listen whenever you feel inclined.
+
+
+================================================================================
+NODE: RockNRoll (1 line)
+================================================================================
+
+[L176]
+原文: 居士: 这小姑娘说话真新奇。就要和你们小丫头说话，我们也年轻点。（温和地笑）
+译文: Madame Hou: What a wonderfully fresh way of putting it. Chatting with young women like you keeps us feeling young too. (She smiles warmly.)
+
+
+================================================================================
+NODE: Select1 (3 lines)
+================================================================================
+
+[L184]
+原文: 居士: 那么，我们来选紫砂壶吧。
+译文: Madame Hou: Well then, shall we choose a purple clay teapot?
+
+[L186]
+原文: 居士: 拈花？
+译文: Madame Hou: Holding a Flower?
+
+[L192]
+原文: 居士: 我比较急。我看现货是供春，还有僧帽壶。
+译文: Madame Hou: I'm on a somewhat tight schedule. I see you have the Gongchun and the Monk's Cap teapot in stock.
+
+
+================================================================================
+NODE: SengMao (8 lines)
+================================================================================
+
+[L218]
+原文: 居士: 什么意思?
+译文: Madame Hou: What do you mean by that?
+
+[L223]
+原文: 居士: 小姑娘。（居士温和地笑）
+译文: Madame Hou: Young lady. (Madame Hou smiles gently.)
+
+[L224]
+原文: 居士: 大觉寺是由星云大师设计的，公共设施和风雨长廊都很周到。
+译文: Madame Hou: Dajue Temple was designed by Master Hsing Yun; its public facilities and sheltered corridors are remarkably considerate.
+
+[L225]
+原文: 居士: 因为它人文关怀很足，做义工的人来自四面八方。
+译文: Madame Hou: Precisely because it has such genuine warmth and care, volunteers come from all corners of the country.
+
+[L226]
+原文: 居士: 我朋友就不是宜兴人。
+译文: Madame Hou: My friend isn't actually from Yixing.
+
+[L241]
+原文: 居士: 我倒不同意这话。
+译文: Madame Hou: I'm afraid I don't quite agree with that.
+
+[L243]
+原文: 居士: 我既愿意接待她，花了我的功夫，这才是我在意她。
+译文: Madame Hou: That I gladly host her and give her my time and care—that is how I show she matters to me.
+
+[L244]
+原文: 居士: 和钱有什么关系？
+译文: Madame Hou: What does money have to do with it?
+
+
+================================================================================
+NODE: GongChun (1 line)
+================================================================================
+
+[L293]
+原文: 居士: 既知有争议，为什么给我推荐这个呢？
+译文: Madame Hou: If you know its origin is disputed, why would you recommend it to me?
+
+
+================================================================================
+NODE: GongNext (2 lines)
+================================================================================
+
+[L319]
+原文: 居士: （抿嘴。）
+译文: Madame Hou: (She presses her lips together thoughtfully.)
+
+[L321]
+原文: 居士: 不取于相。那你自己怎么看供春这个传说呢？
+译文: Madame Hou: "Not grasping at outward appearances." Then how do you yourself view the legend of Gongchun?
+
+
+================================================================================
+NODE: HatTalk (7 lines)
+================================================================================
+
+[L333]
+原文: 居士: 不瞒你说，我以前就不大喜欢僧帽壶。
+译文: Madame Hou: To tell you the truth, I've never been particularly fond of Monk's Cap teapots.
+
+[L334]
+原文: 居士: 我父亲倒是收藏过一把，现在不知道在哪里了。
+译文: Madame Hou: My father did collect one years ago, though I couldn't say where it is now.
+
+[L337]
+原文: 居士: 也不完全是少欲知足。你看这个壶盖，像什么？
+译文: Madame Hou: It isn't merely a matter of few desires and contentment. Look closely at this lid—what does it remind you of?
+
+[L339]
+原文: 居士: 浅薄什么，你说的很好啊。那样前面五片莲花瓣，后面一片小帽子的叫做毗卢冠。
+译文: Madame Hou: Not shallow at all—you observed very well. That shape, with five lotus petals in front and a small cap behind, is called a Vairocana Crown.
+
+[L341]
+原文: 居士: 虽然从唐代到今天各民族、教派交流发展有点交融了，总体来说汉地大法师才能佩戴的。
+译文: Madame Hou: Although traditions and regions have blended somewhat since the Tang dynasty, generally speaking it is worn only by senior Han Buddhist dharma masters.
+
+[L342]
+原文: 居士: 普通僧侣用的是观音兜。
+译文: Madame Hou: Ordinary monks wear a simple Guanyin hood.
+
+[L343]
+原文: 居士: 那种以莲花为造型，每面顶一个佛像，一共五的叫五佛冠，是藏传佛教用的。
+译文: Madame Hou: The lotus-shaped crown with a Buddha image atop each of its five panels is the Five-Buddha Crown, used in Tibetan Buddhism.
+
+
+================================================================================
+NODE: MiZong (7 lines)
+================================================================================
+
+[L367]
+原文: 居士: 我是反感等级关系，密宗最讨厌。
+译文: Madame Hou: I dislike hierarchy intensely—and esoteric Tantric Buddhism most of all.
+
+[L368]
+原文: 居士: 现在的百分之九十几的人，都是接受的宗教思想
+译文: Madame Hou: Over ninety percent of people today are simply absorbing institutional religious dogma.
+
+[L369]
+原文: 居士: 特别是密宗，如果你不相信上师所说的，你就永世不得超生
+译文: Madame Hou: Especially in Tantric sects—if you dare doubt the guru's word, you're told you'll be condemned for eternity.
+
+[L370]
+原文: 居士: 踩上师影子，都是大逆不道
+译文: Madame Hou: Even stepping on the guru's shadow is treated as a grave transgression.
+
+[L371]
+原文: 居士: 大比丘奴役小比丘，就是宗教现实
+译文: Madame Hou: Senior monks subjugating junior monks—that is the reality of organized religion.
+
+[L372]
+原文: 居士: 区别对待，和社会团体的处事模式一模一样的
+译文: Madame Hou: Playing favorites, enforcing rank—it operates no differently from any worldly social clique.
+
+[L373]
+原文: 居士: 腐朽啊
+译文: Madame Hou: Deeply corrupt, truly.
+
+
+================================================================================
+NODE: Dengji (15 lines)
+================================================================================
+
+[L380]
+原文: 居士: 实际宗教文化不是佛陀所宣说的佛法，真正的佛法是真理，是可以自己验证的。
+译文: Madame Hou: In truth, religious culture is not the Dharma the Buddha taught. True Dharma is truth itself—something you can verify for yourself.
+
+[L381]
+原文: 居士: 不是那种信仰式的崇拜，也不是乞求保佑。
+译文: Madame Hou: It is not blind devotional worship, nor is it begging for blessings.
+
+[L382]
+原文: 居士: 真正的还是要修心，能够借事练心，遇到生活中的境缘，反观自己的内心。
+译文: Madame Hou: What truly matters is cultivating the mind—using everyday circumstances to refine it, turning inward to examine yourself whenever life tests you.
+
+[L383]
+原文: 居士: 只有自身的努力才能实现愿望，相信有外力，就容易被骗。
+译文: Madame Hou: Only your own effort can bring a wish to fruition. Put your faith in external powers, and you leave yourself open to deception.
+
+[L384]
+原文: 居士: 现在很多宗教都打着幌子骗财呢。
+译文: Madame Hou: Plenty of religious groups today use devotion as a front to fleece people of their money.
+
+[L385]
+原文: 居士: 我现在转方向了，因为在宗教呆久了，人是愚痴的。
+译文: Madame Hou: I've changed course now—stay too long inside institutional religion, and it dulls one's clarity.
+
+[L386]
+原文: 居士: 这种信实际是一种愚信，不是真正的正信。
+译文: Madame Hou: That kind of faith is really blind credulity, not genuine right faith.
+
+[L387]
+原文: 居士: 我现在知道真正的佛法是可以验证的，就是真理，是在任何时空下都适用的。
+译文: Madame Hou: I understand now that the true Dharma can be tested and verified; it is universal truth, valid in any era and any place.
+
+[L388]
+原文: 居士: 如果要我现在来评定宗教，就是统治者的工具，饮鸩止渴。
+译文: Madame Hou: If you ask me to judge organized religion today, it is merely a tool for rulers—drinking poison to quench a thirst.
+
+[L389]
+原文: 居士: 佛学不是凭空起的，他也不是一天变成现在的样子。
+译文: Madame Hou: Buddhist thought did not arise out of thin air, nor did it take its present shape overnight.
+
+[L390]
+原文: 居士: 这里面是有沙门运动、有和婆罗门的磨合，传播过程和各地文化不断交融的。
+译文: Madame Hou: It grew out of the Sramana movement, through friction and dialogue with Brahmanism, continually mingling with local cultures wherever it traveled.
+
+[L391]
+原文: 居士: 你要辨别什么是真的佛学，什么是别的宗教和传播过程赋予他的。
+译文: Madame Hou: One has to discern what is genuine Buddhist teaching, and what was layered onto it by other faiths and historical transmission.
+
+[L392]
+原文: 居士: 在有些人很痛苦的时候，宗教也是可以起到暂时的安慰。
+译文: Madame Hou: Of course, when someone is in deep suffering, religion can offer temporary comfort.
+
+[L393]
+原文: 居士: 麻醉剂吧，但不能真正的断除烦恼，超越生死。
+译文: Madame Hou: A kind of anesthetic—yet it can never truly sever affliction or transcend birth and death.
+
+[L395]
+原文: 居士: 这不能衡量的，但我还在努力。
+译文: Madame Hou: That isn't something one can measure, though I am still working at it.
+
+
+================================================================================
+NODE: Ours (4 lines)
+================================================================================
+
+[L402]
+原文: 居士: 是的，你们家这把壶做的是六方高僧帽的造型。时大彬的？
+译文: Madame Hou: Yes, this piece of yours is modeled after the hexagonal tall Monk's Cap—after Shi Dabin's design?
+
+[L403]
+原文: 居士: 但是正确的形制是将六面中的一面作为壶流的。
+译文: Madame Hou: Properly made, however, one of those six sides should open into the spout.
+
+[L404]
+原文: 居士: 也就是说，壶盖的六面切片中只有五片莲花瓣，一面敞开。
+译文: Madame Hou: Which means the lid should have only five lotus petals, leaving the sixth side open.
+
+[L405]
+原文: 居士: 这一把壶却给五方佛又找了个同事。邵苇怎么选品的?
+译文: Madame Hou: This teapot, on the other hand, has gone and hired the Five Dhyani Buddhas a sixth colleague. How on earth is Shao Wei curating her stock?
+
+
+================================================================================
+NODE: SucEnd (10 lines)
+================================================================================
+
+[L418]
+原文: 居士: 时间不早了，丫头，我回去了。
+译文: Madame Hou: It's getting late, my dear—I ought to be heading back.
+
+[L419]
+原文: 居士: 就听你的，要这一把供春壶。
+译文: Madame Hou: I'll take your advice and go with this Gongchun teapot.
+
+[L420]
+原文: 居士: 辛苦你接待我，额外做了不少活。
+译文: Madame Hou: Thank you for looking after me—I know I've put you to quite a bit of extra trouble.
+
+[L422]
+原文: 居士: 你这么小的年纪……（轻轻拍拍你的肩膀）比我儿子都小。
+译文: Madame Hou: So young... (She pats your shoulder gently.) You're even younger than my son.
+
+[L423]
+原文: 居士: 他在国外念书，要在哥伦比亚念硕士的。
+译文: Madame Hou: He's studying abroad—about to start his master's at Columbia.
+
+[L428]
+原文: 居士: 怪不得这么健谈。好孩子。
+译文: Madame Hou: No wonder you're such a lively conversationalist. Good child.
+
+[L429]
+原文: 居士: 他呢，就不大爱思考这些东西，可人很善良，也很温和。
+译文: Madame Hou: As for him, he doesn't much care for pondering these sorts of things, though he is very kindhearted and gentle.
+
+[L430]
+原文: 居士: 我喜欢同孩子说话，分享我虚长几岁的生命体验。
+译文: Madame Hou: I enjoy talking with young people—sharing a bit of whatever life experience my extra years have given me.
+
+[L431]
+原文: 居士: 他是不爱佛法的，虽然他们选修宗教的课也能学到。他总耐着心听我讲完的。
+译文: Madame Hou: He has no interest in the Dharma, even though he could pick some up in his religion electives. Still, he always listens patiently until I've finished.
+
+[L433]
+原文: 居士: 收拾好了吗？打包吧，不用太繁琐，别浪费。
+译文: Madame Hou: All ready? Go ahead and wrap it—nothing too elaborate, no need to be wasteful.
+
+
+================================================================================
+NODE: JushiD1_ScanGongChun (1 line)
+================================================================================
+
+[L449]
+原文: 居士: 这不对吧姑娘（温和地笑）。
+译文: Madame Hou: I don't think this is the right one, young lady. (She smiles gently.)
+
+
+================================================================================
+NODE: JushiD1_SaleComplete (1 line)
+================================================================================
+
+[L457]
+原文: 居士: 包装得真利索。我走了，你也早点收拾休息。
+译文: Madame Hou: Wrapped so neatly. I'll be on my way—wrap up early and get some rest yourself.
+
+
+================================================================================
+NODE: FailEnd (1 line)
+================================================================================
+
+[L467]
+原文: 居士: 我下次再来，先走了。为了我来这一趟，也耽误你不少事。
+译文: Madame Hou: I'll stop by another time—I'll take my leave for now. Making you host me today must have held up plenty of your work.

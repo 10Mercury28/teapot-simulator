@@ -1,0 +1,821 @@
+================================================================================
+character_jushi_d2.yarn — 居士 (Madame Hou) 英文翻译对照稿
+================================================================================
+源文件: Assets/YarnScript/character_jushi_d2.yarn
+覆盖范围: 全部 159 句「居士:」对白（含句内括号动作提示），按 Node 与原始行号 [L###] 排列。
+未包含: 「我:」、「老师:」及独立旁白行（留给 partner 自行翻译并手动粘贴核对）。
+
+【术语与专名统一表（方便 partner 翻译「我:」时对齐）】
+- 居士 / 侯居士      -> Madame Hou
+- 紫砂壶             -> purple clay teapot
+- 打掼蛋             -> play cards
+- 北上广             -> Beijing, Shanghai, Guangzhou
+- 传世系列 / 闺趣系列 -> Heritage Collection / Ladies' Whimsy Collection
+- 梅桩壶             -> Plum Stump teapot (简称 the Plum Stump)
+- 佛手提梁壶         -> Buddha's Hand teapot (简称 the Buddha's Hand)
+- 合欢壶             -> Hehuan teapot (意含 conjugal harmony / unity)
+- 方片壶             -> Square Panel teapot
+- 蟠桃壶             -> Longevity Peach teapot
+- 常元涛 / 元涛      -> Chang Yuantao / Yuantao
+- 蒯校长 / 蒯校      -> Principal Kuai
+- 凯宾斯基 1314 包厢 -> the Kempinski, Private Room 1314
+- 邵苇               -> Shao Wei
+- 小王               -> Little Wang
+- 宜兴 / 重庆        -> Yixing / Chongqing
+
+【人设语气说明】
+- Day 2 的 Madame Hou 表面仍在勉力维持修佛人的优雅体面，但内核极度急躁、紧绷、防备心重、随时濒临失控；
+- 电话第一通（对前夫家公公）彻底撕破克制、尖锐歇斯底里；第二通（对亲家蒯校长）瞬间切回圆滑热情的面具；
+- 挑壶与谈论准儿媳时在“强装大度”与“刻薄失控”间反复摇摆；离店时又骤然收拢成冰冷精准的命令口吻。
+================================================================================
+
+
+================================================================================
+NODE: JushiD2_Start (11 lines)
+================================================================================
+
+[L63]
+原文: 居士: 小姑娘！小姑娘！
+译文: Madame Hou: Girl! Young lady!
+
+[L64]
+原文: 居士: 江湖救急江湖救急！
+译文: Madame Hou: Emergency—save my skin here!
+
+[L65]
+原文: 居士: 快，给我做一个可以当给儿子女朋友当见面礼物的壶！
+译文: Madame Hou: Quick, pull together a teapot I can give as a first-meeting gift to my son's girlfriend!
+
+[L67]
+原文: 居士: 啊呀不要慢腾腾的，过来。
+译文: Madame Hou: Oh, don't drag your feet—get over here.
+
+[L68]
+原文: 居士: 他们晚上17：30开餐，估计现在已经要出发去打掼蛋了。
+译文: Madame Hou: Dinner's at 17:30. They're probably already heading out to play cards before it starts.
+
+[L69]
+原文: 居士: （啧了一声）
+译文: Madame Hou: (She clicks her tongue.)
+
+[L78]
+原文: 居士: 啊呀这有什么需求。（啧了一声）
+译文: Madame Hou: Ugh, what is there to "look for"? (Tsk.)
+
+[L79]
+原文: 居士: 小姑娘是重庆人，在国内读的电子电器本科，马上去国外读研究生。
+译文: Madame Hou: The girl's from Chongqing. Did her undergrad in electrical engineering here in China, about to go abroad for grad school.
+
+[L80]
+原文: 居士: 我儿子以后的同学。
+译文: Madame Hou: She'll be my son's classmate.
+
+[L81]
+原文: 居士: 啊呀多的我也不知道。
+译文: Madame Hou: Ugh, I don't know anything else, okay?
+
+[L84]
+原文: 居士: 嗯。
+译文: Madame Hou: Mm.
+
+
+================================================================================
+NODE: JushiD2_PrePitch (2 lines)
+================================================================================
+
+[L104]
+原文: 居士: 有什么区别？
+译文: Madame Hou: What's the difference?
+
+[L110]
+原文: 居士: 这和我有什么关系。你理不理解我需要买一个赶快走？
+译文: Madame Hou: What does that have to do with me? Do you not understand that I need to buy one and get out of here?!
+
+
+================================================================================
+NODE: JushiD2_PitchFamily (4 lines)
+================================================================================
+
+[L170]
+原文: 居士: 什么意思？
+译文: Madame Hou: What's that supposed to mean?
+
+[L174]
+原文: 居士: 两家？
+译文: Madame Hou: Two families?
+
+[L175]
+原文: 居士: 哪两家？谁跟谁家？
+译文: Madame Hou: Which two families? Whose family and whose?
+
+[L182]
+原文: 居士: 还不错，再看看别的呢？
+译文: Madame Hou: Not bad. What else have you got?
+
+
+================================================================================
+NODE: JushiD2_PitchWelcome (6 lines)
+================================================================================
+
+[L192]
+原文: 居士: 加入谁家？
+译文: Madame Hou: Into *whose* family?
+
+[L194]
+原文: 居士: 加入谁家？这是你能说定的吗？
+译文: Madame Hou: *Into whose family?* Who gave you the right to decide that?!
+
+[L195]
+原文: 居士: 我生的孩子跟谁过，就是留在美国不回来，
+译文: Madame Hou: Whoever the child I gave birth to ends up with—even if he stays in America and never comes back,
+
+[L196]
+原文: 居士: 去北上广或者重庆，就是住老婆家里，
+译文: Madame Hou: moves to Beijing, Shanghai, Guangzhou, or Chongqing, even if he lives under his wife's roof—
+
+[L197]
+原文: 居士: 都是我的孩子。
+译文: Madame Hou: he is *still* my child!
+
+[L198]
+原文: 居士: 加入谁家？（居士狠狠地一啧）
+译文: Madame Hou: "Into whose family"... (Madame Hou clicks her tongue sharply.)
+
+
+================================================================================
+NODE: JushiD2_PitchSmall (3 lines)
+================================================================================
+
+[L208]
+原文: 居士: 什么？你当你是在介绍洛阳龙门地武曌千佛窟？
+译文: Madame Hou: What? Do you think you're giving a tour of Wu Zetian's Ten Thousand Buddhas Grotto at Longmen?
+
+[L209]
+原文: 居士: 女人送女人的场合，只知道小巧玲珑、花花草草的？
+译文: Madame Hou: A woman gifting another woman, and all you can come up with is "dainty little things" and flowers and vines?
+
+[L210]
+原文: 居士: 为这个理由，我买什么紫砂壶。
+译文: Madame Hou: If that were the point, why on earth would I be buying a purple clay teapot?!
+
+
+================================================================================
+NODE: JushiD2_PitchVirtue (3 lines)
+================================================================================
+
+[L219]
+原文: 居士: 嗯？
+译文: Madame Hou: Oh?
+
+[L222]
+原文: 居士: 哟，比翼双飞？
+译文: Madame Hou: Oh, "lovebirds flying wing to wing"?
+
+[L228]
+原文: 居士: 偶哟，宜室宜家！
+译文: Madame Hou: Oh my, "blessing home and hearth"!
+
+
+================================================================================
+NODE: JushiD2_VirtueReturn (3 lines)
+================================================================================
+
+[L238]
+原文: 居士: 怎么？你替我见过她？
+译文: Madame Hou: What? Have *you* met her for me?
+
+[L241]
+原文: 居士: 我都不知道她是什么人，你倒比我先知道她是什么品格？
+译文: Madame Hou: I don't even know what sort of person she is, and you're already telling me what her character is?!
+
+[L242]
+原文: 居士: 她还没进门呢！我还没点头呢！（居士啧了一声）
+译文: Madame Hou: She hasn't even crossed the threshold yet! I haven't even given my nod! (Madame Hou clicks her tongue.)
+
+
+================================================================================
+NODE: JushiD2_Phones (39 lines)
+================================================================================
+
+[L298]
+原文: 居士: 喂！喂？
+译文: Madame Hou: Hello! Hello?!
+
+[L300]
+原文: 居士: 没有餐位？
+译文: Madame Hou: No seat at the table?!
+
+[L301]
+原文: 居士: 凭什么？我的孩子是我生的。
+译文: Madame Hou: On what grounds?! That is *my* child—I gave birth to him!
+
+[L302]
+原文: 居士: 什么叫本科四年的钱全是你掏的？
+译文: Madame Hou: What do you mean *you* paid for all four years of his undergrad?!
+
+[L303]
+原文: 居士: 我虽然没供他读书，可是那是我的一块肉，我也费尽心思教育过他。
+译文: Madame Hou: Fine, I didn't pay his tuition, but he is still my own flesh and blood—I poured my heart into raising and teaching him too!
+
+[L304]
+原文: 居士: 老头子，
+译文: Madame Hou: Old man—
+
+[L305]
+原文: 居士: 什么叫我不带走？
+译文: Madame Hou: What do you mean I *wouldn't* take him with me?!
+
+[L306]
+原文: 居士: 谁叫他和他的醉鬼爹姓不和我姓。硬是不给我带走。他不是跟你姓？
+译文: Madame Hou: Whose fault is it he took his drunkard father's surname instead of mine?! You flat-out refused to let me take him! Doesn't he carry *your* family name?!
+
+[L307]
+原文: 居士: 他奶奶洗到他的衣服就哭！
+译文: Madame Hou: His grandmother burst into tears every time she washed his clothes!
+
+[L308]
+原文: 居士: 我，
+译文: Madame Hou: I—
+
+[L309]
+原文: 居士: 我心软一下就......
+译文: Madame Hou: I softened for one second and...
+
+[L310]
+原文: 居士: 我工作。
+译文: Madame Hou: I had to work.
+
+[L312]
+原文: 居士: 我问你，常元涛的儿子以后叫谁奶奶？
+译文: Madame Hou: Let me ask you this—who is Chang Yuantao's son going to call Grandma?
+
+[L313]
+原文: 居士: （突然声音又拔高）常元涛的后娘嘛？
+译文: Madame Hou: (Her voice suddenly pitches shrill again.) Chang Yuantao's stepmother?!
+
+[L314]
+原文: 居士: 还是他那个管自己孙子叫奥尼（儿子）的太奶奶！
+译文: Madame Hou: Or his great-grandmother—the one who calls her own grandson "my boy"?!
+
+[L318]
+原文: 居士: 欸？欸，蒯校长。
+译文: Madame Hou: Oh? Oh, Principal Kuai!
+
+[L319]
+原文: 居士: 诶诶，蒯校。和夫人都好嗯。
+译文: Madame Hou: Yes, yes, Principal Kuai. Hope you and your wife are both keeping well, mm.
+
+[L320]
+原文: 居士: 我今天是由禅修活动走不大开。嗯嗯。
+译文: Madame Hou: I'm tied up at a Zen meditation retreat today, just can't quite get away. Mm-hm.
+
+[L321]
+原文: 居士: 好欢迎欢迎，元涛都和我说了。
+译文: Madame Hou: Wonderful—welcome, welcome, Yuantao told me all about it.
+
+[L322]
+原文: 居士: 很是不好意思，他回国就先去你们家里住了半个月，多打扰。
+译文: Madame Hou: I'm terribly sorry—the moment he flew back, he went straight to stay at your place for two whole weeks. What an imposition.
+
+[L323]
+原文: 居士: 这孩子要是和我们说也不会这么失礼。
+译文: Madame Hou: If the boy had only told us, we would never have been so remiss in our manners.
+
+[L324]
+原文: 居士: 多亏你们包容。
+译文: Madame Hou: Thank goodness you've been so gracious with him.
+
+[L325]
+原文: 居士: 欸欸欸，
+译文: Madame Hou: Mm, yes, yes...
+
+[L328]
+原文: 居士: 是。欸他俩是好呢。
+译文: Madame Hou: Yes. Oh, the two of them really are lovely together.
+
+[L330]
+原文: 居士: 嗯嗯今天我礼物送过来，人不好来。
+译文: Madame Hou: Mm-hm, I'll have the gift sent over today—I really can't make it in person.
+
+[L331]
+原文: 居士: 等元涛爷爷举家拜访过重庆，我们再约。
+译文: Madame Hou: Once Yuantao's grandfather takes the whole family to visit Chongqing, let's get together properly.
+
+[L332]
+原文: 居士: 嗯。（她摸一摸自己滚烫的脸，挂了电话）
+译文: Madame Hou: Mm. (She touches her burning cheek and hangs up.)
+
+[L334]
+原文: 居士: （对你温和地笑）哈哈。不急了。
+译文: Madame Hou: (She gives you a gentle smile.) Haha. No rush anymore.
+
+[L335]
+原文: 居士: 你也听到，我也不和你遮掩。
+译文: Madame Hou: You heard it all anyway—no point trying to hide it from you.
+
+[L336]
+原文: 居士: 礼物你叫个跑腿送去凯宾斯基。
+译文: Madame Hou: Just call a courier to deliver the gift to the Kempinski.
+
+[L337]
+原文: 居士: 嗯。就可以了。
+译文: Madame Hou: Mm. That'll do.
+
+[L338]
+原文: 居士: 包好一点，慢一点，不着急了。
+译文: Madame Hou: Wrap it nicely, take your time—there's no hurry now.
+
+[L339]
+原文: 居士: 我要18：00吃到一半的时候大概送到。
+译文: Madame Hou: I want it arriving right around 18:00, halfway through their dinner.
+
+[L340]
+原文: 居士: 送什么......我们可以慢慢挑了。
+译文: Madame Hou: As for what to send... we can take our time picking it out.
+
+[L341]
+原文: 居士: 你刚刚说的哪些？
+译文: Madame Hou: Which ones were you mentioning just now?
+
+[L348]
+原文: 居士: 你说的那两个闺趣的也还行。
+译文: Madame Hou: Those two from the Ladies' Whimsy Collection you mentioned aren't bad either.
+
+[L349]
+原文: 居士: 比翼鸟算了，本来就在地球另一端了，再飞我就再也看不见了。
+译文: Madame Hou: Forget the lovebirds—he's already on the other side of the earth. If they fly any farther, I'll never see him again.
+
+[L350]
+原文: 居士: 蟠桃的还不错哦，圆润可爱的。
+译文: Madame Hou: The Longevity Peach one is rather nice, though—round and charming.
+
+[L352]
+原文: 居士: 你不要因为我说两句就排除这两个壶。
+译文: Madame Hou: Don't rule those two out just because I snapped at you a bit.
+
+
+================================================================================
+NODE: JushiD2_GiftMenuReturn (2 lines)
+================================================================================
+
+[L413]
+原文: 居士: 啊呀，不麻烦了。
+译文: Madame Hou: Oh, don't go to the trouble.
+
+[L414]
+原文: 居士: 就那个佛手的吧。一看就知道是我送的。
+译文: Madame Hou: Just make it the Buddha's Hand. One look and everyone will know it's from me.
+
+
+================================================================================
+NODE: JushiD2_FlowerIntro (1 line)
+================================================================================
+
+[L460]
+原文: 居士: 嗯，再看看。
+译文: Madame Hou: Mm, let's see what else.
+
+
+================================================================================
+NODE: JushiD2_ClassicIntro (3 lines)
+================================================================================
+
+[L494]
+原文: 居士: 嗯对，还有这个。
+译文: Madame Hou: Right, yes—there's this one too.
+
+[L495]
+原文: 居士: 你刚刚说，一有个壶专门关于宴会的？还有一个象征融合的？
+译文: Madame Hou: Earlier you said there's a teapot inspired by a banquet? And another one that symbolizes coming together?
+
+[L496]
+原文: 居士: 别弄得太玄乎，大家看不懂。
+译文: Madame Hou: Don't make it too esoteric—nobody's going to get it.
+
+
+================================================================================
+NODE: JushiD2_MeiZhuang (5 lines)
+================================================================================
+
+[L530]
+原文: 居士: 这个桩子做得蛮有力气的。
+译文: Madame Hou: This stump has real strength to it.
+
+[L531]
+原文: 居士: 就是已经被伐倒，居然还有风中伫立的力气。
+译文: Madame Hou: Even after being felled, it still has the backbone to stand in the wind.
+
+[L532]
+原文: 居士: 这个梅花款的还只是在圆形壶上添上几段梅枝。
+译文: Madame Hou: The Plum Blossom one just has a few plum branches tacked onto a round body.
+
+[L533]
+原文: 居士: 梅桩这个已经和壶浑然一体了。
+译文: Madame Hou: With the Plum Stump, the tree and the pot have fused into one.
+
+[L534]
+原文: 居士:  ……行啊。这个不俗气。
+译文: Madame Hou: ...Alright. This one isn't tacky.
+
+
+================================================================================
+NODE: JushiD2_FoShou (16 lines)
+================================================================================
+
+[L550]
+原文: 居士: 哟，还有个佛手的。这小壶钮，怪可爱。
+译文: Madame Hou: Oh, you even have a Buddha's Hand. That little lid knob is oddly cute.
+
+[L562]
+原文: 居士: 有福气，有缘分，意义倒是挺好。
+译文: Madame Hou: Good fortune, good karma—the meaning is nice enough.
+
+[L563]
+原文: 居士: （抿了抿嘴）其实啊，人的福气，不只是这一辈子的事情。
+译文: Madame Hou: (She presses her lips together.) Truth is, a person's good fortune isn't just about this one lifetime.
+
+[L565]
+原文: 居士: 你知道，就像我们现在选壶，是因为品味到了、这个也够了——
+译文: Madame Hou: You know, it's just like us picking a teapot right now—we can choose because we've reached the taste for it, and we have enough of *this*—
+
+[L567]
+原文: 居士: 圣贤到了那个境界，也是能够自己选择来处的。
+译文: Madame Hou: Once sages reach that level, they can choose where they're born into, too.
+
+[L568]
+原文: 居士: 真的，如果能够证道，那么我们下一世投身在哪里，谁是父母，也是可以决定的
+译文: Madame Hou: Really—if you can attain the Way, then where you're reborn in the next life, and who your parents are, you get to decide that too.
+
+[L569]
+原文: 居士: 人啊，都是选择母亲的卵子投身，因为父亲的精子投身太不可靠了。
+译文: Madame Hou: People always choose the mother's egg to enter life through—entering through the father's sperm is far too unreliable.
+
+[L570]
+原文: 居士: 男性的一次射精量上万呢，要在这上万的精子中和唯一的卵子结合，真的是太难了
+译文: Madame Hou: A man releases tens of thousands of sperm at once—trying to unite with that one single egg out of tens of thousands, it's impossibly hard.
+
+[L571]
+原文: 居士: 而且很多还没成形就被打掉的，女性一生的卵子也是有定数的，所以得人身不容易
+译文: Madame Hou: And so many are aborted before they even take shape—plus a woman only has a fixed number of eggs in her whole life. Being born into a human body is no easy thing.
+
+[L573]
+原文: 居士: 你不要不相信。
+译文: Madame Hou: Don't look at me like you don't believe it.
+
+[L574]
+原文: 居士: 这是有科学依据的。因为生命的相续就是信息的传承
+译文: Madame Hou: There's a scientific basis for this. Because the continuity of life is simply the transmission of information.
+
+[L575]
+原文: 居士: 普通人的心性是五趣杂居，心地含诸种。
+译文: Madame Hou: An ordinary person's mind is crowded with all five realms of rebirth—the mind-ground holds every kind of seed.
+
+[L576]
+原文: 居士: 所谓的证圣，实际上就是让自己的心性统一，
+译文: Madame Hou: What they call attaining sagehood is really just unifying your own mind-nature.
+
+[L577]
+原文: 居士: 但圣贤的心性就是一个大种，我们的投生都是引业和满业决定的
+译文: Madame Hou: A sage's mind is one single, great seed. Every rebirth of ours is determined by projecting karma and completing karma.
+
+[L578]
+原文: 居士: 圣性的种子做大了，自然就能主宰自己的人生了，可能下一辈子还是如此的
+译文: Madame Hou: Grow that seed of sagehood large enough, and naturally you become the master of your own life—and maybe in the next life, it'll be the same.
+
+[L581]
+原文: 居士: 是啊。
+译文: Madame Hou: Yes, indeed.
+
+
+================================================================================
+NODE: JushiD2_HeHuan (4 lines)
+================================================================================
+
+[L600]
+原文: 居士: 合欢？是那种夫妻和合的意思？
+译文: Madame Hou: Hehuan? As in conjugal harmony?
+
+[L606]
+原文: 居士: （打断）大镲？
+译文: Madame Hou: (Cutting in.) Big cymbals?
+
+[L607]
+原文: 居士: 敲锣打鼓那个？
+译文: Madame Hou: The loud gong-and-drum kind?
+
+[L608]
+原文: 居士: （居士温和地笑）这和今天的场合有什么关系
+译文: Madame Hou: (Madame Hou smiles gently.) And what does that have to do with tonight's occasion?
+
+
+================================================================================
+NODE: JushiD2_HeHuanHistory (1 line)
+================================================================================
+
+[L622]
+原文: 居士: （咬了一下嘴唇）和今天的场合有什么关系？
+译文: Madame Hou: (She bites her lip.) What does that have to do with tonight's occasion?
+
+
+================================================================================
+NODE: JushiD2_HeHuanStory (4 lines)
+================================================================================
+
+[L637]
+原文: 居士: （笑。）堂堂县令自己下去敲大镲？
+译文: Madame Hou: (She laughs.) A full county magistrate hopping down to clash cymbals himself?
+
+[L638]
+原文: 居士: 倒是真性情不拘泥于形式。
+译文: Madame Hou: Now that's genuine spirit—not bound up by formality.
+
+[L649]
+原文: 居士: 是啊。各人想法不同，立场不同，能先坐到一起，才好谈和合。
+译文: Madame Hou: True enough. Different minds, different sides—you have to sit down at the same table first before you can even talk about harmony.
+
+[L651]
+原文: 居士: 这个典故好。
+译文: Madame Hou: That's a good story behind it.
+
+
+================================================================================
+NODE: JushiD2_FangPian (1 line)
+================================================================================
+
+[L672]
+原文: 居士: 这不就是方的吗？
+译文: Madame Hou: Isn't that just... square?
+
+
+================================================================================
+NODE: JushiD2_FangPianConfirm (3 lines)
+================================================================================
+
+[L690]
+原文: 居士: ……（温和地一笑。）
+译文: Madame Hou: ... (She gives a gentle smile.)
+
+[L693]
+原文: 居士: 她学电子电器的，说不定还真喜欢这种。
+译文: Madame Hou: She's in electrical engineering—she might actually like something like this.
+
+[L694]
+原文: 居士: 嗯，不错。
+译文: Madame Hou: Mm, not bad.
+
+
+================================================================================
+NODE: JushiD2_BuyMei (1 line)
+================================================================================
+
+[L719]
+原文: 居士: 好，那就这个梅桩吧。
+译文: Madame Hou: Fine—then let's go with the Plum Stump.
+
+
+================================================================================
+NODE: JushiD2_BuyFoShou (1 line)
+================================================================================
+
+[L729]
+原文: 居士: 就这个吧。那就这个佛手。
+译文: Madame Hou: This one, then. The Buddha's Hand it is.
+
+
+================================================================================
+NODE: JushiD2_BuyHeHuan (1 line)
+================================================================================
+
+[L739]
+原文: 居士: 就用这个吧。合欢，挺好的。
+译文: Madame Hou: Let's go with this one. Hehuan—that's nice.
+
+
+================================================================================
+NODE: JushiD2_BuyFang (1 line)
+================================================================================
+
+[L749]
+原文: 居士: 就用这个吧。挺个性。
+译文: Madame Hou: Let's go with this one. It's got character.
+
+
+================================================================================
+NODE: JushiD2_NeedMore (4 lines)
+================================================================================
+
+[L756]
+原文: 居士: 不急不急。（她温和地笑）
+译文: Madame Hou: No rush, no rush. (She smiles gently.)
+
+[L758]
+原文: 居士: 这才看了第一把，怎么就定了？
+译文: Madame Hou: We've only looked at the first one—how could we decide already?
+
+[L760]
+原文: 居士: 这才看了两把，我们再多比较比较。
+译文: Madame Hou: That's only two so far. Let's compare a few more.
+
+[L762]
+原文: 居士: 刚刚说的那几个，我们再挑一挑。
+译文: Madame Hou: Let's look through those other ones you mentioned.
+
+
+================================================================================
+NODE: JushiD2_ScanMeiZhuang (1 line)
+================================================================================
+
+[L776]
+原文: 居士: 不对吧（啧），这不是我要的，重新来。
+译文: Madame Hou: That's not right—(tsk)—that's not the one I picked. Do it again.
+
+
+================================================================================
+NODE: JushiD2_ScanFoShou (1 line)
+================================================================================
+
+[L791]
+原文: 居士: 不对吧（啧），这不是我要的，重新来。
+译文: Madame Hou: That's not right—(tsk)—that's not the one I picked. Do it again.
+
+
+================================================================================
+NODE: JushiD2_ScanHeHuan (1 line)
+================================================================================
+
+[L806]
+原文: 居士: 不对吧（啧），这不是我要的，重新来。
+译文: Madame Hou: That's not right—(tsk)—that's not the one I picked. Do it again.
+
+
+================================================================================
+NODE: JushiD2_ScanFangPian (1 line)
+================================================================================
+
+[L821]
+原文: 居士: 不对吧（啧），这不是我要的，重新来。
+译文: Madame Hou: That's not right—(tsk)—that's not the one I picked. Do it again.
+
+
+================================================================================
+NODE: JushiD2_AfterGift (7 lines)
+================================================================================
+
+[L834]
+原文: 居士: 我，我没筹备礼物，哈哈，给你看笑话。
+译文: Madame Hou: I... I didn't prepare a gift, haha—must look ridiculous to you.
+
+[L835]
+原文: 居士: 呼……
+译文: Madame Hou: Phew...
+
+[L836]
+原文: 居士: 之前没有人……通知我。
+译文: Madame Hou: Nobody... let me know beforehand.
+
+[L837]
+原文: 居士: 我不知道我儿子谈恋爱了，也不知道他们这么快就同意了……
+译文: Madame Hou: I didn't know my son was seeing anyone, and I had no idea they'd all agree to it this fast...
+
+[L838]
+原文: 居士: 我不认识，我都没见过她，他们就在国外同居了。
+译文: Madame Hou: I don't know her—I haven't even laid eyes on her—and they're already living together abroad.
+
+[L839]
+原文: 居士: 要不是我看到……
+译文: Madame Hou: If I hadn't happened to see it...
+
+[L840]
+原文: 居士: 差点没问我就见完家长订好结婚了。
+译文: Madame Hou: They practically met the parents and settled the wedding without so much as asking me.
+
+
+================================================================================
+NODE: JushiD2_DaughterInLawIntro (5 lines)
+================================================================================
+
+[L913]
+原文: 居士: 我和你说，说实话，我不喜欢这个姑娘。
+译文: Madame Hou: I'll tell you honestly—I don't like this girl.
+
+[L915]
+原文: 居士: 哼。婚前同居不说。（她又咬了一下嘴唇。）
+译文: Madame Hou: Hmph. Living together before marriage, for starters. (She bites her lip again.)
+
+[L916]
+原文: 居士: 我儿子一年回一次国，这次不回宜兴不说。
+译文: Madame Hou: My son only comes home to China once a year, and this time he didn't even come back to Yixing—
+
+[L917]
+原文: 居士: 他不打招呼就被这姑娘带去重庆了。
+译文: Madame Hou: Without a word to us, that girl whisked him straight off to Chongqing.
+
+[L918]
+原文: 居士: 我们很被动。
+译文: Madame Hou: It puts us completely on the back foot.
+
+
+================================================================================
+NODE: JushiD2_DaughterInLaw (19 lines)
+================================================================================
+
+[L926]
+原文: 居士: 你们小姑娘不是什么都喜欢发到网上吗？
+译文: Madame Hou: Don't you young girls love posting every little thing online?
+
+[L927]
+原文: 居士: 她又听摇滚，眼睛嘴巴乌漆嘛黑的。
+译文: Madame Hou: She listens to rock music, paints her eyes and lips pitch black.
+
+[L928]
+原文: 居士: 前段时间，她又搞什么月经什么东西的，怎么好意思。
+译文: Madame Hou: A while back she was going on about periods or some such thing—how does she even have the nerve?
+
+[L929]
+原文: 居士: 还为一个粉头发轻生地女孩摇旗呐喊的。哦哟。
+译文: Madame Hou: Even waving flags and shouting online over some pink-haired girl who took her own life. Good grief.
+
+[L930]
+原文: 居士: 你不知道，你不知道。
+译文: Madame Hou: You don't understand—you really don't understand.
+
+[L931]
+原文: 居士: 我儿子是一个非常非常善良的人。
+译文: Madame Hou: My son is a very, *very* kindhearted person.
+
+[L932]
+原文: 居士: 太会照顾别人的情绪，太会委屈自己。
+译文: Madame Hou: Way too considerate of everyone else's feelings, always swallowing his own hurt.
+
+[L933]
+原文: 居士: 都是爷爷奶奶教育的不好！
+译文: Madame Hou: It's all his grandparents' fault for raising him wrong!
+
+[L934]
+原文: 居士: 我也是有反抗意识的性格，和他们处不了。
+译文: Madame Hou: I've got a rebellious streak myself—that's why I could never get along with them.
+
+[L936]
+原文: 居士: 人生一次不容易，真正随心而活，不用太顾及他人。
+译文: Madame Hou: You only live once, and it isn't easy—you should truly live by your own heart and stop bending over backwards for others.
+
+[L938]
+原文: 居士: 那是她的事。
+译文: Madame Hou: That's *her* business.
+
+[L939]
+原文: 居士: 我管得了她吗？我连自己儿子都管不了。
+译文: Madame Hou: Like I could control her? I can't even control my own son.
+
+[L941]
+原文: 居士: 我儿子不能驾驭她这样叛逆心重的。
+译文: Madame Hou: My son can't handle someone with a rebellious streak that strong.
+
+[L942]
+原文: 居士: 讲真的，她那样好的本科，拒绝保研名额就是要出国读个研看看。
+译文: Madame Hou: Honestly—with an undergrad degree that good, she turned down a guaranteed grad-school spot just to go abroad and "see what it's like."
+
+[L943]
+原文: 居士: 她还有奖学金。
+译文: Madame Hou: And she's on a scholarship, too.
+
+[L944]
+原文: 居士: 我儿子没有这么聪明，本来说只是申请研究生看看，顺便找找工作。
+译文: Madame Hou: My son isn't that sharp. He was originally just going to apply to grad school for the heck of it and look for a job along the way.
+
+[L945]
+原文: 居士: 都是被她激的。
+译文: Madame Hou: She's the one who pushed him into it.
+
+[L946]
+原文: 居士: 我儿子驾驭不了她。他善良，真要让人拿捏了，要吃大亏。
+译文: Madame Hou: My son can't handle her. He's too soft—if she gets him under her thumb, he'll be the one paying dearly for it.
+
+[L947]
+原文: 居士: 我是不鼓励儿子现在谈恋爱，都是爷爷催的。
+译文: Madame Hou: I'm not even encouraging him to date right now. It's his grandfather who's been pushing it.
+
+
+================================================================================
+NODE: JushiD2_Delivery (5 lines)
+================================================================================
+
+[L981]
+原文: 居士: 不是18：00送过去，是要送达。
+译文: Madame Hou: Not *sent out* at 18:00—*delivered* by 18:00.
+
+[L982]
+原文: 居士: 大概开餐30min送达。凯宾斯基1314包厢。
+译文: Madame Hou: Delivered about thirty minutes into dinner. The Kempinski, Private Room 1314.
+
+[L983]
+原文: 居士: 我先走了。你这里出库，我直接把钱转给邵苇。
+译文: Madame Hou: I'll head out first. Ring it out on your end—I'll transfer the money straight to Shao Wei.
+
+[L984]
+原文: 居士: 小姑娘，你叫什么？
+译文: Madame Hou: Young lady, what's your name?
+
+[L986]
+原文: 居士: 小王，辛苦你了。
+译文: Madame Hou: Little Wang—thank you for your trouble.
