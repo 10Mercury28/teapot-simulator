@@ -99,10 +99,10 @@ title: JushiD2_FirstSilence
 title: JushiD2_PrePitch
 position: 3295,1362
 ---
-// HINT：加入「传世系列／闺趣系列」对话及居士的催促。
-我: 对方家里应该不太了解紫砂壶吧，我们可以看看传世系列，也可以看看闺趣系列。 
+// HINT：加入「[b]传世系列[/b]／[b]闺趣系列[/b]」对话及居士的催促。
+我: 对方家里应该不太了解紫砂壶吧，我们可以看看[b]传世系列[/b]，也可以看看[b]闺趣系列[/b]。 
 居士: 有什么区别？ 
-我: 传世系列都是经典壶形，闺趣......
+我: [b]传世系列[/b]都是经典壶形，闺趣......
 (一边说着，您伸手越过柜台，试图把册子扒拉到目录去)
 //这里暂停一下沟通页面，空格后重新pull up
 <<pause_dialogue>>
@@ -118,9 +118,9 @@ position: 2259,1587
 <<if $D2TriedFamily and $D2TriedWelcome and $D2TriedSmall and $D2TriedVirtue>>
     <<jump JushiD2_Phones>>
 <<endif>>
--> 传世系列 <<if not $D2TriedFamily or not $D2TriedWelcome>>
+-> [b]传世系列[/b] <<if not $D2TriedFamily or not $D2TriedWelcome>>
     <<jump JushiD2_TraditionalMenu>>
--> 闺趣系列 <<if not $D2TriedSmall or not $D2TriedVirtue>>
+-> [b]闺趣系列[/b] <<if not $D2TriedSmall or not $D2TriedVirtue>>
     <<jump JushiD2_GuiquMenu>>
 -> （低头翻册子）嗯……
     <<jump JushiD2_Phones>>
@@ -131,7 +131,7 @@ position: 2259,1587
 title: JushiD2_TraditionalMenu
 position: 2037,687
 ---
-// 第二层：传世系列，两种话术各一次
+// 第二层：[b]传世系列[/b]，两种话术各一次
 -> 想必女方也是一家子来赴宴的，这作为家族与家族间的来往够正式。 <<if not $D2TriedFamily>>
     <<set $D2TriedFamily to true>>
     <<set $D2PitchCount to $D2PitchCount + 1>>
@@ -150,7 +150,7 @@ position: 2037,687
 title: JushiD2_GuiquMenu
 position: 2436,462
 ---
-// 第二层：闺趣系列，两种话术各一次
+// 第二层：[b][b]闺趣系列[/b][/b]，两种话术各一次
 -> ......我们老板常说女人就喜欢精美小巧的东西。 <<if not $D2TriedSmall>>
     <<set $D2TriedSmall to true>>
     <<set $D2PitchCount to $D2PitchCount + 1>>
@@ -196,7 +196,7 @@ position: 2480,912
 居士: 去北上广或者重庆，就是住老婆家里，
 居士: 都是我的孩子。 
 居士: 加入谁家？（居士狠狠地一啧） 
-【你听见“伍尔夫”的呼唤】 
+[b]【我听见[u]伍尔夫[/u]的呼唤】[/b]
 <<jump JushiD2_Awkward>>
 ===
 
@@ -240,7 +240,7 @@ position: 2760,912
 <<else>>
     居士: 我都不知道她是什么人，你倒比我先知道她是什么品格？
     居士: 她还没进门呢！我还没点头呢！（居士啧了一声）
-    【你听见自己对宝钗的呼唤】
+    [b]【我听见自己对[u]宝钗[/u]的呼唤】[/b]
 <<endif>>
 <<set $D2PitchCount to $D2PitchCount + 1>>
 <<jump JushiD2_Awkward>>
@@ -253,11 +253,11 @@ position: 2760,1137
 <<set $D2AwkwardCount to $D2AwkwardCount + 1>>
 我: （啊啊啊啊啊啊啊啊！）
 <<if $D2AwkwardCount == 1>>
-    【你听见 MBTI 的呼唤】
+    [b]【我听见[u]MBTI[/u]的呼唤】[/b]
 <<elseif $D2AwkwardCount == 2>>
-    【你听见星座的呼唤】
+    [b]【我听见[u]星座[/u]的呼唤】[/b]
 <<elseif $D2AwkwardCount == 3>>
-    【你听见生肖的呼唤】
+    [b]【我听见[u]生肖[/u]的呼唤】[/b]
 <<endif>>
 我: (好尴尬！好尴尬！)
 -> （你手上不停，继续收拾）
@@ -307,7 +307,9 @@ position: 2259,1812
 居士: 他奶奶洗到他的衣服就哭！
 居士: 我，
 居士: 我心软一下就......
-居士: 我工作。
+<<pause_dialogue>>
+居士: 我要工作。
+<<pause_dialogue>>
 （居士无比烦躁地挠了挠头皮，长叹一口气，语气放缓）
 居士: 我问你，常元涛的儿子以后叫谁奶奶？
 居士: （突然声音又拔高）常元涛的后娘嘛？
@@ -330,7 +332,7 @@ position: 2259,1812
 居士: 嗯嗯今天我礼物送过来，人不好来。
 居士: 等元涛爷爷举家拜访过重庆，我们再约。
 居士: 嗯。（她摸一摸自己滚烫的脸，挂了电话）
-【你听见mbti和比尔博的呼唤】 
+[b]【我听见[u]MBTI和“比尔博”[/u]的呼唤】[/b]
 居士: （对你温和地笑）哈哈。不急了。
 居士: 你也听到，我也不和你遮掩。
 居士: 礼物你叫个跑腿送去凯宾斯基。
@@ -344,26 +346,26 @@ position: 2259,1812
 <<pause_dialogue>>
 <<if ($D2TriedFamily or $D2TriedWelcome) and ($D2TriedSmall or $D2TriedBird or $D2TriedPeach)>>
     // 两个系列都介绍过
-    我: 啊，传世系列。
+    我: 啊，[b]传世系列[/b]。
     居士: 你说的那两个闺趣的也还行。
     居士: 比翼鸟算了，本来就在地球另一端了，再飞我就再也看不见了。
     居士: 蟠桃的还不错哦，圆润可爱的。
     旁白: （她对你温和地笑。）
     居士: 你不要因为我说两句就排除这两个壶。
 <<elseif $D2TriedFamily or $D2TriedWelcome>>
-    // 只介绍过传世系列
-    我: 啊，传世系列。
-    我: 我又看了一下册子，闺趣系列也行。
+    // 只介绍过[b]传世系列[/b]
+    我: 啊，[b]传世系列[/b]。
+    我: 我又看了一下册子，[b]闺趣系列[/b]也行。
     旁白: （居士温和地笑。） 
 <<elseif $D2TriedSmall or $D2TriedBird or $D2TriedPeach>>
-    // 只介绍过闺趣系列
-    我: 啊，闺趣系列。
-    我: 我又看了一下册子，传世系列也行。
+    // 只介绍过[b]闺趣系列[/b]
+    我: 啊，[b]闺趣系列[/b]。
+    我: 我又看了一下册子，[b]传世系列[/b]也行。
     旁白: （居士温和地笑。）
 <<else>>
     // 两个系列都没介绍过，直接低头翻册子
     我: 我刚才还没来得及给您介绍。
-    我: 传世系列和闺趣系列都可以看看。
+    我: [b]传世系列[/b]和[b]闺趣系列[/b]都可以看看。
     旁白: （居士温和地笑。）
 <<endif>>
 <<jump JushiD2_GiftMenu>>
@@ -385,7 +387,7 @@ title: JushiD2_GiftMenuFirst
 ---
 -> 那您看一下花器壶这一页，这便是蟠桃壶。
     <<jump JushiD2_FlowerEntry>>
--> 不会的，那我们把花器纳入考量。还有您之前说愿意看看的传世系列。
+-> 不会的，那我们把花器纳入考量。还有您之前说愿意看看的[b]传世系列[/b]。
     <<jump JushiD2_ClassicEntry>>
 ===
 
@@ -433,7 +435,7 @@ title: JushiD2_GiftMoreMenu
 （居士抿了抿嘴。）
 -> 我们看看花器系列的。 <<if not $D2ViewedMei or not $D2ViewedFoShou>>
     <<jump JushiD2_FlowerEntry>>
--> 我们看看传世系列的。 <<if not $D2ViewedHeHuan or not $D2ViewedFang>>
+-> 我们看看[b]传世系列[/b]的。 <<if not $D2ViewedHeHuan or not $D2ViewedFang>>
     <<jump JushiD2_ClassicEntry>>
 -> 那我们再看看刚刚备选的几把。
     <<jump JushiD2_GiftMenuReturn>>
@@ -473,7 +475,7 @@ position: 572,462
     <<set $D2ViewedFoShou to true>>
     <<set $D2ViewedCount to $D2ViewedCount + 1>>
     <<jump JushiD2_FoShou>>
--> 嗯，咱们看看传世系列。
+-> 嗯，咱们看看[b]传世系列[/b]。
     <<jump JushiD2_ClassicEntry>>
 ===
 
@@ -510,7 +512,7 @@ position: 444,12
     <<set $D2ViewedFang to true>>
     <<set $D2ViewedCount to $D2ViewedCount + 1>>
     <<jump JushiD2_FangPian>>
--> 嗯，那我们回到闺趣系列。
+-> 嗯，那我们回到[b]闺趣系列[/b]。
     <<jump JushiD2_FlowerEntry>>
 ===
 
@@ -548,6 +550,7 @@ title: JushiD2_FoShou
 position: 1536,687
 ---
 居士: 哟，还有个佛手的。这小壶钮，怪可爱。
+（居士抿了抿嘴）
 我: 佛手是香橼，一种柑橘果实，长得像伸开的手指。
 我: 传统上取它“佛”“福”相近的吉祥意思。
 我: 这一款和蟠桃壶是一样的泥料，都是在固定器形上添加装饰。
@@ -577,7 +580,7 @@ position: 1536,687
 居士: 但圣贤的心性就是一个大种，我们的投生都是引业和满业决定的
 居士: 圣性的种子做大了，自然就能主宰自己的人生了，可能下一辈子还是如此的
 我: 哦哦，那我倒是很感谢这一世，能够生而为人。
-【你听见柯湘和宝钗的呼唤】
+[b]【我听见[u]柯湘和宝钗[/u]的呼唤】[/b]
 居士: 是啊。
 （她又看了一眼佛手壶，抿了抿嘴）
 <<jump JushiD2_FoShouConfirm>>
@@ -618,7 +621,7 @@ position: 351,462
 ---
 我: 由于他自己是士人出身，又经常找匠人兄妹设计和定制紫砂壶，
 我: 甚至亲自题字，紫砂壶便成为了媒介和艺术载体。 
-【你听见名妓的呼唤】
+[b]【我听见[u]名妓[/u]的呼唤】[/b]
 居士: （咬了一下嘴唇）和今天的场合有什么关系？ 
 我:  是，是。
 <<jump JushiD2_HeHuanStory>>
@@ -636,7 +639,7 @@ position: 666,687
 我: 以这件事情为灵感，他设计了合欢壶。
 居士: （笑。）堂堂县令自己下去敲大镲？
 居士: 倒是真性情不拘泥于形式。
-【你听见自己对吕蒙的呼唤】
+[b]【我听见自己对[u]吕蒙[/u]的呼唤】[/b]
 我: 您看这把，壶身上下两部分合在一起，像两片镲扣住了。
 （你嘴上说着，手上不停，将那光栅卡取出，递到居士手上。
 趁着她来回比较和把玩，你背过身去，在展柜里一目十行的搜索现货的身影）
@@ -768,7 +771,7 @@ position: 923,1137
 ---
 <<d2_scan "09-H2zhuangjj">>
 <<if $D2ScanMatched>>
-    【未来发生了变化】
+    [b]【未来发生了变化】[/b]
     <<set $D2GiftCode to "09-H2zhuangjj">>
     <<set $D2GiftName to "梅桩壶">>
     <<jump JushiD2_AfterGift>>
@@ -783,7 +786,7 @@ position: 1503,1137
 ---
 <<d2_scan "09-H1FoShouJ">>
 <<if $D2ScanMatched>>
-    【未来发生了变化】
+    [b]【未来发生了变化】[/b]
     <<set $D2GiftCode to "09-H1FoShouJ">>
     <<set $D2GiftName to "佛手提梁壶">>
     <<jump JushiD2_AfterGift>>
@@ -798,7 +801,7 @@ position: 633,1137
 ---
 <<d2_scan "05-HeHuanHu">>
 <<if $D2ScanMatched>>
-    【未来发生了变化】
+    [b]【未来发生了变化】[/b]
     <<set $D2GiftCode to "05-HeHuanHu">>
     <<set $D2GiftName to "合欢壶">>
     <<jump JushiD2_AfterGift>>
@@ -813,7 +816,7 @@ position: 1213,1137
 ---
 <<d2_scan "04-FangXingHj">>
 <<if $D2ScanMatched>>
-    【未来发生了变化】
+    [b]【未来发生了变化】[/b]
     <<set $D2GiftCode to "04-FangXingHj">>
     <<set $D2GiftName to "方片壶">>
     <<jump JushiD2_AfterGift>>
@@ -945,7 +948,7 @@ title: JushiD2_DaughterInLaw
 居士: 都是被她激的。
 居士: 我儿子驾驭不了她。他善良，真要让人拿捏了，要吃大亏。
 居士: 我是不鼓励儿子现在谈恋爱，都是爷爷催的。
-【你听见比尔博的呼唤】
+[b]【我听见[u]“比尔博”[/u]的呼唤】[/b]
 <<jump JushiD2_PackRemaining>>
 ===
 
@@ -1022,7 +1025,7 @@ position: 265,2262
 老师: 后来不晓得给哪个举报了。真真小人，害她升职也升不成。
 老师: 她老子公司里的账也查出来了。
 老师: 哎呀，你说再熬几年，搞不好公司都是自己家的了，何必急这一时呢？
-【你听到自己对柯湘地呼唤的同时，听到了柯湘对你的呼唤】
+[b]【我听见自己对[u]柯湘[/u]的呼唤的同时，听到了[u]柯湘[/u]对你的呼唤】[/b]
 老师: 时也，命也！
 老师: 连她公公也给调查了。
 老师: 虽然最后没有出事，可这还怎么在一个屋檐下过。

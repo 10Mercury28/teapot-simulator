@@ -1,0 +1,2067 @@
+
+
+title: JushiD2_Variables
+
+position: 12,12
+
+---
+
+// Do not redeclare the existing Day 1 variables: $LikeU / $JushiSuccess。
+
+// Deep-talk flag: reuse Day 1 $LikeU; update the D2_Start condition only if its meaning changes.
+
+<<declare $D2Started = false>>
+
+<<declare $D2Finished = false>>
+
+<<declare $D2Pack = 0>>
+
+<<declare $D2PitchCount = 0>>
+
+<<declare $D2TriedFamily = false>>
+
+<<declare $D2TriedWelcome = false>>
+
+<<declare $D2TriedSmall = false>>
+
+<<declare $D2TriedVirtue = false>>
+
+<<declare $D2TriedBird = false>>
+
+<<declare $D2TriedPeach = false>>
+
+<<declare $D2AwkwardCount = 0>>
+
+<<declare $D2TeaGiven = false>>
+
+<<declare $D2SeenMei = false>>
+
+<<declare $D2SeenFoShou = false>>
+
+<<declare $D2SeenHeHuan = false>>
+
+<<declare $D2SeenFang = false>>
+
+<<declare $D2ScanMatched = false>>
+
+<<declare $D2GiftName = "">>
+
+<<declare $D2FangReserved = false>>
+
+<<declare $D2GiftCode = "">>
+
+<<declare $D2PackReturn = 0>>
+
+<<declare $D2GiftMenuVisited = false>>
+
+<<declare $D2FlowerIntroduced = false>>
+
+<<declare $D2ClassicIntroduced = false>>
+
+<<declare $D2ViewedMei = false>>
+
+<<declare $D2ViewedFoShou = false>>
+
+<<declare $D2ViewedHeHuan = false>>
+
+<<declare $D2ViewedFang = false>>
+
+<<declare $D2AcceptFang = false>>
+
+<<declare $D2ViewedCount = 0>>
+
+===
+
+title: Character_Jushi_D2
+
+position: 3541,687
+
+---
+
+// Entry point; do not start from the declarations node.
+
+<<jump JushiD2_Start>>
+
+===
+
+title: JushiD2_Start
+
+position: 3541,912
+
+---
+
+<<if $D2Finished>>
+
+    <<stop>>
+
+<<endif>>
+
+<<set $D2Started to true>>
+
+Me: 15:49. Lay Buddhist Hou is coming back to the shop.
+
+<<if $LikeU>>
+
+<<endif>>
+
+//Pause the dialogue panel here; press Space to show it again.
+
+<<pause_dialogue>>
+
+Me: 16:20.
+
+<<wait 1>>
+
+<<play_sfx "doorbell">>
+
+<<wait 0.8>>
+
+<<show_character "jushi">>
+
+<<wait 0.3>>
+
+Hou: Miss! Miss!
+
+Hou: I need a lifesaver here, right now!
+
+Hou: Quick! Find me a teapot I can give my son's girlfriend when I meet her family!
+
+Me: Huh?
+
+Hou: Oh, don't dawdle. Come here!
+
+Hou: Dinner starts at 5:30. They're probably already on their way to play guandan before that.
+
+(She clicks her tongue.)
+
+(The same woman with shoulder-length hair, her head still slightly bowed...)
+
+//Pause the dialogue panel here; press Space to show it again.
+
+<<pause_dialogue>>
+
+Me: Oh, of course. Have a look through the catalog. Everything here is in stock.
+
+(You hurriedly hand her the catalog. She practically snatches it with one hand.)
+
+//Pause the dialogue panel here; press Space to show it again.
+
+<<pause_dialogue>>
+
+Me: I'll get the box and gift bag ready while you tell me what you're looking for. Then we can choose a pot together.
+
+Hou: What is there to tell? (She clicks her tongue.)
+
+Hou: The girl's from Chongqing. She did her bachelor's in electrical and electronic engineering here in China, and she's going abroad for grad school.
+
+Hou: She'll be studying with my son.
+
+Hou: Oh, I don't know much else.
+
+Me: Haha, it's the first meeting. I imagine everyone's nervous. Try to relax.
+
+Me: You're such a gracious person. Meeting you is bound to make your son look good in her eyes.
+
+Hou: Mm.
+
+(Neither of you speaks for a while.)
+
+//Pause the dialogue panel here; press Space to show it again.
+
+<<pause_dialogue>>
+
+<<jump JushiD2_FirstSilence>>
+
+===
+
+title: JushiD2_FirstSilence
+
+---
+
+-> (You dare not stop moving, so you straighten the empty boxes and gift bags behind the counter.)
+
+-> (Try to break the silence.) Well, perhaps...
+
+    (Hou picks at the dead skin on her lip with her teeth.)
+
+<<jump JushiD2_PrePitch>>
+
+===
+
+title: JushiD2_PrePitch
+
+position: 3295,1362
+
+---
+
+// HINT: Include the two collections and Hou's urging.
+
+Me: I imagine her family may not know much about zisha teapots. We could look at the Heritage Collection, or the Boudoir Charms Collection.
+
+Hou: What's the difference?
+
+Me: The Heritage Collection has classic forms. Boudoir Charms...
+
+(As you speak, you reach across the counter and try to flip the catalog to the contents page.)
+
+//Pause the dialogue panel here; press Space to show it again.
+
+<<pause_dialogue>>
+
+Me: ...has the ones our boss thinks suit young women's tastes.
+
+Hou: What's that got to do with me? Do you understand I need to buy one and leave, quickly?
+
+Me: Yes, of course. Let me show you...
+
+<<jump JushiD2_PitchMenu>>
+
+===
+
+title: JushiD2_PitchMenu
+
+position: 2259,1587
+
+---
+
+<<if $D2TriedFamily and $D2TriedWelcome and $D2TriedSmall and $D2TriedVirtue>>
+
+    <<jump JushiD2_Phones>>
+
+<<endif>>
+
+-> Heritage Collection <<if not $D2TriedFamily or not $D2TriedWelcome>>
+
+    <<jump JushiD2_TraditionalMenu>>
+
+-> Boudoir Charms Collection <<if not $D2TriedSmall or not $D2TriedVirtue>>
+
+    <<jump JushiD2_GuiquMenu>>
+
+-> (Look down and leaf through the catalog.) Um...
+
+    <<jump JushiD2_Phones>>
+
+===
+
+
+
+
+
+title: JushiD2_TraditionalMenu
+
+position: 2037,687
+
+---
+
+// Second level: Heritage Collection, each pitch used once.
+
+-> I imagine the girl's family will be at dinner too. This would make a suitably formal gift between two families. <<if not $D2TriedFamily>>
+
+    <<set $D2TriedFamily to true>>
+
+    <<set $D2PitchCount to $D2PitchCount + 1>>
+
+    <<jump JushiD2_PitchFamily>>
+
+-> This is a lovely first zisha teapot to receive. The collection works well as a gift for a first meeting. <<if not $D2TriedWelcome>>
+
+    <<set $D2TriedWelcome to true>>
+
+    <<set $D2PitchCount to $D2PitchCount + 1>>
+
+    <<jump JushiD2_PitchWelcome>>
+
+-> (Try another collection.)
+
+    <<jump JushiD2_PitchMenu>>
+
+-> (Look down and leaf through the catalog.) Um...
+
+    <<jump JushiD2_Phones>>
+
+===
+
+
+
+title: JushiD2_GuiquMenu
+
+position: 2436,462
+
+---
+
+// Second level: Boudoir Charms, each pitch used once.
+
+-> ...Our boss always says women like delicate, pretty little things. <<if not $D2TriedSmall>>
+
+    <<set $D2TriedSmall to true>>
+
+    <<set $D2PitchCount to $D2PitchCount + 1>>
+
+    <<jump JushiD2_PitchSmall>>
+
+-> Many of these teapots use motifs traditionally associated with women's virtues. <<if not $D2TriedVirtue>>
+
+    <<jump JushiD2_PitchVirtue>>
+
+-> (Try another collection.)
+
+    <<jump JushiD2_PitchMenu>>
+
+-> (Look down and leaf through the catalog.) Um...
+
+    <<jump JushiD2_Phones>>
+
+===
+
+
+
+title: JushiD2_PitchFamily
+
+position: 2148,1137
+
+---
+
+Hou: What do you mean?
+
+Me: Well, this is a meeting between your family and hers... A classic design is a safe choice...
+
+Me: Some of the classic designs even come with stories about distinguished families.
+
+Me: Since this is the first formal meeting between the two families, a classic form would give it a certain dignity.
+
+Hou: Two families?
+
+Hou: Which two families? Whose family and whose?
+
+Me: Well... yours and the girl's...
+
+(Hou freezes for a moment, then smiles gently.)
+
+-> (Keep your hands busy tidying up.)
+
+    <<jump JushiD2_PackBeforePhone>>
+
+-> Let me tell you about one of them.
+
+    Some classic teapots even symbolize coming together through the way they're made. One was inspired by a banquet!
+
+    Hou: Not bad. What else have you got?
+
+    <<jump JushiD2_PitchMenu>>
+
+<<jump JushiD2_PitchMenu>>
+
+===
+
+
+
+title: JushiD2_PitchWelcome
+
+position: 2480,912
+
+---
+
+Me: Welcome the girl from Chongqing into a Yixing family. A teapot could be like your family's calling card.
+
+Hou: Into whose family?
+
+Me: ...Yours.
+
+Hou: Into whose family? And who are you to decide that?
+
+Hou: The child I gave birth to is still my child, whoever he lives with. Even if he stays in America and never comes back,
+
+Hou: even if he goes to Beijing, Shanghai, Guangzhou, or Chongqing, even if he lives with his wife's family,
+
+Hou: he is still my child.
+
+Hou: Into whose family? (Hou clicks her tongue sharply.)
+
+[You hear Woolf calling.]
+
+<<jump JushiD2_Awkward>>
+
+===
+
+
+
+title: JushiD2_PitchSmall
+
+position: 3040,912
+
+---
+
+Me: For centuries, women of status have been taught to cultivate just this sort of taste.
+
+Hou: What? Are you giving me a lecture on Empress Wu's Buddhist sculptures at the Longmen Grottoes in Luoyang?
+
+Hou: When one woman gives another a gift, all you can think of is dainty things and flowers?
+
+Hou: Why would I buy a zisha teapot for that reason?
+
+(Hou clicks her tongue.)
+
+<<jump JushiD2_Awkward>>
+
+===
+
+
+
+title: JushiD2_PitchVirtue
+
+position: 2760,687
+
+---
+
+Hou: Hmm?
+
+-> For example, we could choose a Palace Lantern teapot with a clay-painted pair of lovebirds. <<if not $D2TriedBird>>
+
+    <<set $D2TriedBird to true>>
+
+    Hou: Oh? Two birds flying wing to wing?
+
+    (Hou clicks her tongue.)
+
+    <<jump JushiD2_VirtueReturn>>
+
+-> Or we could choose a Longevity Peach teapot. <<if not $D2TriedPeach>>
+
+    <<set $D2TriedPeach to true>>
+
+    Me: This one has peaches at four stages of growth, representing four generations under one roof...
+
+    Hou: Oh, how very domestic! A perfect little wife and home!
+
+    (Hou bites at the dead skin on her lip.)
+
+    <<jump JushiD2_VirtueReturn>>
+
+===
+
+
+
+title: JushiD2_VirtueReturn
+
+position: 2760,912
+
+---
+
+<<if $D2TriedBird and $D2TriedPeach>>
+
+    Hou: What, have you met her on my behalf?
+
+    <<set $D2TriedVirtue to true>>
+
+<<else>>
+
+    Hou: I don't even know what sort of person she is, and somehow you already know her character better than I do?
+
+    Hou: She hasn't even set foot in our home! I haven't even given my approval! (She clicks her tongue.)
+
+    [You hear yourself calling for Baochai.]
+
+<<endif>>
+
+<<set $D2PitchCount to $D2PitchCount + 1>>
+
+<<jump JushiD2_Awkward>>
+
+===
+
+
+
+title: JushiD2_Awkward
+
+position: 2760,1137
+
+---
+
+<<set $D2AwkwardCount to $D2AwkwardCount + 1>>
+
+Me: (AAAAAAH!)
+
+<<if $D2AwkwardCount == 1>>
+
+    [You hear MBTI calling.]
+
+<<elseif $D2AwkwardCount == 2>>
+
+    [You hear the Zodiac Signs calling.]
+
+<<elseif $D2AwkwardCount == 3>>
+
+    [You hear the Chinese Zodiac calling.]
+
+<<endif>>
+
+Me: (This is so awkward. So awkward!)
+
+-> (Keep your hands moving and continue tidying up.)
+
+    <<jump JushiD2_PackBeforePhone>>
+
+-> Sorry. Let me look again.
+
+    <<jump JushiD2_PitchMenu>>
+
+-> (Lower your head over the catalog and say no more.)
+
+    <<jump JushiD2_Phones>>
+
+===
+
+
+
+title: JushiD2_PackBeforePhone
+
+position: 2259,1362
+
+---
+
+<<if $D2Pack == 0>>
+
+    (You take out a gift box the boss had specially ordered for female customers.)
+
+    <<set $D2Pack to 1>>
+
+<<elseif $D2Pack == 1>>
+
+    (You unfold a gift bag along its creases.)
+
+    <<set $D2Pack to 2>>
+
+<<elseif $D2Pack == 2>>
+
+    (You open the gift box and lay in the lining.)
+
+    <<set $D2Pack to 3>>
+
+<<elseif $D2Pack == 3>>
+
+    (You choose a ribbon of the right color, measure it, and cut it to length.)
+
+    <<set $D2Pack to 4>>
+
+<<else>>
+
+    (The box and ribbon are ready. All that's left is to put the teapot inside.)
+
+<<endif>>
+
+<<jump JushiD2_PitchMenu>>
+
+===
+
+
+
+title: JushiD2_Phones
+
+position: 2259,1812
+
+---
+
+(A phone rings.)
+
+Hou: Hello? Hello?
+
+(Hou snatches up her phone.)
+
+Hou: There's no seat for me at dinner?
+
+Hou: How dare you? I gave birth to that child!
+
+Hou: What do you mean, you paid for all four years of his undergraduate education?
+
+Hou: I may not have paid his tuition, but he is my flesh and blood. I put everything I had into raising him, too.
+
+Hou: You old man—
+
+Hou: What do you mean, I didn't take him with me?
+
+Hou: He has his drunkard father's surname, not mine! You wouldn't let me take him. Doesn't he have your name?
+
+Hou: His grandmother would cry just from washing his clothes!
+
+Hou: I...
+
+Hou: I gave in for just one moment, and...
+
+Hou: I had to work.
+
+(Hou scratches her scalp in agitation, lets out a long sigh, and lowers her voice.)
+
+Hou: Tell me something. Who will Chang Yuantao's son call Grandma someday?
+
+Hou: (Her voice rises again.) Chang Yuantao's stepmother?
+
+Hou: Or that great-grandmother of his, who calls her own grandson *aoni*—"son"!
+
+(She suddenly laughs, very gently, ends the call in one swift motion, and dials another number.)
+
+//Pause the dialogue panel here; press Space to show it again.
+
+<<pause_dialogue>>
+
+Hou: Oh! Principal Kuai.
+
+Hou: Yes, Principal Kuai. And how is your wife? Both well, I hope.
+
+Hou: I have a meditation event today, so it's rather difficult for me to get away. Mm-hmm.
+
+Hou: Of course, you're most welcome. Yuantao told me all about it.
+
+Hou: I'm terribly sorry. He came back to China and stayed at your home for two whole weeks. We must have imposed.
+
+Hou: Had he told us, we would never have let him be so discourteous.
+
+Hou: Thank you for being so understanding.
+
+Hou: Yes, yes, of course.
+
+(She grips the phone, cupping half her face and the hand holding it with her other hand, listening gravely.)
+
+(The warmth she had summoned for the call melts away from her face. She bites her lip and nods silently.)
+
+Hou: Yes. Oh, the two of them are doing well together.
+
+(Hou smiles gently, and the warmth surges back into her face.)
+
+Hou: Mm-hmm. I'll have the gift delivered today, though I won't be able to come myself.
+
+Hou: Let's meet again after Yuantao's grandfather and the family have paid a visit to Chongqing.
+
+Hou: Mm. (She touches her burning cheek and ends the call.)
+
+[You hear MBTI and Bilbo calling.]
+
+Hou: (Smiling gently at you.) Haha. No need to rush now.
+
+Hou: You heard all that. I won't pretend otherwise.
+
+Hou: Have a local courier take the gift to the Kempinski.
+
+Hou: Mm. That'll do.
+
+Hou: Wrap it nicely. Take your time. No rush anymore.
+
+Hou: I want it to arrive around six, when they're halfway through dinner.
+
+Hou: As for what to give them... we can take our time choosing.
+
+Hou: What were those collections you mentioned earlier?
+
+(You gently turn the catalog back to the contents page.)
+
+//Pause the dialogue panel here; press Space to show it again.
+
+<<pause_dialogue>>
+
+<<if ($D2TriedFamily or $D2TriedWelcome) and ($D2TriedSmall or $D2TriedBird or $D2TriedPeach)>>
+
+    // Both collections have been mentioned.
+
+    Me: Oh, the Heritage Collection.
+
+    Hou: Those two from Boudoir Charms weren't bad either.
+
+    Hou: Forget the lovebirds. They're already on opposite sides of the world. If they fly any farther, I'll never see him again.
+
+    Hou: The peach one was nice, though. Round and rather sweet.
+
+    Narrator: (She smiles gently at you.)
+
+    Hou: Don't rule those teapots out just because I said a few things.
+
+<<elseif $D2TriedFamily or $D2TriedWelcome>>
+
+    // Only the Heritage Collection has been mentioned.
+
+    Me: Oh, the Heritage Collection.
+
+    Me: I was looking at the catalog again. Boudoir Charms could work too.
+
+    Narrator: (Hou smiles gently.)
+
+<<elseif $D2TriedSmall or $D2TriedBird or $D2TriedPeach>>
+
+    // Only Boudoir Charms has been mentioned.
+
+    Me: Oh, Boudoir Charms.
+
+    Me: I was looking at the catalog again. The Heritage Collection could work too.
+
+    Narrator: (Hou smiles gently.)
+
+<<else>>
+
+    // Neither collection was introduced; player skipped straight to the catalog.
+
+    Me: I hadn't quite had the chance to introduce them yet.
+
+    Me: We could look at either the Heritage Collection or Boudoir Charms.
+
+    Narrator: (Hou smiles gently.)
+
+<<endif>>
+
+<<jump JushiD2_GiftMenu>>
+
+===
+
+title: JushiD2_GiftMenu
+
+position: 1757,2037
+
+---
+
+// First visit: original two options.
+
+<<if not $D2GiftMenuVisited>>
+
+    <<set $D2GiftMenuVisited to true>>
+
+    <<jump JushiD2_GiftMenuFirst>>
+
+<<endif>>
+
+// Later visits: show the shortlisted choices.
+
+<<jump JushiD2_GiftMenuReturn>>
+
+===
+
+title: JushiD2_GiftMenuFirst
+
+---
+
+-> Then let me show you this page of floral teapots. Here's the Longevity Peach.
+
+    <<jump JushiD2_FlowerEntry>>
+
+-> Not at all. Let's consider the floral teapots, and the Heritage Collection you said you'd be willing to see.
+
+    <<jump JushiD2_ClassicEntry>>
+
+===
+
+
+
+title: JushiD2_GiftMenuReturn
+
+---
+
+Me: So, our shortlisted teapots are...
+
+<<if $D2ViewedMei>>
+
+    Me: Plum-Stump Teapot.
+
+<<endif>>
+
+<<if $D2ViewedFoShou>>
+
+    Me: Buddha's Hand Overhead-Handle Teapot.
+
+<<endif>>
+
+<<if $D2ViewedHeHuan>>
+
+    Me: Mansheng Harmony Teapot.
+
+<<endif>>
+
+<<if $D2AcceptFang>>
+
+    Me: Square-Panel Teapot.
+
+<<endif>>
+
+(Hou presses her lips together and nods.)
+
+// When all four are shortlisted, force selection of Buddha's Hand.
+
+<<if $D2ViewedMei and $D2ViewedFoShou and $D2ViewedHeHuan and $D2AcceptFang>>
+
+    Me: Ms. Hou, our boss has a rule: no more than four teapots out for a customer to examine at once.
+
+    Me: If you'd like to see something else, we'd need to put one away first.
+
+    Hou: Oh, don't bother.
+
+    Hou: Let's have the Buddha's Hand. Anyone can tell it's from me.
+
+    <<jump JushiD2_BuyFoShou>>
+
+<<endif>>
+
+Me: Does anything catch your eye?
+
+(Hou smiles gently, looking from one teapot to the next.)
+
+-> How about that Plum-Stump Teapot you just saw? <<if $D2ViewedMei>>
+
+    <<jump JushiD2_BuyMei>>
+
+-> Shall we go with the Buddha's Hand Overhead-Handle Teapot? <<if $D2ViewedFoShou>>
+
+    <<jump JushiD2_BuyFoShou>>
+
+-> I think the Mansheng Harmony Teapot might suit the occasion. <<if $D2ViewedHeHuan>>
+
+    <<jump JushiD2_BuyHeHuan>>
+
+-> Then the Square-Panel Teapot? <<if $D2AcceptFang>>
+
+    <<jump JushiD2_BuyFang>>
+
+-> There are others I could show you. <<if not ($D2ViewedMei and $D2ViewedFoShou and $D2ViewedHeHuan and $D2ViewedFang)>>
+
+    <<jump JushiD2_GiftMoreMenu>>
+
+===
+
+title: JushiD2_GiftMoreMenu
+
+---
+
+(Hou presses her lips together.)
+
+-> Let's look at the floral collection. <<if not $D2ViewedMei or not $D2ViewedFoShou>>
+
+    <<jump JushiD2_FlowerEntry>>
+
+-> Let's look at the Heritage Collection. <<if not $D2ViewedHeHuan or not $D2ViewedFang>>
+
+    <<jump JushiD2_ClassicEntry>>
+
+-> Let's go back to the ones we've shortlisted.
+
+    <<jump JushiD2_GiftMenuReturn>>
+
+===
+
+title: JushiD2_FlowerEntry
+
+---
+
+<<if not $D2FlowerIntroduced>>
+
+    <<set $D2FlowerIntroduced to true>>
+
+    <<jump JushiD2_FlowerIntro>>
+
+<<endif>>
+
+<<jump JushiD2_FlowerMenu>>
+
+===
+
+title: JushiD2_FlowerIntro
+
+position: 545,2262
+
+---
+
+Me: Some floral teapots are based on round or ribbed forms, with decorations modeled after plants and animals.
+
+(As you explain, your hands keep moving, turning the saddle-stitched catalog to its middle spread, where it lies flattest.)
+
+//Pause the dialogue panel here; press Space to show it again.
+
+<<pause_dialogue>>
+
+Me: Others take the shape of a plant themselves.
+
+Me: The Gongchun teapot you bought last time is the latter; today's Longevity Peach is the former.
+
+Hou: Mm. Let's see more.
+
+<<jump JushiD2_FlowerMenu>>
+
+===
+
+title: JushiD2_FlowerMenu
+
+position: 572,462
+
+---
+
+// Each teapot may be presented only once.
+
+-> Actually, I'd recommend the Plum-Stump or Plum-Blossom teapot. <<if not $D2ViewedMei>>
+
+    <<set $D2ViewedMei to true>>
+
+    <<set $D2ViewedCount to $D2ViewedCount + 1>>
+
+    <<jump JushiD2_MeiZhuang>>
+
+-> We have every floral design on this page in stock. <<if not $D2ViewedFoShou>>
+
+    <<set $D2ViewedFoShou to true>>
+
+    <<set $D2ViewedCount to $D2ViewedCount + 1>>
+
+    <<jump JushiD2_FoShou>>
+
+-> All right, let's look at the Heritage Collection.
+
+    <<jump JushiD2_ClassicEntry>>
+
+===
+
+title: JushiD2_ClassicEntry
+
+---
+
+// Play the Heritage introduction only on the first visit.
+
+<<if not $D2ClassicIntroduced>>
+
+    <<set $D2ClassicIntroduced to true>>
+
+    <<jump JushiD2_ClassicIntro>>
+
+<<endif>>
+
+<<jump JushiD2_ClassicMenu>>
+
+===
+
+title: JushiD2_ClassicIntro
+
+position: 1824,2262
+
+---
+
+// Second level: Harmony / Square-Panel.
+
+Hou: Ah yes, there's this one too.
+
+Hou: Didn't you say one teapot was connected with a banquet, and another symbolized two things coming together?
+
+Hou: Don't make it too esoteric. People won't understand.
+
+<<jump JushiD2_ClassicMenu>>
+
+===
+
+
+
+title: JushiD2_ClassicMenu
+
+position: 444,12
+
+---
+
+// Do not repeat ClassicIntro dialogue here.
+
+-> Yes, yes, this is Mansheng's Harmony Teapot. <<if not $D2ViewedHeHuan>>
+
+    <<set $D2ViewedHeHuan to true>>
+
+    <<set $D2ViewedCount to $D2ViewedCount + 1>>
+
+    <<jump JushiD2_HeHuan>>
+
+-> Yes, this is the Square-Panel Teapot. <<if not $D2ViewedFang>>
+
+    <<set $D2ViewedFang to true>>
+
+    <<set $D2ViewedCount to $D2ViewedCount + 1>>
+
+    <<jump JushiD2_FangPian>>
+
+-> Mm, let's go back to Boudoir Charms.
+
+    <<jump JushiD2_FlowerEntry>>
+
+===
+
+
+
+title: JushiD2_MeiZhuang
+
+position: 1757,687
+
+---
+
+(You take out two lenticular cards and hand them to Hou.
+
+While she compares and handles them, you turn toward the display cabinet, scanning the shelves for the actual teapots.)
+
+//Pause the dialogue panel here; press Space to show it again.
+
+<<pause_dialogue>>
+
+(Found them at last! You place them before Hou.)
+
+Me: I don't think young women necessarily want blessings about making a good home anymore,
+
+Me: especially if she's eager to go out and make her own way.
+
+Me: "Plum blossoms grow fragrant through bitter cold." Who wouldn't appreciate that?
+
+(Hou studies the teapot without answering. She runs her fingers across the sculpted clay.)
+
+Hou: The stump has real strength to it.
+
+Hou: It's already been cut down, yet it still has the strength to stand against the wind.
+
+Hou: The plum-blossom version only adds a few sprigs to a round teapot.
+
+Hou: But with this one, the stump and the pot are one.
+
+Hou: ...All right. This isn't vulgar.
+
+<<jump JushiD2_MeiZhuangConfirm>>
+
+===
+
+title: JushiD2_MeiZhuangConfirm
+
+position: 1757,1587
+
+---
+
+-> Of course. I'll pack it for you.
+
+    <<jump JushiD2_BuyMei>>
+
+-> Let's keep it on the shortlist and see the others.
+
+    <<jump JushiD2_GiftMenu>>
+
+===
+
+title: JushiD2_FoShou
+
+position: 1536,687
+
+---
+
+Hou: Oh, there's one with Buddha's hand fruit! That little lid knob is rather cute.
+
+Me: Buddha's hand is a kind of citron, a citrus fruit shaped like outstretched fingers.
+
+Me: Traditionally it's auspicious because "Buddha" and "good fortune" sound alike in Chinese.
+
+Me: It's made from the same clay as the Longevity Peach. Both add decorations to an established teapot form.
+
+(You take out the lenticular card and hand it to Hou.
+
+As she compares and handles it, you turn toward the display cabinet, scanning the shelves for the actual teapot.)
+
+//Pause the dialogue panel here; press Space to show it again.
+
+<<pause_dialogue>>
+
+(Found it! You place the teapot before Hou.)
+
+Me: But this one's an overhead-handle teapot, not a basic round design.
+
+(Hou runs her fingers over the teapot.)
+
+Me: If you choose this one, it'll be quite different from the Gongchun you bought last time.
+
+Hou: Good fortune, good connections. That's a lovely meaning.
+
+Hou: (She presses her lips together.) You know, a person's good fortune isn't limited to one lifetime.
+
+Me: Hmm?
+
+Hou: You see, we're choosing a teapot because we've acquired the taste for it, and because we have enough of... this—
+
+(She gestures as if counting money, then smiles gently.)
+
+Hou: Once sages reach a certain level of attainment, they can choose where they come into the world.
+
+Hou: Truly. If you've attained enlightenment, you can decide where you'll be reborn, and who your parents will be.
+
+Hou: You see, people choose to enter through their mother's egg, because entering through the father's sperm is far too unreliable.
+
+Hou: A man releases tens of thousands of sperm at once. For just one to join the single egg, the odds are terribly slim.
+
+Hou: And so many are aborted before they're even fully formed. A woman has only so many eggs in her lifetime. That's why a human birth is so precious.
+
+Me: Mm, right. Every child is born from a womb.
+
+Hou: Don't think I'm making this up.
+
+Hou: There's science behind it. The continuity of life is, after all, the transmission of information.
+
+Hou: Ordinary minds contain seeds of all kinds, wandering among the five realms of existence.
+
+Hou: What we call attaining sainthood is really the unification of one's mind.
+
+Hou: A sage has one great seed of mind, whereas our rebirths are determined by the karma that propels us and the karma that completes our circumstances.
+
+Hou: As the seed of sagehood grows, you can take charge of your own life, perhaps even in the next one.
+
+Me: Oh. Well, I'm grateful to have been born human in this life.
+
+[You hear Ke Xiang and Baochai calling.]
+
+Hou: Yes.
+
+(She looks once more at the Buddha's Hand teapot and presses her lips together.)
+
+<<jump JushiD2_FoShouConfirm>>
+
+===
+
+
+
+title: JushiD2_FoShouConfirm
+
+position: 1536,912
+
+---
+
+-> This one. Anyone can tell it came from you.
+
+    <<jump JushiD2_BuyFoShou>>
+
+-> Let's keep it on the shortlist and look at the others.
+
+    <<jump JushiD2_GiftMenu>>
+
+===
+
+
+
+title: JushiD2_HeHuan
+
+position: 384,237
+
+---
+
+Hou: Harmony? As in harmony between husband and wife?
+
+Me: That can certainly be one auspicious meaning.
+
+Me: But there's also a local story in Yixing that Chen Mansheng designed it after seeing a pair of large cymbals.
+
+(You turn to page seven of the catalog and lay it open in front of Hou.)
+
+//Pause the dialogue panel here; press Space to show it again.
+
+<<pause_dialogue>>
+
+Hou: (Interrupting.) Cymbals?
+
+Hou: The kind people bang at celebrations?
+
+Hou: (She smiles gently.) What does that have to do with tonight?
+
+-> Before Chen Mansheng, zisha teapots were largely consumed by scholars and men of letters.
+
+    <<jump JushiD2_HeHuanHistory>>
+
+-> He designed it after a celebration banquet.
+
+    <<jump JushiD2_HeHuanStory>>
+
+===
+
+
+
+title: JushiD2_HeHuanHistory
+
+position: 351,462
+
+---
+
+Me: As a scholar-official himself, he often worked with artisan siblings to design and commission zisha teapots,
+
+Me: and even inscribed them himself. The teapot became both a medium and an artistic object.
+
+[You hear the Courtesan calling.]
+
+Hou: (Biting her lip.) And what does that have to do with tonight?
+
+Me: Right, right.
+
+<<jump JushiD2_HeHuanStory>>
+
+===
+
+
+
+title: JushiD2_HeHuanStory
+
+position: 666,687
+
+---
+
+Me: The story goes that while Mansheng was serving as an official in Liyang, he was responsible for transporting Baiya tribute tea to the capital.
+
+Me: The tea arrived on time, the emperor was pleased, and Mansheng held a banquet for his friends to celebrate.
+
+Me: Drums thundered, gongs rang, and firecrackers went off.
+
+Me: Delighted, he jumped right in, grabbed two big cymbals, and clashed them open and shut.
+
+Me: As the story puts it: "Amid banquet music, he himself took up the great cymbals."
+
+Me: That's what inspired him to design the Harmony Teapot.
+
+Hou: (Laughing.) A county magistrate himself banging away at cymbals?
+
+Hou: Now that's someone with spirit, unconcerned with appearances.
+
+[You hear yourself calling for Lü Meng.]
+
+Me: See how the two halves of the body fit together, like two cymbals pressed against each other?
+
+(Still talking, you take out the lenticular card and hand it to Hou.
+
+While she handles it and compares the images, you turn toward the display cabinet and scan the shelves for the teapot.)
+
+//Pause the dialogue panel here; press Space to show it again.
+
+<<pause_dialogue>>
+
+(Found it! You put it in front of Hou.)
+
+Me: And I think, as a gift tonight, it doesn't have to mean just marital harmony.
+
+Me: Friends, relatives, even people who hardly know one another—getting to sit down at the same table is a good thing in itself.
+
+Me: It can wish someone success in their career and celebrate the joy of gathering together, without being too obscure.
+
+Hou: Quite. People have different views and different positions. They have to sit down together before they can even begin to talk about harmony.
+
+(She presses her lips together.)
+
+Hou: I like that story.
+
+<<jump JushiD2_HeHuanConfirm>>
+
+===
+
+title: JushiD2_HeHuanConfirm
+
+position: 666,912
+
+---
+
+-> Mm-hmm. It does suit the occasion!
+
+    <<jump JushiD2_BuyHeHuan>>
+
+-> Let's keep it on the shortlist and look at the others.
+
+    <<jump JushiD2_GiftMenu>>
+
+===
+
+
+
+title: JushiD2_FangPian
+
+position: 3773,237
+
+---
+
+Me: Look, it's quite different from those round teapots.
+
+(You turn the catalog to page two and lay it open before Hou.)
+
+//Pause the dialogue panel here; press Space to show it again.
+
+<<pause_dialogue>>
+
+Hou: Isn't it just square?
+
+Me: A common way to make a zisha teapot is to paddle the clay into a cylindrical body.
+
+Me: You take a uniformly flattened slab of clay, wrap it around a circular base, and paddle it into a rounded body.
+
+(As you speak, you take out a lenticular card and hand it to Hou.
+
+While she handles it and compares the images, you turn toward the display cabinet and scan the shelves for the teapot.)
+
+//Pause the dialogue panel here; press Space to show it again.
+
+<<pause_dialogue>>
+
+(Found it! You place it before Hou.)
+
+Me: Square teapots are often made by joining slabs. You cut each slab first, assemble them, and refine the edges.
+
+Me: Here, only once the corners have been joined does it become a complete body.
+
+Me: I think, as a gift for the two young people, this could suggest that
+
+Me: two people who once led separate lives will have to learn how to fit together and connect.
+
+<<jump JushiD2_FangPianConfirm>>
+
+===
+
+title: JushiD2_FangPianConfirm
+
+position: 3773,1587
+
+---
+
+Hou: ... (She smiles gently.)
+
+-> The corners are softened, and the design is quite clean and modern.
+
+    Me: A bit like American Art Deco!
+
+    Hou: She studies electrical engineering. She might actually like something like this.
+
+    Hou: Mm. Not bad.
+
+    <<set $D2AcceptFang to true>>
+
+    <<jump JushiD2_FangPianFinal>>
+
+-> We could look at something else.
+
+    <<jump JushiD2_GiftMenu>>
+
+===
+
+
+
+title: JushiD2_FangPianFinal
+
+position: 3851,1812
+
+---
+
+-> Shall I wrap it up for you, then?
+
+    <<jump JushiD2_BuyFang>>
+
+-> Let's keep it on the shortlist and look at the others.
+
+    <<jump JushiD2_GiftMenu>>
+
+===
+
+// Four shared purchase entry points.
+
+// If too few teapots have been shown, Hou prevents the sale.
+
+title: JushiD2_BuyMei
+
+---
+
+<<if $D2ViewedCount < 3>>
+
+    <<jump JushiD2_NeedMore>>
+
+<<endif>>
+
+Hou: All right, the Plum-Stump it is.
+
+<<jump JushiD2_ScanMeiZhuang>>
+
+===
+
+
+
+title: JushiD2_BuyFoShou
+
+---
+
+<<if $D2ViewedCount < 3>>
+
+    <<jump JushiD2_NeedMore>>
+
+<<endif>>
+
+Hou: This one. Let's go with the Buddha's Hand.
+
+<<jump JushiD2_ScanFoShou>>
+
+===
+
+
+
+title: JushiD2_BuyHeHuan
+
+---
+
+<<if $D2ViewedCount < 3>>
+
+    <<jump JushiD2_NeedMore>>
+
+<<endif>>
+
+Hou: We'll take this one. Harmony. Very nice.
+
+<<jump JushiD2_ScanHeHuan>>
+
+===
+
+
+
+title: JushiD2_BuyFang
+
+---
+
+<<if $D2ViewedCount < 3>>
+
+    <<jump JushiD2_NeedMore>>
+
+<<endif>>
+
+Hou: This one, then. It has character.
+
+<<jump JushiD2_ScanFangPian>>
+
+===
+
+
+
+title: JushiD2_NeedMore
+
+---
+
+Hou: No rush, no rush. (She smiles gently.)
+
+<<if $D2ViewedCount == 1>>
+
+    Hou: We've only seen one. How can we decide already?
+
+<<else>>
+
+    Hou: We've only seen two. Let's compare a few more.
+
+<<endif>>
+
+Hou: Let's take another look at those you mentioned.
+
+<<jump JushiD2_GiftMenu>>
+
+===
+
+title: JushiD2_ScanMeiZhuang
+
+position: 923,1137
+
+---
+
+<<d2_scan "09-H2zhuangjj">>
+
+<<if $D2ScanMatched>>
+
+    [The future has changed.]
+
+    <<set $D2GiftCode to "09-H2zhuangjj">>
+
+    <<set $D2GiftName to "Plum-Stump Teapot">>
+
+    <<jump JushiD2_AfterGift>>
+
+<<else>>
+
+    Hou: That's not right. (Tsk.) That's not the one I asked for. Try again.
+
+    <<jump JushiD2_ScanMeiZhuang>>
+
+<<endif>>
+
+===
+
+title: JushiD2_ScanFoShou
+
+position: 1503,1137
+
+---
+
+<<d2_scan "09-H1FoShouJ">>
+
+<<if $D2ScanMatched>>
+
+    [The future has changed.]
+
+    <<set $D2GiftCode to "09-H1FoShouJ">>
+
+    <<set $D2GiftName to "Buddha's Hand Overhead-Handle Teapot">>
+
+    <<jump JushiD2_AfterGift>>
+
+<<else>>
+
+    Hou: That's not right. (Tsk.) That's not the one I asked for. Try again.
+
+    <<jump JushiD2_ScanFoShou>>
+
+<<endif>>
+
+===
+
+title: JushiD2_ScanHeHuan
+
+position: 633,1137
+
+---
+
+<<d2_scan "05-HeHuanHu">>
+
+<<if $D2ScanMatched>>
+
+    [The future has changed.]
+
+    <<set $D2GiftCode to "05-HeHuanHu">>
+
+    <<set $D2GiftName to "Harmony Teapot">>
+
+    <<jump JushiD2_AfterGift>>
+
+<<else>>
+
+    Hou: That's not right. (Tsk.) That's not the one I asked for. Try again.
+
+    <<jump JushiD2_ScanHeHuan>>
+
+<<endif>>
+
+===
+
+title: JushiD2_ScanFangPian
+
+position: 1213,1137
+
+---
+
+<<d2_scan "04-FangXingHj">>
+
+<<if $D2ScanMatched>>
+
+    [The future has changed.]
+
+    <<set $D2GiftCode to "04-FangXingHj">>
+
+    <<set $D2GiftName to "Square-Panel Teapot">>
+
+    <<jump JushiD2_AfterGift>>
+
+<<else>>
+
+    Hou: That's not right. (Tsk.) That's not the one I asked for. Try again.
+
+    <<jump JushiD2_ScanFangPian>>
+
+<<endif>>
+
+===
+
+title: JushiD2_AfterGift
+
+position: 943,1362
+
+---
+
+(Once the teapot is chosen, an unspoken agreement settles into silence between you.
+
+You turn to put the rejected teapots back in the cabinet, struggling to tuck the little cards into the booklet again.
+
+After the flurry, you gently wipe down the {$D2GiftName} with a tea cloth.)
+
+//Pause the dialogue panel here; press Space to show it again.
+
+<<pause_dialogue>>
+
+Hou: I... I hadn't prepared a gift. Haha. How embarrassing, having you see me like this.
+
+Hou: Whew...
+
+Hou: Nobody... told me anything beforehand.
+
+Hou: I didn't know my son was seeing someone, or that they'd agreed to things so quickly...
+
+Hou: I don't know her. I've never even met her, and they're already living together overseas.
+
+Hou: If I hadn't happened to see...
+
+Hou: They'd have met the families and settled a wedding without even asking me.
+
+-> (Keep your hands moving, continuing to wrap the gift.) <<if $D2Pack < 5>>
+
+    <<set $D2PackReturn to 1>>
+
+    <<jump JushiD2_PackOneStep>>
+
+-> (You notice Hou has bitten her lip raw. Pour her some tea.) <<if not $D2TeaGiven>>
+
+    Me: Have some tea.
+
+    (Hou presses her lips together.)
+
+    <<set $D2TeaGiven to true>>
+
+    <<jump JushiD2_AfterGiftCheck>>
+
+===
+
+title: JushiD2_AfterGiftChoice2
+
+---
+
+<<if $D2Pack == 5 and $D2TeaGiven>>
+
+    <<jump JushiD2_AfterGiftSecondCheck>>
+
+<<endif>>
+
+-> (Keep your hands moving, continuing to wrap the gift.) <<if $D2Pack < 5>>
+
+    <<set $D2PackReturn to 2>>
+
+    <<jump JushiD2_PackOneStep>>
+
+-> (You notice Hou has bitten her lip raw. Pour her some tea.) <<if not $D2TeaGiven>>
+
+    Me: Have some tea.
+
+    (Hou presses her lips together.)
+
+    <<set $D2TeaGiven to true>>
+
+    <<jump JushiD2_AfterGiftSecondCheck>>
+
+===
+
+title: JushiD2_AfterGiftSecondCheck
+
+---
+
+<<if $D2Pack < 5 or $D1TalkedCicada>>
+
+    <<jump JushiD2_DaughterInLaw>>
+
+<<else>>
+
+    <<jump JushiD2_Delivery>>
+
+<<endif>>
+
+===
+
+title: JushiD2_PackOneStep
+
+---
+
+<<if $D2Pack == 0>>
+
+    (You take out a gift box the boss had specially ordered for female customers.)
+
+    <<set $D2Pack to 1>>
+
+<<elseif $D2Pack == 1>>
+
+    (You unfold a gift bag along its creases.)
+
+    <<set $D2Pack to 2>>
+
+<<elseif $D2Pack == 2>>
+
+    (You open the gift box and lay in the lining.)
+
+    <<set $D2Pack to 3>>
+
+<<elseif $D2Pack == 3>>
+
+    (You choose a ribbon of the right color, measure it, and cut it to length.)
+
+    <<set $D2Pack to 4>>
+
+<<elseif $D2Pack == 4>>
+
+    (You put the {$D2GiftName} and its certificate into the box, tie the ribbon, and place it all in the gift bag.)
+
+    <<set $D2Pack to 5>>
+
+<<endif>>
+
+<<if $D2PackReturn == 1>>
+
+    <<jump JushiD2_AfterGiftCheck>>
+
+<<elseif $D2PackReturn == 2>>
+
+    <<jump JushiD2_AfterGiftSecondCheck>>
+
+<<else>>
+
+    <<jump JushiD2_PackRemaining>>
+
+<<endif>>
+
+===
+
+title: JushiD2_AfterGiftCheck
+
+---
+
+<<if $D2Pack < 5 or $D1TalkedCicada>>
+
+    <<jump JushiD2_DaughterInLawIntro>>
+
+<<else>>
+
+    <<jump JushiD2_Delivery>>
+
+<<endif>>
+
+===
+
+title: JushiD2_DaughterInLawIntro
+
+---
+
+Hou: I'll tell you something. To be frank, I don't like this girl.
+
+Me: Why? Haven't you said you've never met her?
+
+Hou: Hmph. For one thing, they're living together before marriage. (She bites her lip again.)
+
+Hou: My son only comes back once a year. This time he didn't even come back to Yixing.
+
+Hou: Without a word, that girl took him off to Chongqing.
+
+Hou: It left us with no say in any of it.
+
+(She clicks her tongue.)
+
+<<jump JushiD2_AfterGiftChoice2>>
+
+===
+
+title: JushiD2_DaughterInLaw
+
+---
+
+// Continue from here.
+
+Hou: You girls put everything online these days, don't you?
+
+Hou: She listens to rock music, with all that black stuff around her eyes and on her lips.
+
+Hou: A while ago she was making a fuss about some menstruation thing. How can she be so shameless?
+
+Hou: And she was campaigning for that pink-haired girl who took her own life. Good heavens.
+
+Hou: You don't understand. You don't understand.
+
+Hou: My son is a very, very kind person.
+
+Hou: He's always looking after other people's feelings, always putting himself last.
+
+Hou: His grandparents brought him up all wrong!
+
+Hou: I'm the sort of person who knows how to resist, too. I could never get along with them.
+
+(Hou bites at the dead skin on her lip.)
+
+Hou: You only live once. You should live as you please, without worrying so much about everyone else.
+
+Me: Well, if she wants to study abroad and listen to rock, maybe she's trying to make her own choices too.
+
+Hou: That's her business.
+
+Hou: Can I control her? I can't even control my own son.
+
+(She glances at her phone.)
+
+Hou: My son can't handle a girl with that much rebellion in her.
+
+Hou: I mean it. She had such a good undergraduate record. She turned down a guaranteed graduate-school place just to see what studying abroad would be like.
+
+Hou: She's got a scholarship, too.
+
+Hou: My son isn't as clever. He only meant to try applying for grad school, maybe look for a job while he was at it.
+
+Hou: She pushed him into it.
+
+Hou: He can't handle her. He's kind, and if she gets him under her thumb, he'll suffer for it.
+
+Hou: I never encouraged him to date at this age. It's all because his grandfather kept pushing him.
+
+[You hear Bilbo calling.]
+
+<<jump JushiD2_PackRemaining>>
+
+===
+
+title: JushiD2_PackRemaining
+
+---
+
+<<if $D2Pack < 5>>
+
+    <<set $D2PackReturn to 3>>
+
+    <<jump JushiD2_PackOneStep>>
+
+<<else>>
+
+    <<jump JushiD2_Delivery>>
+
+<<endif>>
+
+===
+
+title: JushiD2_Delivery
+
+position: 265,2037
+
+---
+
+You quietly finish up what you're doing.
+
+(Hou slowly turns toward the window.
+
+The sun is beginning to set. There are fewer people on Gunan Street now.
+
+Some push their bicycles; others start their electric scooters with a couple of little chirps.
+
+Here and there, a beetle-like car pulls away.
+
+Your gaze moves from the backlit window frame to her.
+
+She is thin, with very short hair, alert and spirited.
+
+The skin on her face clings tightly to her bones, yet her cheeks are not hollow.
+
+Dim orange sunlight catches her cheekbones, neck, and pronounced wrist bones.
+
+After all that commotion, no one has switched on the shop lights. Beyond the glow around her, everything looks dark and cold.
+
+She seems warmly dressed, though:
+
+a dusty-pink cashmere twinset, its pills carefully trimmed, with slightly worn plastic buttons in the same shade.
+
+She smiles very gently.)
+
+//Pause the dialogue panel here; press Space to show it again.
+
+<<pause_dialogue>>
+
+Me: It's all wrapped. I'll send it over at six.
+
+Hou: Not send it at six. I want it delivered by six.
+
+Hou: About thirty minutes into dinner. Room 1314 at the Kempinski.
+
+Hou: I'll be off. You can record the sale here; I'll transfer the money straight to Shao Wei.
+
+Hou: By the way, what's your name?
+
+Me: My surname is Wang.
+
+Hou: Wang. Thank you for all your trouble.
+
+You watch her walk down the lane. There's nothing else to do today. What will she take to leave Gunan Street?
+
+Her figure turns right at the end of the lane and disappears.
+
+<<hide_character "jushi">>
+
+<<jump JushiD2_Teacher>>
+
+===
+
+title: JushiD2_Teacher
+
+position: 265,2262
+
+---
+
+<<wait 0.4>>
+
+<<play_sfx "doorbell">>
+
+<<wait 0.8>>
+
+<<show_character "teacher">>
+
+<<wait 0.3>>
+
+Shao Wei: (She pushes the door open, speaking on speakerphone.)
+
+(She drops a bag onto the table, gestures toward you with her chin, and covers the receiver.)
+
+Shao Wei: I brought these from Huanglong Mountain for you this week. Everything all right?
+
+(Before you can answer, she goes back to the phone.)
+
+Shao Wei: Oh, sis! What brings you here today?
+
+Shao Wei: All good, all good. Mm-hmm.
+
+Shao Wei: This girl here? She's very capable, you know.
+
+Shao Wei: In a hurry to get home? Well, take care! Yes, yes. Bye now.
+
+Shao Wei: (She hangs up and turns to you.)
+
+//Pause the dialogue panel here; press Space to show it again.
+
+<<pause_dialogue>>
+
+(It's the same tall, impeccably dressed Shao Wei.)
+
+//Pause the dialogue panel here; press Space to show it again.
+
+<<pause_dialogue>>
+
+Shao Wei: What do you know about her?
+
+Shao Wei: Oh, her life used to be so comfortable.
+
+Shao Wei: Her father-in-law was somebody in the county government. (She gives a thumbs-up.) Back when they were courting investment, they were riding high!
+
+Shao Wei: She married into quite the family. Lived very well.
+
+Shao Wei: Her sister-in-law was even her best friend from high school. The whole family doted on her little boy.
+
+Shao Wei: She wasn't like this back then. Looked down her nose at everyone, always boasting about her husband's family.
+
+Shao Wei: She and her husband had easy jobs, kept their salaries for themselves, and lived and ate at home. Oh, the things they spent money on!
+
+Shao Wei: Then someone reported her. Such a petty little person. Ruined her chances of promotion.
+
+Shao Wei: They found problems in the accounts at her father's company, too.
+
+Shao Wei: Ah, if they'd only held on a few more years, the whole company might have been theirs. Why the hurry?
+
+[At the same moment that you call out to Ke Xiang, you hear Ke Xiang calling to you.]
+
+Shao Wei: Such is fate!
+
+Shao Wei: Even her father-in-law was investigated.
+
+Shao Wei: Nothing came of it in the end, but how could they go on living under the same roof?
+
+Shao Wei: And right at that moment, her husband moved out. Only later did they find out...
+
+Me: He ran off with the money?
+
+Shao Wei: That drunken fool!
+
+Shao Wei: Him? As if he could pull that off! He had another woman!
+
+Shao Wei: That man had been spoiled rotten since childhood. He kicked up a fuss until he got his divorce and married someone else.
+
+Shao Wei: Her own family couldn't help her. Miserable, really.
+
+Shao Wei: In the first lunar month of 2008,
+
+Shao Wei: she finally moved out for good. She deliberately waited until her son had fallen asleep.
+
+Shao Wei: They loaded the last box of her personal things into the car.
+
+Shao Wei: The engine started, the headlights came on,
+
+Shao Wei: and there was the little boy, standing at the courtyard gate.
+
+Shao Wei: Crying in his grandmother's arms, calling out for his mother.
+
+Shao Wei: His grandmother couldn't possibly let him go running after her. His father would've beaten him for it!
+
+Shao Wei: Both of them crying. Mother and son.
+
+Shao Wei: Oh, I've heard her tell that story more times than I can count.
+
+Shao Wei: The house, the son—what could she take with her?
+
+Shao Wei: And you haven't seen that new wife of his!
+
+Shao Wei: She used to work under Hou Li. Who knows how often Hou looked down her nose at her.
+
+Shao Wei: (Tsk.) What a miserable business.
+
+-> Aren't you her friend?
+
+    <<jump JushiD2_TeacherFriend>>
+
+-> Couldn't she have refused to divorce him?
+
+    <<jump JushiD2_TeacherDivorce>>
+
+===
+
+title: JushiD2_TeacherFriend
+
+position: 512,2487
+
+---
+
+Shao Wei: Of course. Why would I ask you to look after her if we weren't friends?
+
+Me: ...Oh... nothing.
+
+Shao Wei: Huh? What did I say that was so bad about her?
+
+Shao Wei: (She glances down at her phone.)
+
+Shao Wei: Yixing is only so big. Everyone knows everybody's family business.
+
+Shao Wei: It's hardly a secret.
+
+<<jump JushiD2_Order>>
+
+===
+
+title: JushiD2_TeacherDivorce
+
+position: 232,2487
+
+---
+
+Shao Wei: (She pauses.)
+
+Shao Wei: Ah. What happens between husband and wife is never something you can explain in a sentence or two.
+
+Shao Wei: Marriage, eh!
+
+Shao Wei: She's been through enough over the years.
+
+Shao Wei: A woman starting over doesn't need every old story dragged out again.
+
+Me: ...
+
+Shao Wei: Look, she practices meditation, does good deeds, and leads a quiet life now.
+
+Shao Wei: What's wrong with that?
+
+<<jump JushiD2_Order>>
+
+===
+
+title: JushiD2_Order
+
+position: 265,2712
+
+---
+
+<<hide_character "teacher">>
+
+<<show_popup_wait "BoorBash">>
+
+<<if $D2Finished>>
+
+    <<stop>>
+
+<<endif>>
+
+-> Confirm the delivery order and end the day.
+
+    <<set $D2Finished to true>>
+
+    <<load_scene "endScene" "" 2>>
+
+    <<stop>>
+
+===
