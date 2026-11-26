@@ -1,0 +1,520 @@
+// Yarn Spinner 3.2 — Character_Jushi
+// All variables are declared here. To reset for a new playthrough, reset the variable storage in Unity or invoke your own initialization routine.
+// Entry node: Character_Jushi. JushiVariables declares variables only; do not start dialogue there.
+
+title: JushiVariables
+---
+<<declare $NotReal = false>>
+<<declare $LikeStory = false>>
+<<declare $DeepTalk = false>>
+<<declare $LikeU = false>>
+<<declare $WrongFirst = false>>
+<<declare $GongDoubtKnown = false>>
+<<declare $GongMeaningKnown = false>>
+<<declare $TriedSengMao = false>>
+<<declare $TriedGongChun = false>>
+<<declare $AskedMiZong = false>>
+<<declare $AskedDengji = false>>
+<<declare $AskedOurs = false>>
+<<declare $JushiSuccess = false>>
+<<declare $JushiFailed = false>>
+<<declare $D1TalkedCicada = false>>
+===
+
+title: Character_Jushi
+---
+<<wait 0.5>>
+<<play_sfx "doorbell">>
+<<wait 1.5>>
+<<show_character "jushi">>
+<<wait 0.5>>
+I: Hello, welcome in.
+Jushi: Hello.I have an appointment with your shop owner, Shao Wei.
+(The middle-aged woman with shoulder-length hair seems quite approachable, her head slightly bowed.
+<<pause_dialogue>>
+(You study the woman: the very frontal, head tilt left, then right)
+<<pause_dialogue>>
+(You can tilt your head left or right to see more of this customer from different angles.)
+<<pause_dialogue>>
+// Pause the communication interface here; resume the dialogue after Space.
+<<pause_dialogue>>
+I: You must be Lay Buddhist Hou. Everything is ready. Please have a look at the teapots first. We can go to the wild-vegetable restaurant later.
+Jushi: How thoughtful is Shao. Though she has so much on her plate, she still made arrangements for my visit.
+Jushi: One word from her and you're run off your feet. I really do feel quite apologetic.
+I: Oh, not at all!
+Jushi: I would like to pick out a teapot. [i]Dajue Temple[/i] is holding an event next month, and I want to gift it to a fellow volunteer.
+I: Please sit and have some tea. I’ll bring over the teapots and the catalog.
+(You lower your gaze and take out the catalog.)
+<<pause_dialogue>>
+(That catalogue is the first assignment you have completed since your boss hired you.
+Full of determination, you put your lenticular-card and graphic-design skills to work, collaging and photographing,
+and sacrificed quite a bit of your time off to finish it.
+She, meanwhile, spent a good deal of effort writing introductions for herself and the studio and commissioning a seal design.
+Feeling the reassuring weight of the finished catalog in your hands,
+you wonder privately why none of that weight has materialized as overtime pay.)
+// Pause the communication interface here; resume the dialogue after Space.
+<<pause_dialogue>>
+(Hou accepts it in both hands, opens the catalog, and takes a sip of tea.
+She turns a page gently and lifts one of the lenticular cards out to examine it.
+While she studies it, your eyes sweep across the stock in the display cabinets.)
+// Pause the communication interface here; resume the dialogue after Space.
+<<pause_dialogue>>
+Jushi: Shao Wei has an eye for these things, placing the [b][i]Gongchun Teapot[/i][/b] right at the front.
+Jushi: After all, it is the founding ancestor of you pot makers.
+(Hou presses her lips together and spends a little while turning the pages herself.)
+// Pause the communication interface here; resume the dialogue after Space.
+<<pause_dialogue>>
+Jushi: Without him, where would this entire craft tradition be?
+-> (Shao only put it first to make herself look respectful of history so as to sell more.)
+    <<set $NotReal to true>>
+    <<detour NotRealContent>>
+    Jushi: After all that, why do [b]you[/b] still place it on the very first page of your catalog?
+    (Hou smiles gently.)
+    <<jump Select1>>
+-> I rather like this origin story.
+    <<detour LikeStory>>
+    <<jump Select1>>
+===
+
+title: NotRealContent
+---
+// Shared discussion of authenticity; returns to caller without an additional question.
+<<set $GongDoubtKnown to true>>
+I: The origins of the [b][i]Gongchun Teapot[/i][/b] are actually disputed.
+I: In 1928, a local gentleman, Chu, picked up a teapot at a street stall in Suzhou. 
+I: The two characters [i]“Gongchun”[/i] were inscribed on it.
+I: To demonstrate his discernment and refined taste, he undertook a lengthy investigation of its provenance.
+I: Besides him, Huang Binhong, a painter; Pan Zhiliang, a calligrapher;
+I: and Pei Shimin, a teapot maker, all helped [b]fan the flames of this teapot’s mythmaking[/b].
+I: The teapot eventually entered the collection of the [i]National Museum of China[/i],
+I: but leading masters in the field, including [i]Gu Jingzhou[/i], 
+I: questioned whether it had truly been made by Gongchun in the Ming dynasty.
+I: Even the [b]renowned craftsmen of the Wanli[/b] era supposedly could not match the skill this so-called founding master displayed in that one surviving piece.
+I: Besides, before Shi Dabin, which potter even [b]signed his own work in this way[/b]?
+I: That sort of inscription looks more like the habits of [b]literati projected onto artisans[/b].
+I: Perhaps those small landowners, intellectuals, and industrialists of Republican China, 
+I: so eager to learn from the West, envied the humanist artists of the early European Renaissance.
+(Hou presses her lips together. 
+I touch my own mouth, realizing that I may have said too much.)
+<<return>>
+===
+
+title: LikeStory
+---
+// Shared story and two choices, used in the opening and in GongNext.
+<<set $LikeStory to true>>
+I: A story that [b]didn't go with the conventional narration of feudal ages[/b] would be unlikely to survive if it were entirely fabricated.
+I: The people who made this history were not men of letters but monks and servants. 
+I: The [b]literati simply reaped the rewards[/b].
+I: I believe it matters little whether that young servant really was called [i]Gongchun[/i],
+I: or Gongxia, Gongqiu, or Gongdong, for that matter. Nor does it matter which scholar he served.
+I: [b]What matters is the structure of the story.[/b]
+I: Impoverished monks at Jinsha Temple made coarse earthenware for their everyday needs.
+I: Mutual aid and the sharing of knowledge among ordinary people allowed those skills to reach household servants.
+I: Through the intimate work of serving their masters, those servants brought their own creations before the eyes of scholar-officials.
+I: [b]Informal networks of circulation, years of development as everyday utensils, and complex relations of power all helped give birth to purple clay teapots.[/b]
+I: Yet this long period of gestation rarely appears in the stories we tell.
+[b]【I hear the call of [u]Courtesan[/u]】[/b]
+Jushi: Quite so. How much of the work that nurtures something into being remains unseen?
+Jushi: Just like bamboo. 
+Jushi: We only notice it when it breaks through the earth in spring and shoots upward in the breeze,
+Jushi: We give little thought to the years it spent quietly taking root underground.
+Jushi: And when we hear a cicada sing, 
+Jushi: we know nothing of its long years beneath the soil, or the effort of climbing into the trees.
+-> And what about the women behind all those successful men competing in the workplace?
+    <<detour OfficeMan>>
+-> Cicadas must be the most rock-and-roll creatures on earth!
+    <<detour RockNRoll>>
+<<return>>
+===
+
+title: OfficeMan
+---
+I: Housewives managing homes and supporting everyone else are still portrayed as dependents living off another person’s earnings.
+I: Has anyone calculated how much they save their families in domestic and care work? 
+I: A live-in housekeeper alone can cost thousands of yuan a month.
+I: And beyond the failure to value that labor, the exhaustion and physical harm of pregnancy and childcare
+I: [b]still go largely unseen, unrecognized, and unaddressed.[/b]
+I: Yet the more quantifiable achievements of raising a child—education, employment, buying a home or a car—
+I: are often [b]credited to the father[/b], as proof of his achievement and foresight.
+I: And many women simply accept that account of things.
+Jushi: My dear girl. 
+(She presses her lips together.)
+Jushi: [b]Such is the selfishness of human desire.[/b]
+Jushi: Even a man whose life has gone smoothly will complain that someone else has had it better.
+Jushi: They never [b]look downward[/b] to see how many have far fewer chances than they do.
+Jushi: But tell me, how much of that complaint is [b]truly lamenting injustice[/b], 
+Jushi: and how much is resentment at not having [b]more privilege[/b] himself?
+Jushi: We are fortunate to have been born in China. 
+Jushi: Consider what some women endure in India. Have you seen [i]Pad Man[/i]?
+Jushi: In some places women still face menstrual taboos and discrimination in marriage and widowhood. 
+Jushi: It is terribly hard.
+-> (Why does something about that make me uncomfortable?)
+    I: But why should we use other people’s suffering as a measure of our own?
+-> Mm...
+I: Mm...
+I: And what about the men in those societies?
+I: Yes, what about the people responsible for these injustices?
+I: In Buddhism, are they punished in the cycle of rebirth?
+I: Is there some heavenly law, some scale, to judge kings, generals, slaveholders, and oppressors?
+Jushi: Strictly speaking, punishment is not what the Buddha taught. 
+Jushi: Only [b]reaping what one sows [/b] belongs to the Buddha's teaching.
+Jushi: [i]“Even after hundreds and thousands of kalpas, the karma we have made does not perish; [/i]
+Jushi: [i]when causes and conditions come together, we ourselves receive its fruit.”[/i]
+Jushi: When we look at so many events in society today, it is natural to think them deeply unfair.
+Jushi: But when you consider the continuity of causes, conditions, and results, things are simply as they are.
+Jushi: There is no unfairness.[b]Only the unbroken flow of karmic fruition[/b].
+Jushi: People talk about cause and effect, but it is actually cause, condition, and effect. 
+Jushi: The conditions in between are indispensable.
+Jushi: We tend to look at things from only one side. 
+Jushi: If we could approach them by the Middle Way,
+Jushi: everything is simply the unfolding of causes, conditions, and fruits.
+Jushi: Nothing is inherently good or bad. 
+Jushi: Good and bad are judgments we impose on conditions.
+Jushi: From the standpoint of dependent origination, things have no fixed qualities of their own.
+Jushi: We call what pleases us good and what displeases us bad.
+Jushi: Whether people, events, or objects, each is simply a phenomenon arising through dependent origination.
+I: That is rather profound...
+Jushi: You are a thoughtful young woman. (She presses her lips together.)
+<<set $DeepTalk to true>>
+<<set $LikeU to true>>
+Jushi: I’ll send you a lecture by my master. Have a look, if you feel inclined.
+// Game event placeholder: the Unity system adds the lecture video to WeChat and handles downloading/listening.
+<<show_popup_wait "Day_1_HouJ">>
+[b]【I hear myself calling [u]Ke Xiang[/u]】[/b]
+<<return>>
+===
+
+title: RockNRoll
+---
+<<play_sfx "chanming" 5.5>>
+I: They spend most of the year underground, then burst out in midsummer, singing at the tops of their lungs.
+I: [b]Silence, then roaring, clamoring, mating—and death[/b].
+I: Hahaha.
+Jushi: What an unusual way of putting it. 
+Chatting with young women like you keeps us feeling young too. (She smiles warmly.)
+I: I saw that online.
+<<set $D1TalkedCicada to true>>
+<<return>>
+===
+
+title: Select1
+---
+Jushi: Well then, shall we choose a teapot?
+I: Since it’s for a fellow volunteer, I think our [b]Lotus Reveries[/b] collection might be especially fitting.
+Jushi: [b]Lotus Reveries[/b]?
+I: It is in the catalogue. 
+I: Master Shao has grouped all the [b]teapots with Buddhist motifs[/b] under that collection.
+(Hou glances at the table of contents, then starts leafing through the catalog.)
+// Pause the communication interface here; resume the dialogue after Space.
+<<pause_dialogue>>
+I: Everything in the catalog is in stock. A custom clay blend or a special form would take rather longer.
+Jushi: I'm on a somewhat tight schedule. 
+Jushi: I see you have the [b][i]Gongchun Teapot[/i][/b] and the [b][i]Monk’s Cap Teapot[/i][/b] in stock.
+I: I would recommend...
+-> The [b][i]Monk’s Cap Teapot[/i][/b].
+    <<jump SengMao>>
+-> The [b][i]Gongchun Teapot[/i][/b].
+    <<jump GongChun>>
+===
+
+
+title: SengMao
+---
+<<set $TriedSengMao to true>>
+(Hou turns to page four of the booklet.
+<<pause_dialogue>>
+She reads the description you revised word by word under Master Shao’s kindly but unmistakable pressure.
+She handles the lenticular card you made as if it were a small curiosity, tilting it up and down.
+// Pause the communication interface here; resume the dialogue after Space.
+<<pause_dialogue>>
+You hurry to retrieve the teapot from the display cabinet and set it before her.
+She holds its handle in one hand and supports the base with the other, examining it from different angles in the light.
+You tilt your head slightly and watch her.)
+
+I: I have heard that Buddhism values [b]seeing things as they truly are[/b].
+I: There is a great deal of controversy surrounding the [b][i]Gongchun Teapot[/i][/b].
+I: Some even suspect that its story borrows the prestige of temples and the history of monks making pottery to lend itself legitimacy.
+<<if not $GongDoubtKnown>>
+    Jushi: What do you mean?
+    <<detour NotRealContent>>
+<<endif>>
+I: That is why I would recommend this [b][i]Monk’s Cap Teapot[/i][/b] for your friend.
+I: First, since she volunteers at [i]Dajue Temple[/i], she must already know quite a bit about the purple clay culture.
+Jushi: My dear girl. (Hou smiles gently.)
+Jushi: [i]Dajue Temple[/i] was designed under [i]Master Hsing Yun’s guidance[/i]. 
+Jushi: Its public facilities and sheltered walkways are remarkably thoughtful.
+Jushi: That spirit of consideration draws volunteers from all over.
+Jushi: My friend is not even from Yixing.
+I: Oh! I see.
+
+-> Then perhaps I could recommend the [b][i]Gongchun Teapot[/i][/b] instead. <<if not $TriedGongChun>>
+    <<jump GongChun>>
+-> Mm... <<if $TriedGongChun>>
+    <<jump FailEnd>>
+-> I think this one is quite suitable.
+    I: It is assembled from six [i]joined clay panels[/i].
+    I: It is extremely difficult to make. 
+    I: Only the elder sophisticated masters we work with still have that skill, so there is very little stock in all of Yixing.
+    I: It is rare and valuable. 
+    I: Some artisans make such pieces simply to [b]display their technique[/b], not even to sell them.
+    I: Our master considers it an advanced collector’s piece, recommended only to serious [b]enthusiasts and connoisseurs[/b].
+    I: Still, among customers buying these higher-end pieces,
+    I: many are reluctant to give or display objects with religious motifs. So they do not sell quite as readily.
+    I: If you give one to your friend, she will know at a [b]glance that you spent a great deal[/b]. 
+    I: She will know how much you value her.
+    Jushi: [b]I'm afraid I don't quite agree with that.[/b]
+    (Hou smiles gently.)
+    Jushi: [b]That I gladly host her and give her my time and care—that is how I show she matters to me.[/b]
+    Jushi: What does money have to do with it?
+
+    <<if $LikeU and not $TriedGongChun>>
+        -> Perhaps I could show you the [b][i]Gongchun Teapot[/i][/b] again.
+            I: You’re right. That was poorly put. 
+            I: [b]It was what they taught us in training,[/b] and I repeated it without thinking.
+            (Hou smiles gently and leafs through the catalog again.)
+            I: Ah, my mouth gets ahead of me. It is not even what I believe myself.
+            <<set $WrongFirst to true>>
+            I: I would still recommend the [b][i]Gongchun Teapot[/i][/b].
+            <<jump GongChun>>
+
+        -> Mm...
+            <<jump FailEnd>>
+    <<else>>
+        -> Mm...
+            [b]【I hear the call of [u]Hermes[/u]】[/b]
+            <<jump FailEnd>>
+    <<endif>>
+===
+
+
+title: GongChun
+---
+<<set $TriedGongChun to true>>
+(Hou turns to page one of the booklet,
+<<pause_dialogue>>
+She reads the description you revised word by word under Master Shao’s kindly but unmistakable pressure.
+She handles the lenticular card you made as if it were a small curiosity, tilting it up and down.
+// Pause the communication interface here; resume the dialogue after Space.
+<<pause_dialogue>>
+You hurry to retrieve the teapot from the display cabinet and set it before her.
+She holds its handle in one hand and supports the base with the other, examining it from different angles in the light.
+You tilt your head slightly and watch her.)
+// Pause the communication interface here; resume the dialogue after Space.
+<<pause_dialogue>>
+<<if $LikeStory>>
+    I: We have both spoken so highly of the [b][i]Gongchun Teapot[/i][/b] and its history, and you agreed with me,
+    I: so I imagine your friend must share that outlook and sensibility!
+    I: But there is something I ought to tell you.
+    <<if not $GongDoubtKnown>>
+        <<detour NotRealContent>>
+    <<else>>
+        I: ...Well, we have already discussed the doubts surrounding the authenticity of that surviving Gongchun teapot.
+    <<endif>>
+<<else>>
+    <<if not $GongDoubtKnown>>
+        <<detour NotRealContent>>
+    <<endif>>
+<<endif>>
+Jushi: Knowing there is a dispute, why recommend it to me?
+
+-> Perhaps I could show you the [b][i]Monk’s Cap Teapot[/i][/b] instead. <<if not $TriedSengMao>>
+    <<jump SengMao>>
+-> Mm... <<if $TriedSengMao>>
+    <<jump FailEnd>>
+-> I think it is precisely the right choice.
+    <<jump GongNext>>
+===
+
+
+title: GongNext
+---
+<<if not $GongDoubtKnown>>
+    <<detour NotRealContent>>
+<<endif>>
+I: Even if that surviving piece was not truly made by Gongchun in the Ming dynasty, 
+I: it does not follow that today’s [b][i]Gongchun-style Teapot[/i][/b] is without value.
+I: At the very least—
+I: at the very least, it offers us a [b]glimpse into the early circulation, economic foundations, and cultural setting of purple clay teapots[/b].
+I: We remember people of the past in the ways available to us today, [b]carrying their ideas into practice[/b].
+I: Using present-day techniques to imperfectly retrace what earlier hands once did
+I: —it feels almost like a conversation across time.
+I: You have never met the Buddha in this life. Does that make his wisdom any less able to guide you?
+I: The volunteer work you do, the prayer beads you wear—[b]have these not changed across generations?[/b]
+I: Even if forms are reinvented and old artifacts disappear, does that mean the meaning of an object vanishes with them?
+I: I would rather think you are [b]speaking with the people who once used these objects and the artisans through whose hands they passed.[/b]
+<<set $GongMeaningKnown to true>>
+Jushi: (She presses her lips together.)
+<<if not $LikeStory>>
+    Jushi: [i]"Not grasping at outward appearances."[/i]. Then what do [b]you[/b] make of the Gongchun story?
+    <<detour LikeStory>>
+<<endif>>
+<<if $LikeU>>
+    <<jump HatTalk>>
+<<else>>
+    <<jump SucEnd>>
+<<endif>>
+===
+
+title: HatTalk
+---
+Jushi: To tell you the truth, I have never been especially fond of the [b][i]Monk’s Cap Teapot[/i][/b].
+Jushi: My father did collect one years ago, though I couldn't say where it is now.
+I: You strike me as someone who believes things should be put to use. 
+I: A piece collected only for display may not appeal to you.
+(Hou smiles gently.)
+Jushi: It isn't merely a matter of [i]"few desires and contentment"[/i]. 
+Jushi: Look at this [b]lid[/b]. What does it remind you of?
+I: It looks like... Please forgive my ignorance, but it reminds me of the [b]hat worn by the monk Tang Sanzang[/b] in the television series [i]Journey to the West[/i].
+Jushi: Ignorance? you observed very well. That shape, 
+Jushi: with five lotus petals in front and a small cap behind, is called [i]Vairocana Crown[/i].
+(Hou presses her lips together.)
+Jushi: Of course, over the centuries, contact among different peoples and Buddhist traditions has blurred some of these distinctions.
+Jushi: But broadly speaking, that headdress was [b]reserved for senior Buddhist masters in the Han Chinese tradition.[/b]
+Jushi: Ordinary monks wore the [i]Guanyin Hood[/i].
+Jushi: The lotus-shaped one with five Buddha images—one on each section—is the [i]Five-Buddha Crown[/i], used in Tibetan Buddhism.
+I: I see.
+<<jump FinalConve>>
+===
+
+title: FinalConve
+---
+// The player may ask any combination of three questions. Hide previously chosen options in the UI.
+<<if $AskedMiZong and $AskedDengji and $AskedOurs>>
+    <<jump SucEnd>>
+<<endif>>
+-> Is it that you dislike [i]Vajrayana[/i]? <<if not $AskedMiZong>>
+    <<jump MiZong>>
+-> Is it the hierarchy you object to? <<if not $AskedDengji>>
+    <<jump Dengji>>
+-> One, two, three, four, five, six... Oh! But the shape of our teapot... <<if not $AskedOurs>>
+    <<jump Ours>>
+-> Mm... Shall we wrap it up, then?
+    <<jump SucEnd>>
+===
+
+title: MiZong
+---
+<<set $AskedMiZong to true>>
+Jushi: [b]What I object to is hierarchy[/b].
+Jushi: and esoteric Tantric Buddhism most of all.
+Jushi: These days, well over ninety percent of people simply absorb [b]institutional religious dogma.[/b]
+Jushi: Especially in Tantric sects. 
+Jushi: If you dare doubt the guru's word, [b]you're told you'll be condemned for eternity.[/b]
+Jushi: Even stepping on the guru’s shadow is treated as a grave transgression.
+Jushi: Senior monks lording it over junior monks. This is the reality of religious institutions.
+Jushi: Such preferential treatment. [b]It operates no differently from any worldly social clique.[/b]
+Jushi: Decadent, really.
+<<jump FinalConve>>
+===
+
+title: Dengji
+---
+<<set $AskedDengji to true>>
+Jushi: Institutional religion is not the same thing as the Dharma taught by the Buddha. 
+Jushi: [b]True Dharma is truth itself,[/b] and it can be verified for oneself.
+Jushi: It is not blind devotional worship, nor is it begging for blessings.
+Jushi: What matters is cultivating the mind. 
+Jushi: using everyday events to refine it, turning inward to examine yourself whenever life tests you.
+Jushi: Only your own effort can bring a wish to fruition. 
+Jushi: [b]Put your faith in outside forces and you become easy to deceive.[/b]
+Jushi: Many religious organizations today use their position to swindle people out of money.
+Jushi: I've changed course now.
+Jushi: Stay too long inside institutional religion, and it dulls one's clarity.
+Jushi: That kind of faith is really blind credulity, not genuine right faith.
+Jushi: I have come to understand that the true Dharma can be tested. 
+Jushi: It is universal truth, valid in any era and any place.
+Jushi: If you ask me to judge institutional religion today, I would call it a [b]tool of rulers[/b].
+Jushi: [i]Drinking poison to quench a thirst.[/i]
+Jushi: Buddhism did not spring from nowhere, nor did it take its present shape overnight.
+Jushi: There were the [i]śramaṇa movements[/i], exchanges and disputes with [i]Brahmanical traditions[/i], 
+Jushi: One must learn to [b]distinguish the Dharma itself[/b] from what other religions and the history of transmission have added to it.
+Jushi: Of course, religion can offer temporary comfort to people in great pain.
+Jushi: [b]An anesthetic[/b], perhaps. But it cannot in itself uproot suffering or carry one beyond birth and death.
+I: And how is your own practice coming along?
+Jushi: That is hardly something one can measure. But I am still working at it.
+<<jump FinalConve>>
+===
+
+title: Ours
+---
+<<set $AskedOurs to true>>
+Jushi: Yes, this piece of yours is modeled after the hexagonal tall Monk's Cap
+Jushi: After [i]Shi Dabin's[/i] design, is it?
+Jushi: But in the proper design, [b]one of the six sides serves as the spout.[/b]
+Jushi: That is to say, only five of the six panels around the lid are lotus petals. One side is left open.
+Jushi: This teapot, on the other hand, has [b]hired the Five Dhyani Buddhas a sixth colleague[/b]. 
+Jushi: How on earth is Shao Wei curating her stock?
+(Hou smiles gently.)
+I: Oh dear... 
+I: That is something we ought to pay more attention to speaking of preserving tradition. 
+I: Thank you for pointing it out.
+<<jump FinalConve>>
+===
+
+title: SucEnd
+---
+// Pre-sale safeguard: both Gongchun discussions must have occurred before checkout.
+<<if not $GongDoubtKnown or not $GongMeaningKnown>>
+    I: Wait, I would still like to explain the provenance of this [b][i]Gongchun-style Teapot[/i][/b] properly.
+    <<jump GongChun>>
+<<endif>>
+Jushi: It is getting late, my dear. I ought to be going.
+Jushi: I shall take your advice and choose this [b][i]Gongchun Teapot[/i][/b].
+Jushi: Thank you for looking after me. I know I've put you to quite a bit of extra work.
+[b]【I hear the call of [u]MBTI[/u]】[/b]
+Jushi: You are so young... (She pats your shoulder gently.) Younger even than my son.
+Jushi: He is [b]studying abroad[/b]. He is going to [b]Columbia[/b] for his master’s degree.
+[b]【I hear the call of [u]Baochai[/u]】[/b]
+-> Mm...
+    I: Mm...
+-> I was an international student once myself. I studied the humanities and art.
+    Jushi: Ah, that explains why you are such a lively conversationalist. A fine young person.
+    Jushi: My son doesn't much care for pondering these sorts of things, though he is very kindhearted and gentle.
+    Jushi: I enjoy speaking with young people, sharing what little I have learned in my few extra years.
+    Jushi: He has no interest in the Dharma, even though he could pick some up in his religion electives in college. 
+    Jushi: Still, he always listens patiently until I've finished.
+    (Hou presses her lips together.)
+Jushi: Is everything ready? Let us wrap it up. Nothing too elaborate. No need to waste materials.
+I: Of course.
+(You take out the [b][i]Gongchun Teapot[/i][/b] and prepare to ring up Hou’s purchase.)
+<<jump JushiD1_ScanGongChun>>
+===
+
+title: JushiD1_ScanGongChun
+---
+[b]【Scan the QR code in the catalog or enter the corresponding product code to complete this sale.】[/b]
+<<d2_scan "03-GongChun">>
+<<if $D2ScanMatched>>
+    [b]【Item successfully checked out.】[/b]
+    <<set $JushiSuccess to true>>
+    <<jump JushiD1_SaleComplete>>
+<<else>>
+    [b]【Item does not match the order.】[/b]
+    Jushi: That does not seem to be the right one, my dear. (She smiles gently.)
+    (Please check out the correct item.)
+    <<jump JushiD1_ScanGongChun>>
+<<endif>>
+===
+
+title: JushiD1_SaleComplete
+---
+Jushi: How efficiently you have wrapped that. I shall be off, then. Do finish up and get some rest yourself.
+I: Thank you, Lay Buddhist Hou. Take care on your way.
+<<hide_character "jushi">>
+<<load_scene "Mindmaze" "入夜" 1>>
+<<stop>>
+===
+
+title: FailEnd
+---
+(Hou smiles gently and turns a few pages of the catalog.)
+Jushi: I shall come another time. I have kept you from your work enough already, just by coming today.
+// Unity event: later, Master Shao asks why Hou made a separate appointment at the shop.
+<<hide_character "jushi">>
+<<set $JushiFailed to true>>
+<<show_popup_wait "Day1_fail">>
+<<load_scene "Mindmaze" "入夜" 1>>
+<<stop>>
+===
+ 
