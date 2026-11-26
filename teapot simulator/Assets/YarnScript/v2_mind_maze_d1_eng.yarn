@@ -1,0 +1,710 @@
+title: Mind_Maze_D1
+position: 12,12
+---
+<<declare $MindDone1 = false>>
+<<declare $MindDone2 = false>>
+<<declare $MindDone3 = false>>
+<<declare $MindDone4 = false>>
+<<declare $MindDone5 = false>>
+
+<<declare $MindTotalWeight = 0>>
+<<declare $MindRoll = 0>>
+<<declare $MindW1 = 0>>
+<<declare $MindW2 = 0>>
+<<declare $MindW3 = 0>>
+<<declare $MindW4 = 0>>
+<<declare $MindW5 = 0>>
+===
+
+title: MindMaze_OpenScene
+---
+I: Every working hours require me to say things I did not entirely believe.
+I: Apart from earning enough to live on,
+I: what else did they leave me with...?
+<<pause_dialogue>>
+“I”: [b]It's all right. Let's go home.[/b]
+<<jump MindMaze_Start>>
+===
+
+title: MindMaze_Start
+---
+// Failure route: enter episode five.
+“I”: Let's see who [b][u]called to me[/u][/b] today.
+<<if not $JushiSuccess>>
+    <<if not $MindDone5>>
+        <<jump MindMaze_5>>
+    <<else>>
+        <<jump MindMaze_End>>
+    <<endif>>
+<<endif>>
+
+// Success route: enter weighted random pool.
+<<jump MindMaze_Roll>>
+===
+
+
+title: MindMaze_Roll
+---
+<<set $MindW1 to 0>>
+<<set $MindW2 to 0>>
+<<set $MindW3 to 0>>
+<<set $MindW4 to 0>>
+
+// Accessible after success only.
+
+// Episode 1 unlocks after success.
+<<if not $MindDone1>>
+    <<set $MindW1 to 1>>
+<<endif>>
+
+// Episode 2 requires the heart-to-heart flag.
+<<if $LikeU and not $MindDone2>>
+    <<set $MindW2 to 1>>
+<<endif>>
+
+// Episodes 3 and 4 have higher weights.
+<<if not $MindDone3>>
+    <<set $MindW3 to 3>>
+<<endif>>
+
+<<if not $MindDone4>>
+    <<set $MindW4 to 3>>
+<<endif>>
+
+<<set $MindTotalWeight to $MindW1 + $MindW2 + $MindW3 + $MindW4>>
+
+<<if $MindTotalWeight == 0>>
+    <<jump MindMaze_End>>
+<<endif>>
+
+<<set $MindRoll to dice($MindTotalWeight)>>
+
+<<if $MindRoll <= $MindW1>>
+    <<jump MindMaze_1>>
+<<elseif $MindRoll <= $MindW1 + $MindW2>>
+    <<jump MindMaze_2>>
+<<elseif $MindRoll <= $MindW1 + $MindW2 + $MindW3>>
+    <<jump MindMaze_3>>
+<<else>>
+    <<jump MindMaze_4>>
+<<endif>>
+===
+
+
+title: MindMaze_Continue
+---
+// The failure route never enters the success pool.
+<<if not $JushiSuccess>>
+    <<jump MindMaze_End>>
+<<endif>>
+
+// All unlocked episodes have been completed.
+<<if $MindDone1 and $MindDone3 and $MindDone4 and (not $LikeU or $MindDone2)>>
+    <<jump MindMaze_End>>
+<<endif>>
+
+-> Keep talking.
+    “I”: Who else [b][u]called to me[/u][/b] today?
+    <<jump MindMaze_Roll>>
+-> Mm...
+    <<jump MindMaze_End>>
+===
+
+
+title: MindMaze_1
+---
+<<mindmaze_roll_anim 1>>
+<<set_speakers "宝钗, 吕蒙, 柯湘">>
+// Episode 1: Baochai, Lv Meng and Ke Xiang discuss openness toward differing perspectives; unlocked after sale.
+Baochai: [i]I wipe away a hero's tears and leave the scholar's home. [/i]
+Baochai: [i]I thank compassion and take the tonsure beneath the lotus throne.[/i]
+Baochai: [i]No bond was fated to remain; in an instant we part. [/i]
+Baochai: [i]Naked we came, and naked we go, with nothing to hold us fast.[/i]
+Baochai: [i]Where shall I seek a rain cape and a traveler's hat? [/i]
+Baochai: [i]With straw sandals and a begging bowl, I shall wander wherever fate leads.[/i]
+“I”: My precious elder sister, how am I to describe the feeling that stranger left me with?
+Baochai: Since she treated you kindly, why should you not return her kindness?
+“I”: But the Buddhist teachings she spoke of aren't words I know well enough to understand, let alone use so freely.
+Baochai: If she wishes to converse, you may answer her with neither servility nor arrogance. 
+Baochai: Only, there's no need to think so little of yourself.
+Baochai: For all we know, she [b]has not yet quite attained the understanding she speaks of[/b]. 
+Baochai: Perhaps that is why she has so much to say.
+Baochai: Whether your counter desk gathers dust or holds flowers and fine objects, 
+Baochai: surely neither should hinder the cultivation of her mind?
+Baochai: If she claims no attachment to things, 
+Baochai: why should furnishings and formal courtesies stir up such distinctions in her heart?
+Baochai: If she truly wished to cut her worldly ties, 
+Baochai: a modest gift her friend would cherish should have sufficed.
+Baochai: Why call upon old acquaintances in the municipal education bureau and certain companies to announce her arrival, 
+Baochai: and have everything arranged like a business reception?
+Baochai: She might perfectly well have dealt with you as a customer with a shop assistant.
+Baochai: Why bring in yet another bond: a family friend of your employer, 
+Baochai: attended upon by someone in that household's service?
+Baochai: And at the end of it all, 
+Baochai: she told you where her son studies, and what degree he is pursuing.
+Baochai: Naturally, he is dear to her heart. 
+Baochai: But what have these worldly distinctions to do with you?
+Baochai: [b]You see, the ties of this world are not so easily laid aside merely by saying one has let them go.[/b]
+“I”: Yet is a courteous nod between acquaintances, or a simple reciprocity bounded by contract,
+“I”: necessarily the best way to encounter another person?
+“I”: She talked to me at such length. Perhaps, like the young people marching in the streets or the monks preaching their faith,
+“I”: she was trying to imagine some new possibility from within the social relationships and ideas she already knew.
+“I”: But does she know that I don't entirely agree with her, 
+"I": or even understand all the Buddhist ideas she invokes?
+“I”: Does she care what I think, or how our thoughts differ?
+“I”: Or did she only want someone willing to listen?
+Lv Meng: Well, I reckon people learn to read and pick up a trade because they want a better life.
+Lv Meng: For themselves and for those around them.
+Lv Meng: As for what the world should look like in the end...
+Lv Meng: Communism, the Pure Land, a world of Great Unity...
+Lv Meng: or that welfare state the social democrats talk about these days?
+Lv Meng: [b]I honestly don't know[/b]
+Lv Meng: Can people really live in harmony while keeping their differences? 
+Lv Meng: I don't know that either.
+Lv Meng: Some look out for the poor; 
+Lv Meng: some want local communities to govern their own affairs.
+Lv Meng: Others speak up for women, or for people nobody much cares to hear.
+Lv Meng: Their arguments needn't agree, and neither do their motives.
+Lv Meng: Some want to save the world, some genuinely have a bodhisattva's heart,
+Lv Meng: And some just want their names in lights.
+Lv Meng: Still, any real, tangible good done is worth cherishing. 
+Lv Meng: [b]Nobody gets to claim a monopoly on being right and truth itself.[/b]
+Lv Meng: Meet them. Talk with them. Understand them—or don't, if you can't.
+Lv Meng: Whether they'll listen to you is something you can only learn by spending time together.
+Lv Meng: [b]You needn't agree on every point, nor make every conversation a contest.[/b]
+Lv Meng: Learn where people are coming from and how they reached their views. 
+Lv Meng: Then feel out the stones and decide how you'll cross the river yourself.
+Baochai: [i]What is desirable is called good;[/i] 
+Baochai: [i]what one possesses within oneself is called trustworthy; [/i] 
+Baochai: [i]what is full and complete is called beautiful.[/i] 
+Ke Xiang: The Chairman said the story of Lv Meng was essential reading for the Red Army.
+(I feel her straighten my collar.) 
+Ke Xiang: And Baochai stands at the very summit of China's greatest classical novel.
+“I”: (I nod.)
+Ke Xiang: But every age has its bounds. 
+Ke Xiang: No learning, however sound, can encompass the whole ground.
+Ke Xiang: We're shaped by the relations in which we live,
+Ke Xiang: and by convictions we did not wholly choose to give.
+Ke Xiang: You've read so many books, walked so many roads. 
+Ke Xiang: Will you leave others to decide where your own road goes?
+Ke Xiang: Look closely, think again: [b]where did these ideas begin, and whose purposes do they serve?[/b]
+Ke Xiang: Which hold a truth you'll carry all your days?
+Ke Xiang: Which bear the speaker's ideology, and must be weighed in other ways?
+Ke Xiang: Which might help, but have their light obscured by how they're told?
+Ke Xiang: Which sound natural, yet speak from positions language itself has made and moulded?
+Ke Xiang: Go beyond the people who offer counsel. Only then will you reach the places they never could.
+“I”: [b]And you? Will you answer every question I put to you?[/b]
+(Ke Xiang falls silent.)
+<<set $MindDone1 to true>>
+<<mindmaze_reset_hands>>
+<<jump MindMaze_Continue>>
+===
+
+title: MindMaze_2
+---
+<<mindmaze_roll_anim 2>>
+<<set_speakers "柯湘, 吕蒙, 赫尔墨斯, 宝钗">>
+// Episode 2: Ke Xiang, Lv Meng, Hermes and Baochai; unlocked by heart-to-heart.
+“I”: I've actually been looking forward to talking with you.
+“I”: I so want you to tell me what belief is, what Buddhist thought is, what religion is.
+”I“: You know, from [b]your[/b] perspectives. 
+“I”: And how the [i]united front against Japanese Militarist Invasion[/i], 
+“I”: the [i]national forms[/i] of the 1950s,
+“I”: and the [i]transformations of the economic base[/i] in the 1960s and 1970s shaped Chinese Buddhism.
+Ke Xiang: Child, you've already thought of economics, politics, culture, and social relations.
+Ke Xiang: A promising way to go--you've learned to question the conditions.
+Ke Xiang: But if Buddhism is what you wish to understand,
+Ke Xiang: You must look beyond the China you know, to the place where it first took its stand.
+Ke Xiang: How did it arise in ancient India, and what was life like in those days?
+Ke Xiang: How did the monastic community take form, and what sustained its daily life?
+Ke Xiang: What needs and obligations held it together amid the world's disputes and strife?
+Ke Xiang: Why did the Mauryan court extend its favour, and kings provide it with support?
+Ke Xiang: How did Buddhists debate, compete, and change alongside Brahmanical thought?
+Ke Xiang: How did monasteries, stupas, and images spread, until worshippers came from far and wide?
+Ke Xiang: How did Greek and West Asian images give Siddhartha a body to behold?
+Ke Xiang: How did those forms reach China, where new faces and features would unfold?
+Ke Xiang: Through wars and trade, through peoples meeting, through dynasties rising and falling,
+Ke Xiang: How did teachings change their course, answering each new age's calling?
+Ke Xiang: And now you ask of the Northern Expedition, urbanisation, and the struggle against fascism;
+Ke Xiang: Of the Liberation War and New China, and their relations to Buddhism.
+Ke Xiang: First, read. Go out and explore. Let what you find become the ground.
+Ke Xiang: Only then can we discuss what lies beneath the claims that you've found.
+Ke Xiang: [b]When accounts disagree, don't rush to believe what you first hear.[/b]
+Ke Xiang: [b]No account stands outside its time; no position is free of what it holds dear.[/b]
+Ke Xiang: Ask what evidence supports each claim, whose interests it may serve.
+Ke Xiang: Ask what perspective gives it shape, and what its telling may preserve.
+Ke Xiang: Perhaps then you'll trace these histories through modern China's bodily culture and national forms,
+Ke Xiang: And we'll speak of Emily Wilcox, Laurence Coderre, and Chinese opera's transformation—
+Ke Xiang: Matters closer to my own life, and worthy of our shared investigation.
+“I”: ...Ah. So you're not going to tell me.
+“I”: [i]Huwei General[/i], will you teach me instead?
+“I”: Please tell me how Buddhism relates to the great clans, divided territories, wars, and exchanges among peoples.
+Lv Meng: Well now... my girl,
+Lv Meng: I could tell you about the shamans and wandering masters of [i]Jiangdong[/i],
+Lv Meng: or how [i]Kang Senghui[/i] brought Buddhist teachings to Jianye  
+Lv Meng: and how[i]His Most Respected Majesty[/i] (refers to Sun Quan) built him a monastery.
+Lv Meng: I could even tell you a curious tale of young [i]Sun Xiaolian[/i] (refers to Sun Quan), fifteen years old, 
+Lv Meng: accompanying the Dowager to [i]Chaoyin Temple[/i] and teaching the people through Buddhist wonders.
+Lv Meng: But if you ask whether that had to do with governing the people of Jiangdong, 
+Lv Meng: with resisting or drawing in the local great families,
+Lv Meng: or with the exchanges between Jiangdong and the Central Plains...
+Lv Meng: Well, I only came to live in your head because we read the [i]Records of the Three Kingdoms[/i], 
+Lv Meng: [i]Wu Slips and Wu Histories, and Peaks and Valleys together.[/i]
+Lv Meng: [b]If the question lies beyond what you know, I cannot answer it, [/b]
+Lv Meng: whether the [i]Marquis of Chanling[/i] (refers to Lv Meng) himself would have known or not.[/b]
+“Hermes”: We can read new things together, sweetie. 
+“Hermes”: And don't fret about biting off more than you can chew.
+“Hermes”: Haven't we been to the [i]White Horse Temple[/i] and the [i]Longmen Grottoes[/i] in the north,
+“Hermes”: and [i]Chaoyin Temple, Dajue Temple, Lingshan,[/i] and [i]Qixia Mountain[/i] in the south?
+“Hermes”: We've read about movements that honoured or suppressed Buddhism, 
+“Hermes”: along with the economic conditions, popular mobilisations, social organisations, and political struggles that made them possible.
+“Hermes”: [b]Why should any of this be beyond our ability to learn and take in?[/b]
+“Hermes”: Leaving university hasn't deprived you of the right to learn, has it?
+Lv Meng: Quite right. 
+Lv Meng: You don't need to research everything down to the last footnote as you do with East Asian cultural studies.
+Lv Meng: Start with a film or a documentary if you like.
+Lv Meng:  Take it a little at a time. Read widely, and let the whole of Asia come into view.
+“I”: My precious elder sister...
+Baochai: Let me ask you something first. What is [i]emptiness[/i]?
+-> Change.
+    Baochai: Yes. A notion you've known for quite some time.
+    Baochai: But [i]emptiness[/i] cannot be exhausted by the thought that all things change.
+    Baochai: It asks whether anything possesses an independent, unchanging [i]self-nature[/i].
+    Baochai: You already knew something of [i]dependent origination[/i], of relation and change.
+    Baochai: Why, then, upon hearing some unfamiliar terms today,
+    Baochai: must you immediately determine what they have to do with your own life?
+
+-> Nothingness.
+    Baochai: You see, [i]emptiness[/i] does not mean that nothing exists.
+    Baochai: Things arise through causes and conditions. They have no independent, immutable [i]self-nature[/i], but that does not make them mere nothingness.
+    Baochai: You've heard so many unfamiliar accounts today that you are eager to locate yourself in relation to them.
+    Baochai: Yet you have scarcely had time to consider what each one actually means.
+
+Baochai: You studied philosophy before, and wondered how knowledge enters into relation with your own experience.
+Baochai: [b]Knowing something and understanding why it matters to you are, after all, two different things.[/b]
+“Hermes”: Didn't we read [i]Merleau-Ponty[/i] and [i]Husserl[/i] together?
+“Hermes”: Remember that passage in [i]The Primacy of Perception[/i]—
+“Hermes”: the [i]paradox of immanence and transcendence[/i]?
+“Hermes”: Imagine the purple clay teapot before you. 
+“Hermes”: You can see its front, yet you know it also has a back and sides,
+“Hermes”: and tea leaves inside you cannot now see. 
+“Hermes”: [b]Scenes of handling, using, and exchanging it are absent from this instant.[/b]
+“Hermes”: What you perceive is one aspect.
+“Hermes”: [b]What you experience has never been confined to that aspect alone.[/b]
+“Hermes”: For Merleau-Ponty, perception is [b]immanent[/b] insofar as what is perceived appears to the one who perceives;
+“Hermes”: and [b]transcendent[/b] insofar as it always exceeds what is immediately given.
+“Hermes”: We've glimpsed Buddhism before, even if we only wandered through one small corner of it.
+“Hermes”: And you know that [b]the histories, ideas, and social relations we have yet to encounter do not cease to exist because we have not seen them.[/b]
+“Hermes”: But isn't it funny? 
+“Hermes”: That knowledge was there all along.
+“Hermes”: Why is it only today, after listening to Hou, 
+“Hermes”: [b]that you suddenly want to pick up the whole teapot and turn it around in your hands?[/b]
+Baochai: Are you so eager to understand Buddhism because you wish to study it,
+Baochai: or because [b]something about today's conversation[/b] makes you feel you must understand it at once?
+
+// Original placeholder: insert the rest of episode two here.
+// Preserve the two choices answering what emptiness means.
+// Both choices rejoin at the common ending.
+<<set $MindDone2 to true>>
+<<mindmaze_reset_hands>>
+<<jump MindMaze_Continue>>
+===
+
+title: MindMaze_3
+---
+<<mindmaze_roll_anim 3>>
+<<set_speakers "MBTI, 伍尔夫, 宝钗">>
+// Episode 3: MBTI, Woolf and Baochai; always unlocked.
+MBTI: Babe, are you exhausted? 
+MBTI: Do you need a little break?
+MBTI: All that emotional labour, all those 'mm-hm, mm-hm's'—that is so draining, right?
+MBTI: Of course, you are absolutely entitled to end those conversations.
+MBTI: But did your boss, your customer, or, 
+MBTI: frankly, [b]the job itself give you that option?[/b]
+MBTI: And was anyone meeting you halfway in that conversation? Anyone?
+MBTI: Did all that [b]education really just buy you the ability to keep awkward silences from happening?[/b]
+Woolf: My dear, after two hours surrendered to these little exertions of sympathy,
+Woolf: what remains of the self that was yours before they began?
+Woolf: Did you enjoy the things you said? 
+Woolf: Did you believe them? 
+Woolf: Or has the [b]person you suppose yourself to be been submerged beneath the obligation to please?[/b]
+Woolf: Do you remember [i]Mrs Ramsay[/i]?
+Woolf: So perceptive a woman, so gifted at sensing a room and putting others at ease.
+Woolf: She read Shakespeare. Her memory was extraordinary.
+Woolf: yet all those gifts were poured away in conversation after conversation 
+Woolf: restoring Mr. Ramsay's faith in himself as a philosopher,
+Woolf: in evening after evening spent making her family and every guest feel effortlessly at ease.
+Woolf: But such conversations are not paintings. 
+Woolf: They cannot be kept upon a wall, or rescued with a fresh coat of varnish.
+Woolf: Mrs Ramsay's pleasures and decisions, the work of her attention,
+Woolf: the evenings and meals made agreeable by her presence...
+Woolf: --[b]all pass like wind when the voices die away.[/b]
+Woolf: Have you, my friend, 
+Woolf: [b]have you wedded yourself to your own trivial trade, [/b]
+Woolf: [b]racking your brain again and again to furnish the right reply[/b]
+Woolf: Only the tiniest trickle of the money spun from the expenditure of your own voice ever reaches your pocket.
+Woolf: Your thoughts may endure less long than a single teapot you have hand across the counter.
+Baochai: Yet did you not live through those very hours yourself?
+Baochai: From one change to another, [b]who among us—and in what form—can ever be kept forever?[/b]
+Baochai: You were present in every moment, every exchange.
+Baochai: distaste, evasion, flattery, ease, pleasure, sudden understanding, quiet observation...
+Baochai: [b]all of it was part of your life.[/b]
+Baochai: It is neither wholly stolen from you by others, nor wholly slipped away through time's fingers.
+Baochai: [i]Could all fair things not fall into the passing stream?[/i]
+Baochai: [i]Could one blossom not lie in fragrant dust? [/i]
+<<set $MindDone3 to true>>
+<<mindmaze_reset_hands>>
+<<jump MindMaze_Continue>>
+===
+
+title: MindMaze_4
+---
+<<mindmaze_roll_anim 4>>
+<<set_speakers "名妓, 比尔博, 赫尔墨斯, 伍尔夫, 宝钗, 柯湘">>
+// Episode 4: Courtesan, Bilbo, Hermes and others; always unlocked.
+Courtesan: Once Zhang Dai acquired the [i]Wooden Dragon, [/i]
+Courtesan: he gathered his Dingchou Poetry Society and 
+Courtesan: [i]诸公赐之名，并赋小言咏之。[/i]
+Courtesan: Master Zhang spared neither ink nor paper, 
+Courtesan: [i]记满座高朋之题咏，诸名盈帙；[/i]
+Courtesan: Nor did he spare a hundred taels in conveyance, that he might 
+Courtesan: [i]磨其尺木，勒铭曰：秋涛夏云。[/i]
+“Hermes”: That's Zhang Dai's [i]The Wooden Dragon[/i], by a survivor of the late Ming. 
+“Hermes”: We've read it before, when we were studying collecting and connoisseurship among Ming and Qing gentlemen.
+“I”: (read read read read.)
+"Bilbo": [b]My dear child[/b], why such a furrowed brow? 
+("Bilbo" rubs the crease between "I'"s eyebrows with his thumb)
+"Bilbo": A young lady with a frown like that? 
+"Bilbo": You'll have three little furrows there before you know it!
+"Bilbo": Why, people will think you're terribly stern before you've even said a word.
+"Bilbo": Has it been so long since you read classical Chinese that the words won't come to you?
+"Bilbo": Poor dear. You can't do as we thoughts do and [b]slip straight past the language to its meaning.[/b]
+"Bilbo": Well, Zhang Dai is telling us about a most peculiar piece of old wood.
+"Bilbo": It passed through the collection of an honoured servant of the early Ming, 
+"Bilbo": a fire, and the hands of antique dealers,
+"Bilbo": through the visits of noble families, inheritance within households, 
+"Bilbo": and even the upheaval of a change of dynasty.
+"Bilbo": It wasn't merely the timber itself that mattered. 
+"Bilbo": [b]There were the people through whose hands it travelled,[/b]
+"Bilbo": [b]their friendships, and the stories and marks of distinction that those friends knew how to recognise.[/b]
+"Bilbo": That's why someone thought it worth seventeen rhinoceros-horn cups in exchange, if you can imagine!
+"Bilbo": Rather like the [i]mithril coat [/i]I gave my nephew.
+"Bilbo": It carries something of our family's wealth and our adventures,
+"Bilbo": and hints at his uncle's—heh, that would be me—acquaintance with the royal house of the Dwarves.
+"Bilbo": Why, it might even call to mind the decline of Durin's line and the long quest to reclaim their kingdom.
+"Bilbo": But the thing must be worn, handled, and put to use—and, most importantly,
+"Bilbo": seen by a discerning friend or fellow traveller—before all those meanings can truly come into their own.
+"Bilbo": And when my old friend Thorin gave it to me,
+"Bilbo": he was not simply preserving his memory, or showing what he felt towards me.
+"Bilbo": He placed a wish for my safety, and the affection between us, into the gift itself.
+Baochai: And it is through all these passages from hand to hand that the piece of stubborn wood acquired its meaning.
+Baochai: Zhang Dai says his father once intended it for Prince Lu, 
+Baochai: but inadvertently wrote the forbidden words 'Wooden Dragon' and so lost the chance to present it.
+Baochai: That reminds me of the coffin my brother sent to the [i]Eastern Mansion[/i].
+Baochai: It had originally been meant for the late [i]Prince Yizhong[/i]. 
+Baochai: When it was not used, it found its way instead to Cousin Zhen.
+Baochai: One object was fit to be presented at court, yet could not fulfil that destiny.
+Baochai: [b]Once you begin to tell these histories, the objects almost seem able to speak for themselves.[/b]
+“Hermes”: Actually, connoisseurship is already an activity with rules, boundaries, and established procedures.
+“Hermes”: Especially at those [b]semi-public gatherings of refined company,[/b]
+“Hermes”: guests are admitted because their standing or their emotional ties have already been recognised.
+“Hermes”: So being invited is itself an enactment of the rules of the game.
+“Hermes”: [i]Connoisseurship[/i] isn't just standing there staring at something, you know.
+“Hermes”: [b]It's an embodied, sensory encounter with objects, inseparable from social practice.[/b]
+“Hermes”: An object almost seems to ask us to respond in a particular way.
+“Hermes”: A coffin holds the dead in a funeral
+“Hermes”: mithril is worn against the body
+“Hermes”: the Wooden Dragon is displayed and admired, 
+“Hermes”: while the [b][i]Gongchun Teapot[/i][/b] is used for tea or display in a scholar's study.
+“Hermes”: But none of those uses is neutral.
+“Hermes”: [b]The object implies which practices and users are considered appropriate within a given society.[/b]
+“Hermes”: It asks the person who takes it up to perform the role that society has already imagined for that user.
+Baochai: People lend objects the dignity of their station, and objects lend people a greater name. How many relations between people must grow out of that!
+“Hermes”: Exactly, Sister Bao!
+“Hermes”: You've just reminded me of Jonathan Hay's [i]Sensuous Surfaces:[/i]
+“Hermes”: [i]The Decorative Object in Early Modern China[/i].
+“Hermes”: Take the funeral at your Eastern Mansion.
+“Hermes”: In that setting the coffin already comes with something like a set of instructions:
+“Hermes”: to hold the body at the funeral, gather people from the deceased's social world, and make burial a socially recognised act.
+“Hermes”: [b]But I think the more important point is that the same object demands different things of different people.[/b]
+“Hermes”: Merchant relatives offers up a treasure to demonstrate its wealth and its former intimacy with the powerful.
+“Hermes”: Jia Zhen, at the Eastern Mansion, acquires the coffin and weeps, performing his grief for the dead.
+“Hermes”: And the servants? 
+“Hermes”: They hoist the coffin onto their shoulders and haul it where it has to go.
+“Hermes”: [b]The object's call, then, operates as a system in its own right.[/b]
+“Hermes”: Through objects, people are woven into the fabric of social relations.
+“Hermes”: Before a piece like Wood Like a Dragon, 
+“Hermes”: the host throws a banquet and plays the cultured scion of an illustrious line with far-flung connections.
+“Hermes”: The literati cite the classics, bestow names, compose verses,
+“Hermes”: playing the erudite, refined men of letters.
+Courtesan: If that is as far as your thoughts reach, 
+Courtesan: it only proves how [b]comfortably detached this little critique of yours is.[/b]
+Courtesan: And what of me?
+Courtesan: Invited to the table, I must sing well, speak wittily, 
+Courtesan: and know when to laugh, when to answer, and when to hold my tongue.
+Courtesan: My profession demands that I know how to judge the gentlemen's paintings, 
+Courtesan: scholars' calligraphy, desk curios, and essays...
+Courtesan: I have to comment gracefully, compose verses in reply, offer praises...
+Courtesan: and make every last one of them believe I am [b]his kindred spirit.[/b]
+Courtesan: [b]But while they are admiring those objects, someone is also admiring me as an object.[/b]
+Courtesan: I am like that lump of wood. And I am not. Not at all.
+Courtesan: The moment I cease to perform the part—
+Courtesan: no more singing, no more entertaining, no longer the charming woman, 
+Courtesan: that understanding companion in their eyes—
+Courtesan: where on earth am I left to stand?
+Courtesan: Lose one curio, and there is always the next.
+Courtesan: End one elegant gathering, and another takes its place.
+Courtesan: Weaving the same comfortable net to hold all of you just as neatly.
+Courtesan: But if I can no longer play my allotted role inside it, 
+Courtesan: [b]will that net still have a knot for me? [/b]
+Woolf: I can well imagine your gentlemen turning those antiques and treasures over in their palms.
+Woolf: The clay, the shape, the signature, the provenance of a purple clay teapot;
+Woolf: Then you, your accomplishments, your misery, your beauty, your lovers.
+Woolf: My dear, beyond all that, 
+Woolf: how are you any different from the refined gentlemen appraising you at that very table?
+Woolf: [b]Same person, just a different sex.[/b]
+Woolf: Yet the treatment each of you receives is worlds apart.
+Courtesan: There are [b]other differences[/b].
+Courtesan: Different origins, different access to education,
+Courtesan: different knowledge we were ever to acquire along the way.
+Courtesan: Yet there we sit at the same table, 
+Courtesan: judging the same objects， appraising the same trinket to trade in cultural capital，
+Courtesan: though we reached it by different roads.
+Courtesan: Truly!
+Courtesan: [b][i]Gongchun Teapot[/i], hear I question you![/b]
+Courtesan: How much of your renown comes from the labour of the hands that made you,
+Courtesan: [b]from generations of experience and oral knowledge passed among those whose room to live was so painfully narrow?[/b]
+Courtesan: [b]And how much from the gentlemen who later gave name you, invent you, inscribe you, verify you, and vouch for you[/b]
+Courtesan: from Tang Bohu's schoolmates, to Yixing's modern notables, to the master artisans of New China,
+Courtesan: generation after generation!?
+([u]Ke Xiang[/u] lowers her eyes to the Courtesan. 
+When has she come to stand behind the Courtesan?
+[u]Ke's[/u] arms hanging quietly at her sides.)
+Courtesan: Even if you are genuine... So what!
+Courtesan: By what right does a vessel shaped by an artisan endure at least as legend for hundreds of years,
+Courtesan: while an evening of my labour, into which I poured my youth, my skill, and my whole heart,
+Courtesan: [b]perishes with the banquet and leaves behind nothing but a few stray lines jotted down by my nameless hands?[/b]
+Courtesan: A scholar hands me lyrics that fit neither melody nor rhyme.
+Courtesan: I sing them to the tune, labouring over the words, correcting the cadence and finding the proper rhymes.
+Courtesan: And afterwards the songs enter his collected verses, without so much as my name.
+Courtesan: Gongchun! How I envy you!
+(She springs to her feet.)
+Courtesan: [b]Even at times when[i]wine-red stains my crimson skirt[/i], I grieve that my gifts have gone unrecognised![/b]
+([u]Baochai[/u] walks over to the Courtesan, slowly, tentatively resting a hand on her shoulder.
+[u]Ke Xiang[/u] looks deeply at the Courtesan. 
+Her parted lips trembling ever so slightly, her large eyes filled with emotions so complex.
+[u]Lv Meng[/u] takes two steps toward the Courtesan, hesitates, then gently nudges "Hermes" forward. 
+The [u]Courtesan[/u] gradually composes herself. 
+[u]She[/u] gives Baochai's hand a gentle pat, then turns to look Ke Xiang straight in the eyes.
+The [u]Courtesan[/u]'s fingers brush over the thick patch of matching fabric sewn onto the shoulder of Ke Xiang's jacket.
+It is a little trick Ke Xiang devised to keep the carrying pole from digging into her bones.
+The three settle into their seats. [u]"Hermes"[/u] tugs Lv Meng down into a seat beside her.)
+"Bilbo": But... my dear child, 
+"Bilbo": without those gentry and literati, purple clay teapot culture—
+"Bilbo": and, well, that sort of culture—
+"Bilbo": [n]wouldn't it have lost its most important patrons?[/n]
+"Bilbo": You know, with cultural things like these, their worth is rarely just the clay and the wages.
+"Bilbo": They rely on people appreciating them, buying them, 
+"Bilbo": and passing them back and forth in fellowship to gather all that extra meaning.
+"Bilbo": One buys a teapot for a friend, or leaves it to one's children and grandchildren.
+"Bilbo": Think of all the affection, all the stories that travel down the generations with it.
+"Bilbo": [b]Those bonds of affection, the good customs of villages, those webs of human warmth...[/b] 
+"Bilbo": [b]that have grown up around them,[/b]
+"Bilbo": [b]and how everyone in that network pictures one another and themselves...[/b]
+"Bilbo": Those bonds and the cultural meaning behind a gift were always meant to nourish each other, weren't they?
+"Bilbo": Like the mithril coat Thorin gave me. Without him, how should it ever have become so precious to me?
+"Bilbo": Though as for... the kind of "culture" you spoke of...
+([u]“Bilbo”[/u] cannot bring himself to look at the Courtesan. 
+He glances at "I", then jerks his gaze away as though he'd been given an electric shock.)
+"Bilbo": I have never, er, been a patron of it myself... 
+"Bilbo": For Ilúvatar's sake! There are children present! Good gracious me! 
+"Bilbo": What I mean is, I'd like to believe that among those people, 
+"Bilbo": there must have been some who were genuinely gentle and kind, who knew how to cherish others...
+(Bilbo stops.)
+(Baochai and Lv Meng look at the Courtesan without speaking.)
+Ke Xiang: Blood and kinship, neighbours and friends
+Ke Xiang: these bonds need not be lies.
+Ke Xiang: [b]To observe and criticise is not to bury every human kindness before our eyes.[/b]
+“Hermes”: But that's a form of structural oppression,
+“Hermes”: not caused by one or two wicked squires, 
+“Hermes”: and not undone by a handful of kindhearted nice guys either.
+“Hermes”: Inside a structure like that, even the oppressed can turn around and wound someone else.
+“Hermes”: What calls for reflection is the structure of social relations,
+“Hermes”: [b]and the ways objects, through the roles, practices, and norms they imply, 
+“Hermes”: help those relations unfold and reproduce themselves.[/b]
+“I”: ("I" give Hermes a nudge.) You're stealing somebody else's lines, aren't you? (Wink at Kexiang, can't hold back smiles)
+Ke Xiang: (A calm, steady gaze) Some well-worn lessons you've heard so often. 
+Ke Xiang: That your ears have grown calluses not to be soften. 
+Ke Xiang: Without fresh observations, what new understanding can you gain?
+Ke Xiang: [b]If life has taught you nothing new, why make me lecture you from scratch again?[/b]
+（“I” don't feel like smiling this time.）
+<<set $MindDone4 to true>>
+<<mindmaze_reset_hands>>
+<<jump MindMaze_Continue>>
+===
+
+
+title: MindMaze_5
+---
+<<mindmaze_roll_anim 5>>
+<<set_speakers "all">>
+“I”: [b]AAAAAAAH![/b]
+“Hermes”: [i]AAAAAAAHHHHHHHHH![/i]
+“I”: [b]AAAAAA[/b]AAAAAAA[i]AAAAAAAHHH[/i]!
+“Hermes”: [i]AAAA[b]AAAAAAAA[/b]AAAAHHH![/i]
+(Baochai seems rather amused by me.)
+Chinese Zodiac: AAAAAAA[b]WILL YOU PLEASE CALM DOWN![/b]
+MBTI: [b]Babe, we're literally part of the same person. [/b]
+MBTI: [b]When you're upset, I feel it too![/b]
+Zodiac Signs: Oh, for God's sake! Who doesn't?
+“I”, “Hermes”, Zodiac Signs, MBTI, Chinese Zodiac: [b]AAAA[/b]AAAA[b]AAAA[i]AAAAAAAH[/i]AAAA![/b]
+([u]Baochai[/u] frowns and covers her ears.)
+“I”: S!O!S!
+([u]Baochai[/u] glances at the others
+[u]Bilbo[/u] is frowning, painfully worried too;
+[u]Ke Xiang[/u] watches our screaming steadily, pressing her lips together and shaking her head;
+[u]Woolf, the Courtesan, and Mirror Self[/u] are utterly still and silent;
+[u]Lv Meng[/u] nods to Baochai, and the two come forward.)
+"Bilbo": What a bloodily abominable job! 
+"Bilbo": That's quite enough of it. Call in sick tomorrow!
+"Bilbo": Crying your eyes out over a few measly bucks! Oh, my poor child!
+“I”: Help!
+(I seize Sister Bao by the arm.)
+“Hermes”: How can you put it in such appallingly vulgar terms? 
+“I”: QAQ
+“Hermes”: Total disaster!
+“I”: I'm not the sort of philistine who measures everything by [b]exchange value![/b]
+“Hermes”: 「(QAQ)「
+“I”: How could I have said such crass things—[b]in front of her![/b]
+Mirror Self: Stop.
+“Hermes”: [i]Aaaah—ooooh![/i]
+Mirror Self: Shut up. You're noisy.
+“I” & “Hermes”: [b](Sniffles...)[/b]
+Mirror Self: Do you even know what you're upset about?
+“I”: [i]Because I ruined everything...[/i]
+Mirror Self: Hold it. (She gestures.) Rewind.
+“Hermes”: [i]...everything ruined I because[/i]. [b])...selffinS([/b] [i]!hoooo-haaaA[/i] [b]HER—OF—FRONT—IN![/b]
+Mirror Self: There. Right there. Look at that.
+Mirror Self: If it hadn't happened right in front of her, you wouldn't be half this devastated. Tell me,[b]who is she?[/b]
+“I”: A customer.
+Mirror Self: Suppose she were just an ordinary customer, someone you'd never met and would never see again.
+Mirror Self: Would you still be crying like this?
+Lv Meng: Surely you can be honest with us, can't you?
+“I”: The master's friend... (sob...) she seems like somebody terribly important...
+“I”: Like she's related to someone, who knows someone, who knows someone else...
+“Hermes”: And her son goes to Columbia University!(「(QAQ)「)
+Baochai: I suspect it goes deeper than that.
+<<pause_dialogue>>
+“I”: [b]Aaaah—aaaah—AAAH![/b]
+“I”: She's about my mother's age. My professors' age, too.
+“I”: And she somehow seems connected to my future...
+Mirror Self: [b]Connected, how?[/b]
+“I”: ...I don't know.
+Mirror Self: Has she offered to write you a recommendation letter?
+“I”: No. I'm already working back home. What good would a recommendation letter do me?
+Mirror Self: Did she offer to refer you for a job?
+“I”: No.
+Mirror Self: Does she even know what you once wanted to do, or what you might want to do next?
+“Hermes”: ...We never told her.
+Mirror Self: Then precisely what part of your future is she supposedly holding in her hands?
+“I”: But she knows so many people...
+Mirror Self: Hah. [b]A double failure.[/b]
+Mirror Self: First, in front of a middle-aged woman who seems plugged into the local web of favors and moral authority,
+Mirror Self: you failed to perform the dutiful young junior she might have expected.
+Mirror Self: Second, before a mature woman who appeared to possess some learning,
+Mirror Self: you failed to prove that you were her equal in intellectual conversation.
+Mirror Self: You wanted to be recognised as a promising child with a future, while being respected as a thinking adult.
+Mirror Self: You rattled on and on in front of her as if
+Mirror Self: as if you were waiting for her to [b]grade you, to pass judgment on you.[/b]
+“I”: ...
+Mirror Self: And who, I wonder, appointed her examiner?
+Mirror Self: You don't even know whether she was examining you at all.
+Mirror Self: [b]You're the one who stacked your mother, your professors, your boss,[/b]
+Mirror Self: [b]and every important person you've ever imagined right behind her shoulders.[/b]
+Mirror Self: As if answering her questions would unlock the next achievement in your life... (She is interrupted.)
+“Hermes”: But... the way she speaks, her background, her connections, that whole framework of thought...
+Mirror Self: (Not stopping for a second.) Never realizing— 
+(She stares down "Hermes" until she shrinks back into silence.)
+Mirror Self: (In her normal voice.) You assigned all that value to her yourself.
+Mirror Self: [b]Your own projection onto her[/b]
+“Hermes”: ...
+Mirror Self: (She points at "Hermes".) All those books, and you learned nothing. 
+Mirror Self: And you never stop showing them off.
+“Hermes”: Meep.
+“I”: But I still feel awful...
+Mirror Self: [b]I only asked you to see whose imagined approval you've been wagging your tail for.[/b]
+Woolf: You know, you still have every right to hurt.
+Woolf: Even after seeing all of this quite clearly.
+Woolf: We take seriously the injury a poem written half a century ago may do to a person's sense of self;
+Woolf: [b]how much more so the unspoken judgment of a living, breathing "little other" standing right before you.[/b]
+“I”: Meep.
+Baochai: (Holding a small bowl in one hand, patting your puffed-up cheek with the other.) Open your mouth. Open wide~
+“I”: Aah—huh?
+Baochai: I should like to see you carry on in this feverish way after you've taken one of my pills.
+Lv Meng: Now, now. Don't herbal medicines without doctor's presciption.
+Baochai: Oh, yes. Of course. 
+Baochai: (To Lv Meng) And you never take medicine without good reason.
+Baochai: Perhaps tomorrow I shall ask everyone in the [u]Hall of Martial Worthies[/u]
+Baochai: see if you, of all its worthies, 
+Baochai: have needed the least medical attention, the least trouble to the sickbed.
+Baochai: Salute, my grand champion of science and the picture of perfect health!
+"Bilbo": [b]Good gracious! Don't joke lightly about things like that.[/b]
+([u]Lv Meng[/u] waves his hands to show he takes no offence. 
+[u]Baochai[/u] smiles and nods to both of them.)
+“I”: ...So what exactly is the [i]Cold-Fragrance Pill[/i] that you take?
+Baochai: Did you truly think there's a magic pill that cures every ill and wipes every worry clean?
+Baochai: It may do you no good at all. [b]For you, let it stand for a little quiet, and a little letting go.[/b]
+“I”: Let go of what?
+Baochai: [b]TThis endless courtroom trial you've been running all night.[/b]
+Baochai: The Lay Buddhist has long since gone home, and here,
+Baochai: You still are, summoning witnesses on her behalf, banging the magistrate's block, and ordering punishments.
+Baochai: Why, you've even reduced the whole jury to a heap.
+“Hermes”: [b][i](「(OVO)「)We were NOT sobbing in a heap! [/i][/b] (Flails both hands in the air.)
+Lv Meng: (He nudges "Hermes" and laughs.) I could hear coroner's still yelling "Order in the court!"
+“I”: But I still feel stupid.
+Baochai: Then you were foolish this once. Tomorrow, if you recall a line that fell flat, simply keep it in mind for next time.
+Baochai: Tonight you can neither explain yourself to her nor pluck spoken words back out of thin air.
+Baochai: Must you insist on making a thing that's over keep you company through the entire night?
+“I”: ...Then what am I supposed to do?
+Baochai: Even without a Cold-Fragrance Pill, quiet yourself down, bit by bit.
+Baochai: Set an alarm for tomorrow morning. 
+Baochai: Rise fifteen minutes early, and spend five minutes in the sun.
+Baochai: On your way to work, count the new flowers by the waterside.
+Baochai: When you reach the shop, do what the day asks of you.
+Baochai: Remember what you said poorly, if you must. 
+Baochai: Only don't turn it into a whip to beat yourself with every day.
+([u]Lv Meng[/u] giggles and makes a playful whipping gesture at "Hermes". 
+[u]"Hermes"[/u] goes Bleh-bleh-bleh and roled her eyes
+Tsk! [u]"Bilbo"[/u] gives her a light rap on the head)
+“I”: ...And if I still remember it?
+Baochai: Then let it come to mind, dear.
+Lv Meng: Chances are she's already forgotten all about it.
+Lv Meng: [b]or she's lying awake remembering some clumsy thing she said to you that you've long since forgotten.[/b]
+([u]"Bilbo"[/u] draws me close.)
+"Bilbo": Off to sleep now, dear.
+<<pause_dialogue>>
+(It is not yet time to wake,
+but even at seven the sky is dim, and no sunlight comes through the window.
+It is [b]pouring rain.[/b])
+“I”: ...
+Zodiac Signs: No sun.
+“I”: ...
+Golden Monkey: The flowers may have been battered down too.
+“I”: Have either of you got network to heaven who can make the weather clear up?
+“Hermes”: [b][i]Let me go on through rain and wind with a straw cape about my shoulders![/i][/b]
+<<set $MindDone5 to true>>
+<<mindmaze_reset_hands>>
+<<jump MindMaze_End>>
+===
+
+title: MindMaze_End
+---
+<<mindmaze_reset_hands>>
+<<mindmaze_close_scene>>
+<<if $MindDone5>>
+    <<load_scene "StudioDesk" "回到前一天" 1>>
+<<else>>
+    <<load_scene "chooseToolBasedOnCut" "Day 2" 2>>
+<<endif>>
+<<stop>>
+===

@@ -161,20 +161,25 @@ Jushi: Strictly speaking, punishment is not what the Buddha taught.
 Jushi: Only reaping what one sows belongs to the Buddha's teaching.
 Jushi: [i]“Even after hundreds and thousands of kalpas, the karma we have made does not perish;[/i]
 Jushi: [i]when causes and conditions come together, we ourselves receive its fruit.”[/i]
-Jushi: When we look at so many events in society today, it is natural to think them deeply unfair.
-Jushi: But when you consider the continuity of causes, conditions, and results, things are simply as they are.
-Jushi: There is no unfairness. Only the unbroken flow of karmic fruition.
-Jushi: People talk about cause and effect, but it is actually cause, condition, and effect. 
-Jushi: The conditions in between are indispensable.
-Jushi: We tend to look at things from only one side. 
-Jushi: If we could approach them by the Middle Way,
-Jushi: everything is simply the unfolding of causes, conditions, and fruits.
-Jushi: Nothing is inherently good or bad. 
-Jushi: Good and bad are judgments we impose on conditions.
-Jushi: From the standpoint of dependent origination, things have no fixed qualities of their own.
-Jushi: We call what pleases us good and what displeases us bad.
-Jushi: Whether people, events, or objects, each is simply a phenomenon arising through dependent origination.
-I: That is rather profound...
+Jushi: You see, when we look at the things happening in society today, we naturally feel that so much of it is terribly unfair.
+Jushi: But if you consider the continuity of [i]causes, conditions, and results[/i], 
+Jushi: everything is simply as it is.
+Jushi: From that perspective, there is no unfairness. 
+Jushi: There is only the continuous unfolding of [i]karmic consequences[/i].
+Jushi: People are always speaking of cause and effect. 
+Jushi: But it is not merely cause and effect, you see. 
+Jushi: It is [i]cause, condition, and result[/i].
+Jushi: The [i]conditions[/i] in between are indispensable.
+Jushi: Most of the time, we see things from only one side.
+Jushi: If we could look at them through the [i]Middle Way[/i], 
+Jushi: we would see that everything arises through the coming together of causes and conditions.
+Jushi: There is nothing inherently good, nor inherently bad. 
+Jushi: These are all [i]conditions[/i]. Good and bad are judgments we ourselves impose.
+Jushi: From the perspective of [i]dependent origination[/i], things possess no fixed nature of their own.
+Jushi: What pleases us, we call good. What displeases us, we call bad.
+Jushi: Favorable circumstances, unfavorable circumstances—these are distinctions we ourselves attach to things.
+Jushi: Whether we speak of people, events, or objects, each is simply a phenomenon arising through [i]dependent origination[/i].
+I: That's rather profound...
 Jushi: You are a thoughtful young woman. (She presses her lips together.)
 <<set $DeepTalk to true>>
 <<set $LikeU to true>>
@@ -411,17 +416,18 @@ Jushi: Decadent, really.
 title: Dengji
 ---
 <<set $AskedDengji to true>>
-Jushi: Institutional religion is not the same thing as the Dharma taught by the Buddha. 
-Jushi: True Dharma is truth itself, and it can be verified for oneself.
+Jushi: Institutional religion is not the same thing as the [i]Dharma[/i]  taught by the Buddha. 
+Jushi: True [i]Dharma[/i]  is truth itself, and it can be verified for oneself.
 Jushi: It is not blind devotional worship, nor is it begging for blessings.
-Jushi: What matters is cultivating the mind. 
-Jushi: Using everyday events to refine it, turning inward to examine yourself whenever life tests you.
+Jushi: What matters is [i]cultivating the mind. [/i]
+Jushi: We speak of [i]refining the mind through everyday encounters[/i].
+Jushi: Do turn inward to examine yourself whenever life tests you.
 Jushi: Only your own effort can bring a wish to fruition. 
 Jushi: Put your faith in outside forces and you become easy to deceive.
 Jushi: Many religious organizations today use their position to swindle people out of money.
 Jushi: I've changed course now.
 Jushi: Stay too long inside institutional religion, and it dulls one's clarity.
-Jushi: That kind of faith is really blind credulity, not genuine right faith.
+Jushi: That is what I would call [i]blind faith[/i], not [i]right faith[/i].
 Jushi: I have come to understand that the true Dharma can be tested. 
 Jushi: It is universal truth, valid in any era and any place.
 Jushi: If you ask me to judge institutional religion today, I would call it a tool of rulers.
@@ -430,7 +436,8 @@ Jushi: Buddhism did not spring from nowhere, nor did it take its present shape o
 Jushi: There were the [i]śramaṇa movements[/i], exchanges and disputes with [i]Brahmanical traditions[/i], 
 Jushi: One must learn to distinguish the Dharma itself from what other religions and the history of transmission have added to it.
 Jushi: Of course, religion can offer temporary comfort to people in great pain.
-Jushi: An anesthetic, perhaps. But it cannot in itself uproot suffering or carry one beyond birth and death.
+Jushi: An anesthetic, perhaps. But comfort alone cannot [i]uproot afflictions[/i],
+Jushi: much less [i]transcend the cycle of birth and death[/i].
 I: And how is your own practice coming along?
 Jushi: That is hardly something one can measure. But I am still working at it.
 <<jump FinalConve>>
