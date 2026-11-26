@@ -174,10 +174,9 @@ public class YarnLanguageBridge : MonoBehaviour
 
     private static bool ProjectContainsNode(YarnProject project, string nodeName)
     {
-        return project != null &&
-               project.Program != null &&
-               project.Program.Nodes != null &&
-               project.Program.Nodes.ContainsKey(nodeName);
+        if (project == null || string.IsNullOrEmpty(nodeName)) return false;
+        string[] names = project.NodeNames;
+        return names != null && Array.IndexOf(names, nodeName) >= 0;
     }
 
     private YarnProject ResolveChineseProject(YarnProject fallback)
