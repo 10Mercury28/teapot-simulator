@@ -351,7 +351,7 @@ I: I would rather think you are speaking with the people who once used these obj
 <<set $GongMeaningKnown to true>>
 Jushi: (She presses her lips together.)
 <<if not $LikeStory>>
-    Jushi: [i]"Not grasping at outward appearances."[/i] Then what do you make of the Gongchun story?
+    Jushi: [i]“Not grasping at outward appearances.”[/i] Then what do you make of the Gongchun story?
     <<detour LikeStory>>
 <<endif>>
 <<if $LikeU>>
@@ -368,7 +368,7 @@ Jushi: My father did collect one years ago, though I couldn't say where it is no
 I: You strike me as someone who believes things should be put to use. 
 I: A piece collected only for display may not appeal to you.
 (Hou smiles gently.)
-Jushi: It isn't merely a matter of [i]"few desires and contentment"[/i]. 
+Jushi: It isn't merely a matter of [i]“few desires and contentment”[/i]. 
 Jushi: Look at this lid. What does it remind you of?
 I: It looks like... Please forgive my ignorance, but it reminds me of the hat worn by the monk Tang Sanzang in the television series [i]Journey to the West[/i].
 Jushi: Ignorance? You observed very well. That shape, 

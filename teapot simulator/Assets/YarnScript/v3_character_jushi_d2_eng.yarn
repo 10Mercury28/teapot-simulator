@@ -80,7 +80,7 @@ She literally snatches it with one hand.)
 I: I'll get the box and gift bag ready. 
 I: Please tell me what you're looking for in the meantime.
 I: Then we can choose a pot together. 
-Jushi: Ugh, what is there to "look for"? (She clicks her tongue.)
+Jushi: Ugh, what is there to “look for”? (She clicks her tongue.)
 Jushi: That chick is from Chongqing. 
 Jushi: Did her undergrad in electrical engineering here in China, about to go abroad for grad school.
 Jushi: She'll be in the same cohort as my son.
@@ -216,7 +216,7 @@ Jushi: Even if he stays in America and never comes back,
 Jushi: Even if he goes to Beijing, Shanghai, Guangzhou, or Chongqing, 
 Jushi: [b]Even if he lives with his wife's family, [/b]
 Jushi: [b]He is still my child! [/b]
-Jushi: "Into whose family"...(Hou clicks her tongue sharply.)
+Jushi: “Into whose family”...(Hou clicks her tongue sharply.)
 [b]【I hear the call of [u]Woolf[/u]】[/b]
 <<jump JushiD2_Awkward>>
 ===
@@ -241,13 +241,13 @@ position: 2760,687
 Jushi: Oh?
 -> For example, this [b][i]Palace Lantern Teapot[/i][/b] with a clay-painted pair of lovebirds. <<if not $D2TriedBird>>
     <<set $D2TriedBird to true>>
-    Jushi: Oh, "lovebirds flying wing to wing"?
+    Jushi: Oh, “lovebirds flying wing to wing”?
     (Hou clicks her tongue.)
     <<jump JushiD2_VirtueReturn>>
 -> For example, this [b][i]Longevity Peach Teapot[/i][/b].<<if not $D2TriedPeach>>
     <<set $D2TriedPeach to true>>
     I: This one has peaches at four stages of growth, representing four generations under one roof...
-    Jushi: Oh my, "blessing home and hearth"!
+    Jushi: Oh my, “blessing home and hearth”!
     Jushi: How very domestic! A perfect little wife and home!
      (The Lay Buddhist bites at the peeling skin on her lip.)
     <<jump JushiD2_VirtueReturn>>
@@ -568,7 +568,7 @@ I turn toward the display cabinet, scanning the shelves for the actual teapots.)
 (Found them at last! I place them before Hou.)
 I: I don't think young women necessarily want blessings about making a good home anymore,
 I: especially if she's eager to go out and make her own way.
-I: [i]"Plum blossoms grow fragrant through bitter cold."[/i] Who wouldn't appreciate that? 
+I: [i]“Plum blossoms grow fragrant through bitter cold.”[/i] Who wouldn't appreciate that? 
 (Hou studies the teapot without answering. She runs her fingers across the sculpted clay.)
 Jushi: This stump has real strength to it.
 Jushi: It's already been cut down, yet it still has the strength to stand against the wind.
@@ -593,7 +593,7 @@ position: 1536,687
 Jushi: Oh, you even have a Buddha's Hand. That little lid knob is oddly cute.
 (Hou presses her lips together.)
 I: Buddha's hand is a kind of citrus fruit, shaped like outstretched fingers.
-I: Traditionally it's auspicious because "Buddha" and "good fortune" sound alike in Chinese.
+I: Traditionally it's auspicious because “Buddha” and “good fortune” sound alike in Chinese.
 I: It's made from the same clay as the [b][i]Longevity Peach Teapot[/i][/b]. Both add decorations to an established teapot form.
 (As I speak, I take out two lenticular cards and hand them to Hou.
 While she compares and handles them, 
@@ -689,7 +689,7 @@ I: and Mansheng held a banquet for his friends to celebrate.
 
 I: Drums thundered, gongs rang, and firecrackers went off.
 I: Delighted, he jumped right in, grabbed two big cymbals, and clashed them open and shut.
-I: As the story puts it: "Amid banquet music, he himself took up the great cymbals."
+I: As the story puts it: “Amid banquet music, he himself took up the great cymbals.”
 I: That's what inspired him to design the [b][i]Mansheng Sharing-Joy Teapot[/i][/b].
 Jushi: (She laughs) A full county magistrate hopping down to clash cymbals himself?
 Jushi: Now that's genuine spirit, not bound up by formality.
