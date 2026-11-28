@@ -595,15 +595,15 @@ public class MindMazeAnimationController : MonoBehaviour
     {
         ("BC", "BC,宝钗,薛宝钗,BaoChai,Baochai,Xue Baochai", "BC", "BC_idle", "BC_talk"),
         ("VW", "VW,伍尔夫,弗吉尼亚,Virginia,Virginia Woolf,Woolf", "VW", "VW_idle", "VW_talk"),
-        ("courtesan", "courtesan,名妓,C,Courtesan,Oiran", "courtesan", "C_idle", "C_talk"),
+        ("courtesan", "courtesan,名妓,C,Courtesan,Late Ming Courtesan,Oiran", "courtesan", "C_idle", "C_talk"),
         ("MBTI", "MBTI,mbti,enfp,ENFP", "MBTIPanel", "enfp_idle", "enfp_talk"),
         ("kong", "kong,孔子,金猴,Confucius,Golden Monkey,Monkey", "kong", "kong idle", "kong idle"),
-        ("LM", "LM,吕蒙,Lu Meng,Lü Meng,Lumeng", "LM", "LM_idle", "LM_talk"),
+        ("LM", "LM,吕蒙,Lu Meng,Lü Meng,Lv Meng,Lumeng", "LM", "LM_idle", "LM_talk"),
         ("Mercury", "Mercury,MercuryPanel,水星,赫尔墨斯,“赫尔墨斯”,Hermes", "MercuryPanel", "Mercury_Idle", "Mercury_Talk"),
         ("KX", "KX,柯湘,康熙,Ke Xiang,Kangxi,Kexiang", "KX", "KX_idle", "KX_talk"),
         ("zodiac", "zodiac,生肖,Zodiac,Chinese Zodiac", "zodiac", "zodiac_idle", "zodiac_talk"),
         ("XZ", "XZ,星座,Constellation,Horoscope,Star Sign,Astrology", "星座", "XZ_idle", "XZ_talk"),
-        ("mirror", "mirror,镜中人,“镜中人”,镜子,奥斯卡,镜子中的“奥斯卡”,Person in the Mirror,The Person in the Mirror,Mirror Person,Man in the Mirror,Woman in the Mirror,Oscar,Oscar in the Mirror", "mirror", "Mirror_Idle", "Mirror_Talk"),
+        ("mirror", "mirror,镜中人,“镜中人”,镜子,奥斯卡,镜子中的“奥斯卡”,The Mirror,Person in the Mirror,The Person in the Mirror,Mirror Person,Man in the Mirror,Woman in the Mirror,Oscar,Oscar in the Mirror", "mirror", "Mirror_Idle", "Mirror_Talk"),
         ("bilbo", "bilbo,比尔博,“比尔博”,Bilbo,Bilbo Baggins", "bilbo", "Bilbo_idle", "Bilbo_talk")
     };
 

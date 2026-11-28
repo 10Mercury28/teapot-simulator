@@ -1,9 +1,9 @@
 {
   "projectFileVersion": 4,
   "sourceFiles": [
-    "Mind_Maze_D1_Eng.yarn",
-    "character_jushi_d2_Eng.yarn",
-    "Character_Jushi_revised_Eng.yarn"
+    "v3_character_jushi_d1_eng.yarn",
+    "v3_character_jushi_d2_eng.yarn",
+    "v3_Mind_Maze_D1_EN.yarn"
   ],
   "excludeFiles": [
     "**/*~/*",
